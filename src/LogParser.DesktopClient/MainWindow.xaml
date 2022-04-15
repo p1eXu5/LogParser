@@ -1,0 +1,59 @@
+﻿<Window x:Class="LogParser.DesktopClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:shared="clr-namespace:LogParser.DesktopClient.Shared"
+        xmlns:res="clr-namespace:LogParser.DesktopClient.Resources"
+        mc:Ignorable="d"
+        Title="{Binding DocumentName}" Height="1000" Width="1800"
+        WindowStartupLocation="CenterScreen"
+        Background="#333333"
+        Icon=".\Resources\gnomelogs_103380.ico"
+        >
+    <Window.Resources>
+        <res:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+        <shared:MainMenu DockPanel.Dock="Top" DataContext="{Binding}" Height="35" />
+        <shared:ToolBar DockPanel.Dock="Top" DataContext="{Binding}" />
+        <Border DockPanel.Dock="Top" BorderBrush="#191919" BorderThickness="1"></Border>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition MinWidth="500" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- Input -->
+            <TextBox 
+                TextWrapping="Wrap"
+                VerticalAlignment="Stretch"
+                MinWidth="280"
+                AcceptsReturn="True"
+                VerticalScrollBarVisibility="Auto"
+                materialDesign:HintAssist.Hint="Log text"
+                TextAlignment="Left"
+                Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="#E6E6E6" />
+            
+            <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+            
+            <!-- Logs -->
+            <ListBox x:Name="m_LogList"
+                     Grid.Column="2" 
+                     ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}" 
+                     ItemsSource="{Binding Logs}" 
+                     Background="#1E1E1E"
+                     ScrollViewer.CanContentScroll="False"
+                     >
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </Grid>
+    </DockPanel>
+</Window>

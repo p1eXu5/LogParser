@@ -1,0 +1,114 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:res="clr-namespace:LogParser.DesktopClient.Resources"
+                    xmlns:local="clr-namespace:LogParser.DesktopClient"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+                    >
+    
+    <res:LogFieldDataTemplateSelector x:Key="ts_FieldTemplateSelector" />
+    
+    <DataTemplate x:Key="dt_TextLog">
+        <Border>
+            <TextBlock Text="{Binding Log}" />
+        </Border>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="dt_TechnoLog">
+        <Border HorizontalAlignment="Stretch" 
+                Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}"
+                >
+            <Behaviors:Interaction.Behaviors>
+                <local:IgnoreMouseWheelBehavior/>
+            </Behaviors:Interaction.Behaviors>
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="16"/>
+                </Expander.Header>
+                <ListBox ItemsSource="{Binding Fields}" Grid.IsSharedSizeScope="True" Margin="20, 10" >
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Stretch" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition MinWidth="100" SharedSizeGroup="A"/>
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border Margin="0,0,20,0">
+                                    <TextBlock VerticalAlignment="Top" Margin="0,8,0,0"><Run Foreground="#92CAF4" Text="{Binding Key, Mode=OneWay}"/>:</TextBlock>
+                                </Border>
+                                <ContentControl Grid.Column="1" ContentTemplateSelector="{StaticResource ts_FieldTemplateSelector}" Content="{Binding}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Expander> 
+        </Border>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="dt_SimpleField">
+        <Grid HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0">
+                <TextBlock Text="{Binding Text}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </Border>
+            <Button  Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0">
+                <materialDesign:PackIcon Kind="ContentCopy" />
+            </Button>
+        </Grid>
+    </DataTemplate>
+    
+    
+    
+    <DataTemplate x:Key="dt_Json">
+        <Border Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
+            <Expander HorizontalAlignment="Stretch" IsExpanded="False">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal" >
+                        <Border>
+                            <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="14" VerticalAlignment="Center"/>
+                        </Border>
+                        <Button Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0" IsHitTestVisible="True">
+                            <materialDesign:PackIcon Kind="ContentCopy" />
+                        </Button>
+                    </StackPanel>
+                </Expander.Header>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding Json}" Margin="22,10" />
+                </ScrollViewer>
+            </Expander> 
+        </Border>
+    </DataTemplate>
+
+    
+    <DataTemplate x:Key="dt_AnnotatedJson">
+        <StackPanel Orientation="Vertical" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
+            <TextBlock Text="{Binding Text}"/>
+            <Expander HorizontalAlignment="Stretch" Margin="0,10" IsExpanded="False" >
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal" >
+                        <Border>
+                            <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="14" VerticalAlignment="Center"/>
+                        </Border>
+                        <Button Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0">
+                            <materialDesign:PackIcon Kind="ContentCopy" />
+                        </Button>
+                    </StackPanel>
+                </Expander.Header>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding Json}" Margin="22,10" />
+                </ScrollViewer>
+            </Expander> 
+        </StackPanel>
+    </DataTemplate>
+    
+    
+</ResourceDictionary>

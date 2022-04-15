@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="LogParser.DesktopClient.Shared.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:LogParser.DesktopClient.Shared"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="500">
+    <Grid Background="{StaticResource MaterialDesignDarkBackground}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Menu IsMainMenu="True" VerticalAlignment="Center">
+            <MenuItem Header="_File" >
+                <MenuItem Header="New"
+                          Icon="{materialDesign:PackIcon Kind=OpenInApp}"
+                          Command="{Binding NewFileCommand}"
+                          InputGestureText="Ctrl+O"
+                          >
+                </MenuItem>
+                
+                <MenuItem Header="Open..."
+                          Icon="{materialDesign:PackIcon Kind=OpenInApp}"
+                          Command="{Binding OpenLogsFileCommand}"
+                          InputGestureText="Ctrl+O"
+                          >
+                </MenuItem>
+            
+                <MenuItem Header="Save"
+                          Icon="{materialDesign:PackIcon Kind=ContentSave}"
+                          Command="{Binding SaveLogsFileCommand}"
+                           InputGestureText="Ctrl+S"
+                          >
+                </MenuItem>
+
+                <MenuItem Header="Save As.."
+                          Icon="{materialDesign:PackIcon Kind=ContentSave}"
+                          Command="{Binding SaveLogsFileAsCommand}"
+                          />
+            </MenuItem>
+        </Menu>
+    </Grid>
+</UserControl>
