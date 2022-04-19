@@ -41,6 +41,7 @@ type Msg =
     | LogParsingRequested of Operation<unit, unit>
     | TechnoFieldMsg of key: string * TechnoField.Msg
     | TechnoLogMsg of logKey: Guid * Msg
+    | CopyLogCommand
     | OpenFile
     | SaveFileAs
     | SaveFile
@@ -152,6 +153,15 @@ module internal Program =
             let newField = TechnoField.Program.update msg field // TODO: update list when field changing
             model, Cmd.none
 
+        | TechnoLogMsg (id, Msg.CopyLogCommand) ->
+            let log =
+                model.Logs
+                |> List.choose (function LogModel.TechnoLog tl -> tl |> Some | _ -> None)
+                |> List.find (fun l -> l.Id = id)
+
+            Clipboard.SetText(log.Log.Fields |> TechnoField.toString)
+            model, Cmd.none
+
         | _ -> model, Cmd.none
 
 
@@ -213,6 +223,8 @@ module internal Program =
                         | LogModel.TechnoLog tl -> tl.Header |> Some
                         | LogModel.TextLog _ -> None
                     )
+
+                    "CopyCommand" |> Binding.cmd Msg.CopyLogCommand
 
                     "Fields" |> Binding.subModelSeq (
                         (fun l ->

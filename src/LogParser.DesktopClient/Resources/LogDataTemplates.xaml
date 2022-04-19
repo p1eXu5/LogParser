@@ -23,7 +23,16 @@
             </Behaviors:Interaction.Behaviors>
             <Expander HorizontalAlignment="Stretch">
                 <Expander.Header>
-                    <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="16"/>
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="16"/>
+                        <Button Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0" IsHitTestVisible="True">
+                            <materialDesign:PackIcon Kind="ContentCopy" />
+                        </Button>
+                    </Grid>
                 </Expander.Header>
                 <ListBox ItemsSource="{Binding Fields}" Grid.IsSharedSizeScope="True" Margin="20, 10" >
                     <ListBox.ItemContainerStyle>
