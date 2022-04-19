@@ -26,6 +26,7 @@ type internal MainModel =
         //Output: string option
         Logs: LogModel list
         ProcessId: Guid
+        Loading: bool
     }
 and
     LogModel =
@@ -56,6 +57,7 @@ module internal Program =
             //Output = None
             Logs = []
             ProcessId = Guid.Empty
+            Loading = false
         },
         Cmd.none
 
@@ -70,8 +72,16 @@ module internal Program =
             fd.Filter <- "text files (*.txt)|*.txt|All files (*.*)|*.*"
             let result = fd.ShowDialog()
             if result.HasValue && result.Value then
-                let content = File.ReadAllText(fd.FileName) |> Some
-                {model with LogFile = LogFile.Existing fd.FileName}, Cmd.ofMsg (InputChanged content)
+                let ``process`` () =
+                    task {
+                        let! content = File.ReadAllTextAsync(fd.FileName)
+                        return content |> Some
+                    }
+                {
+                    model with 
+                        LogFile = LogFile.Existing fd.FileName
+                        Loading = true
+                }, Cmd.OfTask.perform ``process`` () InputChanged
             else 
                 (model, Cmd.none)
 
@@ -125,20 +135,26 @@ module internal Program =
                 }
 
             let processId = Guid.NewGuid()
-            {model with Input = v |> Some; ProcessId = processId}, Cmd.OfAsync.perform ``process`` (v, processId) LogsChanged
+            {
+                model with 
+                    Input = v |> Some; 
+                    ProcessId = processId
+                    Loading = true
+            }
+            , Cmd.OfAsync.perform ``process`` (v, processId) LogsChanged
 
         | InputChanged _ ->
             {model with Logs = []; Input = None; ProcessId = Guid.Empty}, Cmd.none
 
         | LogsChanged (logs, processId) when processId = model.ProcessId ->
-            {model with Logs = logs}, Cmd.none
+            {model with Logs = logs; Loading = false}, Cmd.none
 
         | PastFromClipboardRequested ->
             let v = Clipboard.GetText() |> Some
             model, Cmd.ofMsg (InputChanged v)
 
         | CleanInputRequested ->
-            {model with Input = None; Logs = []; ProcessId = Guid.Empty}, Cmd.none
+            {model with Input = None; Logs = []; ProcessId = Guid.Empty; Loading = false}, Cmd.none
 
         | TechnoLogMsg (id, TechnoFieldMsg (key, msg)) ->
             let log =
@@ -174,6 +190,8 @@ module internal Program =
         [
             "Input" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
             //"Output" |> Binding.oneWayOpt (fun m -> m.Output)
+
+            "Loading" |> Binding.oneWay (fun m -> m.Loading)
 
             "PasteFromClipboardCommand" |> Binding.cmdIf (fun _ ->
                 if Clipboard.ContainsText() then

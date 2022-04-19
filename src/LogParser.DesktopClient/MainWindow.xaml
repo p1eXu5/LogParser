@@ -7,13 +7,14 @@
         xmlns:shared="clr-namespace:LogParser.DesktopClient.Shared"
         xmlns:res="clr-namespace:LogParser.DesktopClient.Resources"
         mc:Ignorable="d"
-        Title="{Binding DocumentName}" Height="800" Width="1200"
+        Title="{Binding DocumentName}" d:Height="800" d:Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="#333333"
         Icon=".\Resources\gnomelogs_103380.ico"
         >
     <Window.Resources>
         <res:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
+        <materialDesign:BooleanToVisibilityConverter x:Key="conv_BoolToVis"/>
     </Window.Resources>
     <DockPanel LastChildFill="True">
         <shared:MainMenu DockPanel.Dock="Top" DataContext="{Binding}" Height="35" />
@@ -40,20 +41,29 @@
             <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
             
             <!-- Logs -->
-            <ListBox x:Name="m_LogList"
-                     Grid.Column="2" 
-                     ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}" 
-                     ItemsSource="{Binding Logs}" 
-                     Background="#1E1E1E"
-                     ScrollViewer.CanContentScroll="False"
-                     >
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Margin" Value="0"/>
-                        <Setter Property="Padding" Value="0"/>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+            <Grid Grid.Column="2" >
+                
+                <ListBox x:Name="m_LogList"
+                     
+                         ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}" 
+                         ItemsSource="{Binding Logs}" 
+                         Background="#1E1E1E"
+                         ScrollViewer.CanContentScroll="False"
+                         >
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Width="100"
+                             Height="100"
+                             Value="0"
+                             Visibility="{Binding Loading, Converter={StaticResource conv_BoolToVis}}"
+                             IsIndeterminate="True" />
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>
