@@ -71,6 +71,7 @@ type TechnoField =
         | Int of key: string * value: int
         | Bool of key: string * value: bool
         | Array of key: string * value: string list
+        | ArrayInt of key: string * value: int list
         | Null of key: string
         | Json of key: string * value: TechnoField list
         | TypeJson of TypeJson
@@ -103,8 +104,11 @@ type TechnoField =
                 | String (k, v) -> $"\"{k}\": \"{v}\""
                 | Int (k, v) -> $"\"{k}\": {v}"
                 | Bool (k, v) -> $"\"{k}\": {v.ToString().ToLowerInvariant()}"
+                | ArrayInt (k, v) ->
+                    let values = String.Join(",\n    ",v)
+                    $"\"{k}\": [\n    {values}\n]"
                 | Array (k, v) -> 
-                    let values = String.Join("\n    ",v)
+                    let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
                     $"\"{k}\": [\n    {values}\n]"
                 | Null k -> $"\"{k}\": null"
                 | Json (k, v) -> $"\"{k}\": {v |> TechnoField.toString}"
@@ -178,8 +182,11 @@ module TechnoField =
         | Int (_, v) -> v.ToString()
         
         | Bool (_, v) -> v.ToString()
+        | ArrayInt (_, v) -> 
+            let values = String.Join(",\n    ",v)
+            $"[\n    {values}\n]"
         | Array (_, v) -> 
-            let values = String.Join("\n    ",v)
+            let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
             $"[\n    {values}\n]"
 
         | Timespan (Timespan.Null)
@@ -220,6 +227,7 @@ module TechnoField =
         | String (k, _)
         | Int (k, _)
         | Bool (k, _)
+        | ArrayInt (k, _)
         | Array (k, _)
         | Null k
         | Json (k, _) -> k

@@ -101,6 +101,9 @@ type TechnoLogBuilder () =
     member _.Field(log: TechnoLog, key: string, value: string list) = { log with Fields = log.Fields @ [((key, value) |> TechnoField.Array)] }
 
     [<CustomOperation("Field")>]
+    member _.Field(log: TechnoLog, key: string, value: int list) = { log with Fields = log.Fields @ [((key, value) |> TechnoField.ArrayInt)] }
+
+    [<CustomOperation("Field")>]
     member _.Field(log: TechnoLog, key: string, typeName: string, value: TechnoLog) = 
         { log with Fields = log.Fields @ [({Key = key; TypeName = typeName; Body = value.Fields} |> TechnoField.TypeJson)] }
 

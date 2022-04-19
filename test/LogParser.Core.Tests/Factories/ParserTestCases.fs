@@ -11,310 +11,339 @@ type ParserTestCases () =
 
     static member FieldTests : IEnumerable =
         seq {
-            TestCaseData(
-                "\"timestamp\": \"2022-04-14T11:49:52.912Z\"",
-                TechnoField.Timespan (Timespan.Value "2022-04-14T11:49:52.912Z")
-            ).SetName("field parsing. Timespan")
-
-
             // -------
             // message
             // -------
-            TestCaseData(
-                "\"message\": \"Returning next host: rabbitmq_node:5672\"",
-                TechnoField.Message "Returning next host: rabbitmq_node:5672"
-            ).SetName("field parsing. Message")
+            yield!
+                seq {
+                    TestCaseData(
+                        "\"message\": \"Returning next host: rabbitmq_node:5672\"",
+                        TechnoField.Message "Returning next host: rabbitmq_node:5672"
+                    ).SetName("field parsing. Message")
 
-            TestCaseData(
-                "\"message\": \"Error during removing token: ApiUnexpectedErrorResult { Message: \\\"Bad status code 404: \\\" }\"",
-                TechnoField.MessageParameterized (
-                    "Error during removing",
-                    [{
-                        Key = "token"
-                        TypeName = "ApiUnexpectedErrorResult"
-                        Body =
-                            jsonLog {
-                                Field "Message" "Bad status code 404: " 
-                            } |> Log.fieldList
-                    }])
+                    TestCaseData(
+                        "\"message\": \"Error during removing token: ApiUnexpectedErrorResult { Message: \\\"Bad status code 404: \\\" }\"",
+                        TechnoField.MessageParameterized (
+                            "Error during removing",
+                            [{
+                                Key = "token"
+                                TypeName = "ApiUnexpectedErrorResult"
+                                Body =
+                                    jsonLog {
+                                        Field "Message" "Bad status code 404: " 
+                                    } |> Log.fieldList
+                            }])
                 
-            ).SetName("field parsing. Message with curly brackets")
+                    ).SetName("field parsing. Message with curly brackets")
 
-            TestCaseData(
-                """ "message": 
-                        "Returning next host: {
-                                \"rabbitmq_node\":5672
-                            }"
-                """,
-                TechnoField.MessageBoddied ("Returning next host:", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
-            ).SetName("field parsing. MessageBoddied")
+                    TestCaseData(
+                        """ "message": 
+                                "Returning next host: {
+                                        \"rabbitmq_node\":5672
+                                    }"
+                        """,
+                        TechnoField.MessageBoddied ("Returning next host:", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
+                    ).SetName("field parsing. MessageBoddied")
 
-            TestCaseData(
-                """ "message": 
-                        "Returning next host, parameters: [( \"request\": DTO {
-                                rabbitmq_node:5672
-                            })] ."
-                """,
-                TechnoField.MessageParameterized (
-                    "Returning next host, parameters:", 
-                    [{
-                        Key = "request"
-                        TypeName = "DTO"
-                        Body =
-                            jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList
+                    TestCaseData(
+                        """ "message": 
+                                "Returning next host, parameters: [( \"request\": DTO {
+                                        rabbitmq_node:5672
+                                    })] ."
+                        """,
+                        TechnoField.MessageParameterized (
+                            "Returning next host, parameters:", 
+                            [{
+                                Key = "request"
+                                TypeName = "DTO"
+                                Body =
+                                    jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList
                             
-                    }]
-                )
-            ).SetName("field parsing. MessageParameter")
+                            }]
+                        )
+                    ).SetName("field parsing. MessageParameter")
 
-            TestCaseData(
-                """
-                    "message": "foo {
-                        \"rabbitmq_node\":{
-                            \"bar\": \"5672\",
-                            \"baz\": {
-                                \"port\": 1234
-                            }
-                        }
-                    }"
-                """,
-                jsonLog {
-                    message
-                        "foo"
-                        (jsonLog {
-                            Field
-                                "rabbitmq_node"
+                    TestCaseData(
+                        """
+                            "message": "foo {
+                                \"rabbitmq_node\":{
+                                    \"bar\": \"5672\",
+                                    \"baz\": {
+                                        \"port\": 1234
+                                    }
+                                }
+                            }"
+                        """,
+                        jsonLog {
+                            message
+                                "foo"
                                 (jsonLog {
-                                     Field "bar" "5672"
-                                     Field 
-                                        "baz"
+                                    Field
+                                        "rabbitmq_node"
                                         (jsonLog {
-                                            Field "port" 1234
+                                             Field "bar" "5672"
+                                             Field 
+                                                "baz"
+                                                (jsonLog {
+                                                    Field "port" 1234
+                                                })
                                         })
                                 })
-                        })
-                } |> Log.fieldList |> List.head
-            ).SetName("field parsing. Message with nested json")
+                        } |> Log.fieldList |> List.head
+                    ).SetName("field parsing. Message with nested json")
 
 
-            TestCaseData(
-                """
-                    "message":
-                        "Response to POST /v8/rock/and/roll 200 {
-                            \"bin\": \"123456\",
-                            \"productId\":\"prd\",
-                            \"metadata\":{
-                                \"lastDigits\":\"8945\",
-                                \"exp\":\"1234\",
-                                \"expFormat\":\"MMYY\"
-                            },
-                            \"cardId\":\"a3ca84ba-6d18-4cd4-a5d4-4dd097ad3eb9\",
-                            \"issuerId\":\"482386d9-3507-4bef-a227-7bcdb01f1e70\",
-                            \"designId\":\"DF09987BC2F\"
-                        }"
-                """,
-                jsonLog {
-                    message
-                        "Response to POST /v8/rock/and/roll 200"
-                        (jsonLog {
-                            Field "bin" "123456"
-                            Field "productId" "prd"
-                            Field
-                                "metadata"
+                    TestCaseData(
+                        """
+                            "message":
+                                "Response to POST /v8/rock/and/roll 200 {
+                                    \"bin\": \"123456\",
+                                    \"productId\":\"prd\",
+                                    \"metadata\":{
+                                        \"lastDigits\":\"8945\",
+                                        \"exp\":\"1234\",
+                                        \"expFormat\":\"MMYY\"
+                                    },
+                                    \"cardId\":\"a3ca84ba-6d18-4cd4-a5d4-4dd097ad3eb9\",
+                                    \"issuerId\":\"482386d9-3507-4bef-a227-7bcdb01f1e70\",
+                                    \"designId\":\"DF09987BC2F\"
+                                }"
+                        """,
+                        jsonLog {
+                            message
+                                "Response to POST /v8/rock/and/roll 200"
                                 (jsonLog {
-                                     Field "lastDigits" "8945"
-                                     Field "exp" "1234"
-                                     Field "expFormat" "MMYY"
+                                    Field "bin" "123456"
+                                    Field "productId" "prd"
+                                    Field
+                                        "metadata"
+                                        (jsonLog {
+                                             Field "lastDigits" "8945"
+                                             Field "exp" "1234"
+                                             Field "expFormat" "MMYY"
+                                        })
+                                    Field "cardId" "a3ca84ba-6d18-4cd4-a5d4-4dd097ad3eb9"
+                                    Field "issuerId" "482386d9-3507-4bef-a227-7bcdb01f1e70"
+                                    Field "designId" "DF09987BC2F"
                                 })
-                            Field "cardId" "a3ca84ba-6d18-4cd4-a5d4-4dd097ad3eb9"
-                            Field "issuerId" "482386d9-3507-4bef-a227-7bcdb01f1e70"
-                            Field "designId" "DF09987BC2F"
-                        })
-                } |> Log.fieldList |> List.head
-            ).SetName("field parsing. Message with complex nested json")
+                        } |> Log.fieldList |> List.head
+                    ).SetName("field parsing. Message with complex nested json")
 
 
+                }
 
 
-            // --------
+            // -------------
+            // simple values
+            // -------------
+            yield!
+                seq {
+                    TestCaseData(
+                        "\"timestamp\": \"2022-04-14T11:49:52.912Z\"",
+                        TechnoField.Timespan (Timespan.Value "2022-04-14T11:49:52.912Z")
+                    ).SetName("field parsing. Timespan")
 
-            TestCaseData(
-                "\"level\": \"Debug\"",
-                TechnoField.Level LogLevel.Debug
-            ).SetName("field parsing. Level")
+                    TestCaseData(
+                        "\"level\": \"Debug\"",
+                        TechnoField.Level LogLevel.Debug
+                    ).SetName("field parsing. Level")
 
-            TestCaseData(
-                "\"level\": \"debuG\"",
-                TechnoField.Level LogLevel.Debug
-            ).SetName("field parsing. Level CI")
+                    TestCaseData(
+                        "\"level\": \"debuG\"",
+                        TechnoField.Level LogLevel.Debug
+                    ).SetName("field parsing. Level CI")
 
-            TestCaseData(
-                "\"method\": \"Post\"",
-                TechnoField.Method "Post"
-            ).SetName("field parsing. Method")
+                    TestCaseData(
+                        "\"method\": \"Post\"",
+                        TechnoField.Method "Post"
+                    ).SetName("field parsing. Method")
 
-            TestCaseData(
-                "\"statusCode\": \"200\"",
-                TechnoField.StatusCode HttpStatusCode.OK
-            ).SetName("field parsing. StatusCode")
+                    TestCaseData(
+                        "\"statusCode\": \"200\"",
+                        TechnoField.StatusCode HttpStatusCode.OK
+                    ).SetName("field parsing. StatusCode")
 
-            TestCaseData(
-                "\"StatusCode\": \"200\"",
-                TechnoField.StatusCode HttpStatusCode.OK
-            ).SetName("field parsing. StatusCode CI")
+                    TestCaseData(
+                        "\"StatusCode\": \"200\"",
+                        TechnoField.StatusCode HttpStatusCode.OK
+                    ).SetName("field parsing. StatusCode CI")
 
-            TestCaseData(
-                "\"path\": \"MassTransit\"",
-                TechnoField.Path "MassTransit"
-            ).SetName("field parsing. Path")
+                    TestCaseData(
+                        "\"path\": \"MassTransit\"",
+                        TechnoField.Path "MassTransit"
+                    ).SetName("field parsing. Path")
 
-            TestCaseData(
-                "\"host\": \"MassTransit\"",
-                TechnoField.Host "MassTransit"
-            ).SetName("field parsing. Host")
+                    TestCaseData(
+                        "\"host\": \"MassTransit\"",
+                        TechnoField.Host "MassTransit"
+                    ).SetName("field parsing. Host")
 
-            TestCaseData(
-                "\"port\": 5672",
-                TechnoField.Port 5672
-            ).SetName("field parsing. Port")
+                    TestCaseData(
+                        "\"port\": 5672",
+                        TechnoField.Port 5672
+                    ).SetName("field parsing. Port")
+
+                    TestCaseData(
+                        "\"sourceContext\": \"MassTransit\"",
+                        TechnoField.SourceContext "MassTransit"
+                    ).SetName("field parsing. SourceContext")
+
+                    TestCaseData(
+                        "\"RequestId\": \"MassTransit\"",
+                        TechnoField.RequestId "MassTransit"
+                    ).SetName("field parsing. RequestId")
+
+                    TestCaseData(
+                        "\"RequeStPath\": \"MassTransit\"",
+                        TechnoField.RequestPath "MassTransit"
+                    ).SetName("field parsing. RequestPath")
+
+                    TestCaseData(
+                        "\"SpanId\": \"MassTransit\"",
+                        TechnoField.SpanId "MassTransit"
+                    ).SetName("field parsing. SpanId")
+
+                    TestCaseData(
+                        "\"TraceId\": \"MassTransit\"",
+                        TechnoField.TraceId "MassTransit"
+                    ).SetName("field parsing. TraceId")
+
+                    TestCaseData(
+                        "\"ParentId\": \"MassTransit\"",
+                        TechnoField.ParentId "MassTransit"
+                    ).SetName("field parsing. ParentId")
+
+                    TestCaseData(
+                        "\"ConnectionId\": \"MassTransit\"",
+                        TechnoField.ConnectionId "MassTransit"
+                    ).SetName("field parsing. ConnectionId")
+
+                    TestCaseData(
+                        "\"HierarchicalTraceId\": \"MassTransit\"",
+                        TechnoField.HierarchicalTraceId "MassTransit"
+                    ).SetName("field parsing. HierarchicalTraceId")
+                }
+
+            // ------------
+            //     body
+            // ------------
+            yield!
+                seq {
+                    TestCaseData(
+                        """
+                            "body": "
+                                {
+                                    \"rabbitmq_node\": \"5672\"
+                                }"
+                        """,
+                        TechnoField.Body (jsonLog { Field "rabbitmq_node" "5672" } |> Log.fieldList)
+                    ).SetName("field parsing. Body")
+
+                    TestCaseData(
+                        """
+                            "body": "
+                                {
+                                    \"authLevelReasons\": [ \"USER_ACCOUNT_AND_CARD_TOO_NEW\" ]
+                                }"
+                        """,
+                        TechnoField.Body (jsonLog { Field "authLevelReasons" ["USER_ACCOUNT_AND_CARD_TOO_NEW"] } |> Log.fieldList)
+                    ).SetName("field parsing. Body with array")
+                }
 
 
-            // ----
-            // body
-            // ----
-            TestCaseData(
-                """
-                    "body": "
-                        {
-                            \"rabbitmq_node\": \"5672\"
-                        }"
-                """,
-                TechnoField.Body (jsonLog { Field "rabbitmq_node" "5672" } |> Log.fieldList)
-            ).SetName("field parsing. Body")
+            // ------------
+            // primitives
+            // ------------
+            yield!
+                seq {
+                    TestCaseData(
+                        "\"customString\": \"foo\"",
+                        TechnoField.String ("customString", "foo")
+                    ).SetName("field parsing. String")
 
-            TestCaseData(
-                """
-                    "body": "
-                        {
-                            \"authLevelReasons\": [ \"USER_ACCOUNT_AND_CARD_TOO_NEW\" ]
-                        }"
-                """,
-                TechnoField.Body (jsonLog { Field "authLevelReasons" ["USER_ACCOUNT_AND_CARD_TOO_NEW"] } |> Log.fieldList)
-            ).SetName("field parsing. Body with array")
+                    TestCaseData(
+                        "\"customInt\": 123",
+                        TechnoField.Int ("customInt", 123)
+                    ).SetName("field parsing. Int")
+
+                    TestCaseData(
+                        "\"customBool\": true",
+                        TechnoField.Bool ("customBool", true)
+                    ).SetName("field parsing. Bool: true")
+
+                    TestCaseData(
+                        "\"customBool\": false",
+                        TechnoField.Bool ("customBool", false)
+                    ).SetName("field parsing. Bool: false")
+
+                    TestCaseData(
+                        """
+                            "scope":["HTTP POST http://gate_be:5000/deploy/push"]
+                        """,
+                        TechnoField.Array ("scope", ["HTTP POST http://gate_be:5000/deploy/push"])
+                    ).SetName("field parsing. Array")
+
+                    TestCaseData(
+                        """
+                            "scope":[3]
+                        """,
+                        TechnoField.ArrayInt ("scope", [3])
+                    ).SetName("field parsing. ArrayInt")
 
 
-            TestCaseData(
-                "\"sourceContext\": \"MassTransit\"",
-                TechnoField.SourceContext "MassTransit"
-            ).SetName("field parsing. SourceContext")
+                    TestCaseData(
+                        """
+                            "foo": null
+                        """,
+                        TechnoField.Null "foo"
+                    ).SetName("field parsing. Null")
+                }
 
-            TestCaseData(
-                "\"RequestId\": \"MassTransit\"",
-                TechnoField.RequestId "MassTransit"
-            ).SetName("field parsing. RequestId")
 
-            TestCaseData(
-                "\"RequeStPath\": \"MassTransit\"",
-                TechnoField.RequestPath "MassTransit"
-            ).SetName("field parsing. RequestPath")
+            // -------------
+            //     json     
+            // -------------
+            yield!
+                seq {
+                    TestCaseData(
+                        """
+                            "foo": "{
+                                \"rabbitmq_node\":5672
+                            }"
+                        """,
+                        TechnoField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
+                    ).SetName("field parsing. Json")
 
-            TestCaseData(
-                "\"SpanId\": \"MassTransit\"",
-                TechnoField.SpanId "MassTransit"
-            ).SetName("field parsing. SpanId")
+                    TestCaseData(
+                        """
+                            "foo": {
+                                "rabbitmq_node":5672
+                            }
+                        """,
+                        TechnoField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
+                    ).SetName("field parsing. Json not wrapped")
 
-            TestCaseData(
-                "\"TraceId\": \"MassTransit\"",
-                TechnoField.TraceId "MassTransit"
-            ).SetName("field parsing. TraceId")
-
-            TestCaseData(
-                "\"ParentId\": \"MassTransit\"",
-                TechnoField.ParentId "MassTransit"
-            ).SetName("field parsing. ParentId")
-
-            TestCaseData(
-                "\"ConnectionId\": \"MassTransit\"",
-                TechnoField.ConnectionId "MassTransit"
-            ).SetName("field parsing. ConnectionId")
-
-            TestCaseData(
-                "\"HierarchicalTraceId\": \"MassTransit\"",
-                TechnoField.HierarchicalTraceId "MassTransit"
-            ).SetName("field parsing. HierarchicalTraceId")
-
-            TestCaseData(
-                "\"customString\": \"foo\"",
-                TechnoField.String ("customString", "foo")
-            ).SetName("field parsing. String")
-
-            TestCaseData(
-                "\"customInt\": 123",
-                TechnoField.Int ("customInt", 123)
-            ).SetName("field parsing. Int")
-
-            TestCaseData(
-                "\"customBool\": true",
-                TechnoField.Bool ("customBool", true)
-            ).SetName("field parsing. Bool: true")
-
-            TestCaseData(
-                "\"customBool\": false",
-                TechnoField.Bool ("customBool", false)
-            ).SetName("field parsing. Bool: false")
-
-            TestCaseData(
-                """
-                    "foo": "{
-                        \"rabbitmq_node\":5672
-                    }"
-                """,
-                TechnoField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
-            ).SetName("field parsing. Json")
-
-            TestCaseData(
-                """
-                    "foo": {
-                        "rabbitmq_node":5672
-                    }
-                """,
-                TechnoField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
-            ).SetName("field parsing. Json not wrapped")
-
-            TestCaseData(
-                """
-                    "foo": "{
-                        \"rabbitmq_node\":{
-                            \"bar\": \"5672\"
-                        }
-                    }"
-                """,
-                jsonLog {
-                    Field
-                        "foo"
-                        (jsonLog {
+                    TestCaseData(
+                        """
+                            "foo": "{
+                                \"rabbitmq_node\":{
+                                    \"bar\": \"5672\"
+                                }
+                            }"
+                        """,
+                        jsonLog {
                             Field
-                                "rabbitmq_node"
+                                "foo"
                                 (jsonLog {
-                                     Field "bar" "5672"
+                                    Field
+                                        "rabbitmq_node"
+                                        (jsonLog {
+                                             Field "bar" "5672"
+                                        })
                                 })
-                        })
-                } |> Log.fieldList |> List.head
-            ).SetName("field parsing. Json nested")
-
-            TestCaseData(
-                """
-                    "scope":["HTTP POST http://gate_be:5000/deploy/push"]
-                """,
-                TechnoField.Array ("scope", ["HTTP POST http://gate_be:5000/deploy/push"])
-            ).SetName("field parsing. Array")
-
-            TestCaseData(
-                """
-                    "foo": null
-                """,
-                TechnoField.Null "foo"
-            ).SetName("field parsing. Null")
+                        } |> Log.fieldList |> List.head
+                    ).SetName("field parsing. Json nested")
+                }
         }
 
     static member LogTests : IEnumerable =

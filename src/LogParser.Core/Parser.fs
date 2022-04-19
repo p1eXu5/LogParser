@@ -86,10 +86,21 @@ let array pIdentifier q =
     .>>? fieldDelimiter
     .>>? skipChar '['
     .>> ws
-    .>>. sepEndBy (fieldStringValue q) (attempt(ws >>. skipChar ',' >>. ws))
+    .>>.? sepEndBy (fieldStringValue q) (attempt(ws >>. skipChar ',' >>. ws))
     .>> ws
     .>> skipChar ']'
     |>> TechnoField.Array
+
+
+let arrayInt pIdentifier =
+    pIdentifier
+    .>>? fieldDelimiter
+    .>>? skipChar '['
+    .>> ws
+    .>>.? sepEndBy (pint32) (attempt(ws >>. skipChar ',' >>. ws))
+    .>> ws
+    .>> skipChar ']'
+    |>> TechnoField.ArrayInt
 
 
 let nullField pIdentifier =
@@ -290,7 +301,8 @@ let field : Parser<TechnoField, unit> =
         body
         notWrappedJson (fieldIdentifier "\"")
         json innerJson (fieldIdentifier "\"")
-        array (fieldIdentifier "\"") "\""
+        attempt(array (fieldIdentifier "\"") "\"")
+        attempt(arrayInt (fieldIdentifier "\""))
         customStringField (fieldIdentifier "\"") "\""
         customIntField (fieldIdentifier "\"")
         customBoolField (fieldIdentifier "\"") true 
@@ -303,7 +315,8 @@ let field : Parser<TechnoField, unit> =
 let innerField : Parser<TechnoField, unit> =
     ws
     >>. choice [
-        array (fieldIdentifier "\\\"") "\\\""
+        attempt(array (fieldIdentifier "\\\"") "\\\"")
+        attempt(arrayInt (fieldIdentifier "\\\""))
         customStringField (fieldIdentifier "\\\"") "\\\""
         customIntField (fieldIdentifier "\\\"")
         customBoolField (fieldIdentifier "\\\"") true 
@@ -316,7 +329,8 @@ let innerField : Parser<TechnoField, unit> =
 let parameterField : Parser<TechnoField, unit> =
     ws
     >>. choice [
-        array identifier "\\\""
+        attempt(array identifier "\\\"")
+        attempt(arrayInt identifier)
         customStringField identifier "\\\""
         customIntField identifier
         customBoolField identifier true 
