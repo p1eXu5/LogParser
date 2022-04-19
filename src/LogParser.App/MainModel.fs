@@ -182,7 +182,11 @@ module internal Program =
                 | _ -> None
             )
 
-            "NewFileCommand" |> Binding.cmd NewFile
+            "NewFileCommand" |> Binding.cmdIf (fun m -> 
+                match m.LogFile with
+                | Existing _ -> Msg.NewFile |> Some
+                | _ -> None
+            ) 
 
             "DocumentName" |> Binding.oneWay (fun m ->
                 match m.LogFile with
