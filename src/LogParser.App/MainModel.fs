@@ -159,7 +159,7 @@ module internal Program =
                 |> List.choose (function LogModel.TechnoLog tl -> tl |> Some | _ -> None)
                 |> List.find (fun l -> l.Id = id)
 
-            Clipboard.SetText(log.Log.Fields |> TechnoField.toString)
+            Clipboard.SetText(log.Log.Fields |> TechnoFields.toString 1)
             model, Cmd.none
 
         | _ -> model, Cmd.none
@@ -212,7 +212,7 @@ module internal Program =
                 (fun () -> [
                     "Log" |> Binding.oneWayOpt (fun l ->
                         match l with
-                        | LogModel.TechnoLog tl -> tl.Fields |> List.map (fun f -> f.TechnoField) |> LogParser.Core.Types.TechnoField.toString |> Some
+                        | LogModel.TechnoLog tl -> tl.Fields |> List.map (fun f -> f.TechnoField) |> LogParser.Core.Types.TechnoFields.toString 1 |> Some
                         | LogModel.TextLog t -> t.Log |> Some
                     )
 

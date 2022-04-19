@@ -36,9 +36,17 @@ type TypeJson =
         }
         with
             override this.ToString() =
-                let fields = this.Body |> TechnoField.toString
-                $"{this.Key}: {this.TypeName} {fields}"
+                let fields = this.Body |> TechnoFields.toString 1
+                $"\"{this.Key}\": {this.TypeName} {fields}"
 
+type MessageParameter =
+    | TechnoField of TechnoField
+    | TypeJson of TypeJson
+    with
+        override this.ToString() =
+            match this with
+            | TechnoField tf -> tf.ToString()
+            | TypeJson tj -> tj.ToString()
 
 type Timespan =
     | Value of string
@@ -50,7 +58,7 @@ type TechnoField =
         | Message of string
         | MessageBoddied of header: string * body: TechnoField list
         /// { "message": "Some text, parameters: [(\"request\": TypeName { TypeProperty: \"value\", ... })]. " }
-        | MessageParameterized of header: string * parameters: TypeJson list
+        | MessageParameterized of header: string * parameters: MessageParameter list
         | Level of LogLevel
         | Method of string
         | StatusCode of HttpStatusCode
@@ -81,8 +89,8 @@ type TechnoField =
                 | Timespan (Timespan.Value v) -> $"\"timespan\": \"{v}\""
                 | Timespan (Timespan.Null) -> $"\"timespan\": null"
                 | Message v -> $"\"message\": \"{v}\""
-                | MessageBoddied (k, v) -> $"\"message\": \"{k}\n, {v |> TechnoField.toString}\""
-                | MessageParameterized (header, v) -> 
+                | MessageBoddied (k, v) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}\""
+                | MessageParameterized (header, v) ->
                     let content = v |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
                     $"\"message\": \"{header} [{content}]\""
                 | Level v -> $"\"level\": \"{v}\""
@@ -91,7 +99,7 @@ type TechnoField =
                 | Path v -> $"\"path\": \"{v}\""
                 | Host v -> $"\"host\": \"{v}\""
                 | Port v -> $"\"port\": {v}"
-                | Body v -> $"\"body\": \"{v |> TechnoField.toString}\""
+                | Body v -> $"\"body\": \"{v |> TechnoFields.toString 1}\""
                 | SourceContext v -> $"\"sourceContext\": \"{v}\"" 
                 | RequestId v -> $"\"requestId\": \"{v}\""
                 | RequestPath v -> $"\"requestPath\": \"{v}\""
@@ -111,15 +119,15 @@ type TechnoField =
                     let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
                     $"\"{k}\": [\n    {values}\n]"
                 | Null k -> $"\"{k}\": null"
-                | Json (k, v) -> $"\"{k}\": {v |> TechnoField.toString}"
+                | Json (k, v) -> $"\"{k}\": {v |> TechnoFields.toString 1}"
                 | TypeJson (tj) -> $"%O{tj}"
 
-module TechnoField =
+module TechnoFields =
 
     open System.Text
 
 
-    let toString (fields: TechnoField list) =
+    let toString (initTabLevel: int) (fields: TechnoField list) =
         let fold folder fields state =
             fields
             |> List.fold folder state
@@ -150,7 +158,9 @@ module TechnoField =
 
         let result = StringBuilder()
         result.Append("{\n") |> ignore
-        let state = fold folder fields {| Result = result; TabLevel = 1; Comma = false |}
+
+        let state = fold folder fields {| Result = result; TabLevel = initTabLevel; Comma = false |}
+
         state.Result.Append("\n}") |> ignore
         state.Result.ToString()
 
@@ -192,10 +202,12 @@ module TechnoField =
         | Timespan (Timespan.Null)
         | Null _ -> "null"
 
-        | MessageBoddied (v, fl) -> $"{v}\n{fl |> toString}"
-        | MessageParameterized (v, tj) -> $"{v}\n{tj.ToString()}"
+        | MessageBoddied (v, fl) -> $"{v}\n{fl |> toString 1}"
+        | MessageParameterized (v, tj) ->
+            let content = tj |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
+            $"{v}\n{content}"
         | Body v
-        | Json (_, v) -> v |> toString
+        | Json (_, v) -> v |> toString 1
         | TypeJson v -> v.ToString()
 
 

@@ -32,7 +32,7 @@ type ParserTestCases () =
                                     jsonLog {
                                         Field "Message" "Bad status code 404: " 
                                     } |> Log.fieldList
-                            }])
+                            } |> MessageParameter.TypeJson])
                 
                     ).SetName("field parsing. Message with curly brackets")
 
@@ -59,9 +59,96 @@ type ParserTestCases () =
                                 Body =
                                     jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList
                             
-                            }]
+                            } |> MessageParameter.TypeJson]
                         )
                     ).SetName("field parsing. MessageParameter")
+
+                    TestCaseData(
+                        """ "message": 
+                                "Returning next host, parameters: 
+                                    [
+                                        ( \"request\": 123-123-123 )
+                                    ] ."
+                        """,
+                        TechnoField.MessageParameterized (
+                            "Returning next host, parameters:", 
+                            [TechnoField.String ("request", "123-123-123") |> MessageParameter.TechnoField]
+                        )
+                    ).SetName("field parsing. MessageParameter - Field")
+
+                    TestCaseData(
+                        """ "message": 
+                                "Returning next host, parameters: 
+                                    [
+                                        ( \"request\": 123-123-123 ),
+                                        ( \"request\": 123-123-123 )
+                                    ] ."
+                        """,
+                        TechnoField.MessageParameterized (
+                            "Returning next host, parameters:", 
+                            [
+                                TechnoField.String ("request", "123-123-123") |> MessageParameter.TechnoField
+                                TechnoField.String ("request", "123-123-123") |> MessageParameter.TechnoField
+                            ]
+                        )
+                    ).SetName("field parsing. MessageParameter - two Field")
+
+                    TestCaseData(
+                        """ "message": 
+                                "Incoming POST request to /abc/v1.0/deploy/1234abcd-abcd-11ff-bada-000011112222, parameters: 
+                                [
+                                    (\"tokenId\": 11b145b64-44gh-36wg-7rja-33654rerw34),
+                                    (\"request\": RequestDto { 
+                                        SessionId: cc0e8a3b-70e9-47dd-b6d0-07032ac93059,
+                                        Id: \"78354-fgh4568-fgh57h\",
+                                        TokenRequestorId: \"123456789\",
+                                        PersoDataId: 654gf56-df4g-d354fg-dfgg, 
+                                        DeviceTokenData: DeviceTokenData {
+                                            Content: null,
+                                            Encoding: BASE64_CIPHERED,
+                                            PrisonId: \"12345\"
+                                        }, 
+                                        Renewal: False,
+                                        TokenInfo: TokenInfo {
+                                            ExpDate: \"1234\",
+                                            Digits: \"4321\"
+                                        }
+                                    })
+                                ]. "
+                        """,
+                        TechnoField.MessageParameterized (
+                            "Incoming POST request to /abc/v1.0/deploy/1234abcd-abcd-11ff-bada-000011112222, parameters:", 
+                            [
+                                TechnoField.String ("tokenId", "11b145b64-44gh-36wg-7rja-33654rerw34") |> MessageParameter.TechnoField
+                                
+                                {
+                                    Key = "request"
+                                    TypeName = "RequestDto"
+                                    Body =
+                                        jsonLog {
+                                            Field "SessionId" "cc0e8a3b-70e9-47dd-b6d0-07032ac93059"
+                                            Field "Id" "78354-fgh4568-fgh57h"
+                                            Field "TokenRequestorId" "123456789"
+                                            Field "PersoDataId" "654gf56-df4g-d354fg-dfgg"
+                                            Field "DeviceTokenData" "DeviceTokenData" (
+                                                jsonLog {
+                                                    Null "Content"
+                                                    Field "Encoding" "BASE64_CIPHERED"
+                                                    Field "PrisonId" "12345"
+                                                }
+                                            )
+                                            Field "Renewal" false
+                                            Field "TokenInfo" "TokenInfo" (
+                                                jsonLog {
+                                                    Field "ExpDate" "1234"
+                                                    Field "Digits" "4321"
+                                                }
+                                            )
+                                        } |> Log.fieldList
+                                } |> MessageParameter.TypeJson
+                            ]
+                        )
+                    ).SetName("field parsing. MessageParameter2")
 
                     TestCaseData(
                         """

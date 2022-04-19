@@ -38,7 +38,7 @@ module Program =
                 Tag = Tag.JsonField; 
                 Key = key; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechnoField.toString |> Some; 
+                Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = None
             }
         | TechnoField.Body fields ->
@@ -47,7 +47,7 @@ module Program =
                 Tag = Tag.JsonField; 
                 Key = "body"; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechnoField.toString |> Some; 
+                Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = None
             }
         | TechnoField.MessageBoddied (text, fields) ->
@@ -56,7 +56,7 @@ module Program =
                 Tag = Tag.AnnotatedJsonField; 
                 Key = "message"; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechnoField.toString |> Some; 
+                Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = text |> Some
             }
 
@@ -77,8 +77,8 @@ module Program =
                 TechnoField = technoField 
                 Header = None; 
                 Tag = Tag.SimpleField; 
-                Key = technoField |> TechnoField.key; 
-                Text = technoField |> TechnoField.value |> Some;
+                Key = technoField |> TechnoFields.key; 
+                Text = technoField |> TechnoFields.value |> Some;
                 Json = None
             }
 

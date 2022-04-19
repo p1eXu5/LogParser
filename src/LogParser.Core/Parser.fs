@@ -61,8 +61,8 @@ let customStringField pIdentifier q =
 let customQuotelessStringField pIdentifier =
     pIdentifier
     .>> fieldDelimiter
-    .>>.? manyCharsTill anyChar (nextCharSatisfies ((=) ',') <|> nextCharSatisfies ((=) '}') <|> (followedBy newline) )
-    |>> TechnoField.String
+    .>>.? manyCharsTill anyChar (nextCharSatisfies ((=) ',') <|> nextCharSatisfies ((=) '}') <|> nextCharSatisfies ((=) ')') <|> (followedBy newline) )
+    |>> (fun t -> TechnoField.String (fst t, (snd t).Trim()))
 
 
 let customIntField pIdentifier =
@@ -191,7 +191,15 @@ let partialTypeJson =
 /// (<typeJson>)
 let messageParameter =
     ws
-    >>. between (pchar '(') (pchar ')') (typeJson (fieldIdentifier "\\\""))
+    >>? between (pchar '(') (pchar ')') 
+        (choice [
+            typeJson (fieldIdentifier "\\\"") |>> MessageParameter.TypeJson
+            ws >>? 
+                choice [
+                    customQuotelessStringField (fieldIdentifier "\\\"")
+                ] 
+                |>> MessageParameter.TechnoField
+        ])
     .>> ws
     
 
@@ -216,7 +224,9 @@ let messageParameterized =
                 |>> (fun t ->
                     let (m, tj) = t
                     let arr = m.Split(' ') |> Array.filter (fun s -> not (String.IsNullOrWhiteSpace(s)))
-                    (String.Join(' ', arr |> Array.take (arr.Length - 1)), {tj with Key = arr |> Array.last} |> List.singleton)
+                    (
+                        String.Join(' ', arr |> Array.take (arr.Length - 1)), 
+                        {tj with Key = arr |> Array.last} |> MessageParameter.TypeJson |> List.singleton)
                 )
             )
         ]
@@ -326,7 +336,7 @@ let innerField : Parser<TechnoField, unit> =
     ]
     .>> ws
 
-let parameterField : Parser<TechnoField, unit> =
+let parameterField =
     ws
     >>. choice [
         attempt(array identifier "\\\"")

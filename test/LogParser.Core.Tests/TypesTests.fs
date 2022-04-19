@@ -22,7 +22,7 @@ module TypesTests =
             "    \"bar\": \"bar\"\n" +
             "}"
 
-        TechnoField.toString json.Fields
+        TechnoFields.toString 1 json.Fields
         |> should equal expected
 
 

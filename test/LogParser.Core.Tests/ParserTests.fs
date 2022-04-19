@@ -72,7 +72,7 @@ module ParserTests =
                         jsonLog {
                             Field "rabbitmq_node" 5672
                         } |> Log.fieldList
-                }
+                } |> MessageParameter.TypeJson
             let! res = runResult messageParameter input
             res |> should equal expected
         } |> Result.runTest
@@ -90,7 +90,7 @@ module ParserTests =
                         jsonLog {
                             Field "rabbitmq_node" 5672
                         } |> Log.fieldList
-                }
+                } |> MessageParameter.TypeJson
             let! res = runResult messageParameterList input
             res |> should haveLength 1
             res |> List.head |> should equal expected
@@ -109,7 +109,7 @@ module ParserTests =
                         jsonLog {
                             Field "rabbitmq_node" 5672
                         } |> Log.fieldList
-                }
+                } |> MessageParameter.TypeJson
             let! res = runResult messageParameterized input
             match res with
             | TechnoField.MessageParameterized (_, e) ->
@@ -133,7 +133,7 @@ module ParserTests =
                         jsonLog {
                             Field "rabbitmq_node" 5672
                         } |> Log.fieldList
-                }
+                } |> MessageParameter.TypeJson
 
             let! res = runResult messageParameterized input
 
@@ -176,7 +176,7 @@ module ParserTests =
                                         })
                                 })
                         } |> Log.fieldList
-                }
+                } |> MessageParameter.TypeJson
             let! res = runResult messageParameterized input
             match res with
             | TechnoField.MessageParameterized (_, e) ->
@@ -192,7 +192,7 @@ module ParserTests =
     let ``field parsing tests`` (input: string, expected: TechnoField) =
         result {
             let! res = runResult field input
-            res |> should equal expected
+            res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
 

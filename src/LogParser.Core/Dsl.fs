@@ -29,7 +29,10 @@ type TechnoLogBuilder () =
     member _.Message(log: TechnoLog, value: string, body: TechnoLog) = { log with Fields = log.Fields @ [((value, body.Fields) |> TechnoField.MessageBoddied)] }
 
     [<CustomOperation("message")>]
-    member _.Message(log: TechnoLog, value: string, parameters: TypeJson) = { log with Fields = log.Fields @ [((value, [parameters]) |> TechnoField.MessageParameterized)] }
+    member _.Message(log: TechnoLog, value: string, parameters: TypeJson) = { log with Fields = log.Fields @ [((value, [parameters  |> MessageParameter.TypeJson]) |> TechnoField.MessageParameterized)] }
+
+    [<CustomOperation("message")>]
+    member _.Message(log: TechnoLog, value: string, parameters: MessageParameter list) = { log with Fields = log.Fields @ [((value, parameters) |> TechnoField.MessageParameterized)] }
 
     [<CustomOperation("level")>]
     member _.Level(log: TechnoLog, value: string) = { log with Fields = log.Fields @ [(Enum.Parse(typeof<LogLevel>, value) |> unbox |> TechnoField.Level)] }
