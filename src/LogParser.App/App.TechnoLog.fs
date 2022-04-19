@@ -18,18 +18,31 @@ type Model =
 module Program =
 
     let init (log: TechnoLog) =
-        let fields =
+        let (mainFields, otherFields) =
             log.Fields
+            |> List.sortBy TechnoFields.order
             |> List.map TechnoField.Program.init
+            |> List.partition (fun f -> 
+                match f.TechnoField with
+                | TechnoField.Timespan _
+                | TechnoField.Level _
+                | TechnoField.Message _
+                | TechnoField.MessageBoddied _
+                | TechnoField.MessageParameterized _ -> true
+                | _ -> false
+            )
 
-        let timespan = log.Fields |> List.tryPick (function | TechnoField.Timespan (Timespan.Value ts) -> ts |> Some | _ -> None ) |> Option.defaultValue "___"
-        let level = log.Fields |> List.tryPick (function | TechnoField.Level l -> l.ToString().ToLowerInvariant() |> Some | _ -> None) |> Option.defaultValue "______"
-        let message = log.Fields |> List.tryPick (function | TechnoField.Message m | TechnoField.MessageBoddied (m, _) -> m |> Some | _ -> None) |> Option.defaultValue "______"
+        let valueOf k =
+            mainFields |> List.tryFind (fun f -> f.TechnoField |> TechnoFields.order |> (=) k) |> Option.bind (fun f -> f.Text) |> Option.defaultValue "___"
+
+        let timespan = valueOf "0"
+        let level = valueOf "1"
+        let message = valueOf "2"
 
         {
             Id = Guid.NewGuid()
             IsExpanded = false
             Header = $"{level}:    {timespan} - {message}"
             Log = log
-            Fields = fields
+            Fields = mainFields @ otherFields
         }

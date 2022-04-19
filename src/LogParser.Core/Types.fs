@@ -211,6 +211,10 @@ module TechnoFields =
         | TypeJson v -> v.ToString()
 
 
+    let capitalize (s: string) =
+        Char.ToUpper(s[0]) |> sprintf "%c%s" <| s[1..]
+
+
     let key field =
         let GetUnionCaseName (x:'a) = 
             match FSharpValue.GetUnionFields(x, typeof<'a>) with
@@ -218,7 +222,6 @@ module TechnoFields =
 
         match field with
         | Timespan _
-        | Message _
         | Method _
         | Path _
         | Host _
@@ -242,10 +245,44 @@ module TechnoFields =
         | ArrayInt (k, _)
         | Array (k, _)
         | Null k
-        | Json (k, _) -> k
+        | Json (k, _) -> capitalize k
 
+        | Message _
         | MessageBoddied _
         | MessageParameterized _ -> "Message"
 
-        | TypeJson v -> v.Key
+        | TypeJson v -> capitalize v.Key
 
+
+    let order = function
+        | Timespan _ -> "0"
+        | Level _ -> "1"
+        | MessageParameterized _
+        | MessageBoddied _
+        | Message _ -> "2"
+        | Json (k, _) when k.Equals("message", StringComparison.InvariantCultureIgnoreCase) -> "2"
+        | Method _ -> nameof(Method)
+        | Path _ -> nameof(Path)
+        | Host _ -> nameof(Host)
+        | SourceContext _ -> nameof(SourceContext)
+        | RequestId _ -> nameof(RequestId)
+        | RequestPath _ -> nameof(RequestPath)
+        | SpanId _ -> nameof(SpanId)
+        | TraceId _ -> nameof(TraceId)
+        | ParentId _ -> nameof(ParentId)
+        | ConnectionId _ -> nameof(ConnectionId)
+        | HierarchicalTraceId _ -> nameof(HierarchicalTraceId)
+        | StatusCode _ -> nameof(StatusCode)
+        | Port _ -> nameof(Port)
+        | Body _ -> nameof(Body)
+        | EventId _ -> nameof(EventId)
+
+        | String (k, _)
+        | Int (k, _)
+        | Bool (k, _)
+        | ArrayInt (k, _)
+        | Array (k, _)
+        | Null k
+        | Json (k, _) -> capitalize k
+
+        | TypeJson v -> capitalize v.Key

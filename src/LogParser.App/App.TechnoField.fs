@@ -36,7 +36,7 @@ module Program =
             { 
                 TechnoField = technoField 
                 Tag = Tag.JsonField; 
-                Key = key; 
+                Key = technoField |> TechnoFields.key; 
                 Header = "json object" |> Some; 
                 Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = None
@@ -45,7 +45,7 @@ module Program =
             { 
                 TechnoField = technoField 
                 Tag = Tag.JsonField; 
-                Key = "body"; 
+                Key = technoField |> TechnoFields.key; 
                 Header = "json object" |> Some; 
                 Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = None
@@ -54,7 +54,7 @@ module Program =
             { 
                 TechnoField = technoField 
                 Tag = Tag.AnnotatedJsonField; 
-                Key = "message"; 
+                Key = technoField |> TechnoFields.key; 
                 Header = "json object" |> Some; 
                 Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = text |> Some
@@ -66,7 +66,7 @@ module Program =
             { 
                 TechnoField = technoField 
                 Tag = Tag.AnnotatedJsonField; 
-                Key = "message"; 
+                Key = technoField |> TechnoFields.key; 
                 Header = $"parameters:" |> Some; 
                 Json = parameter |> Some; 
                 Text = text |> Some
