@@ -196,6 +196,14 @@ module ParserTests =
         } |> Result.runTest
 
 
+    [<TestCaseSource(typeof<ParserTestCases>, nameof ParserTestCases.InnerField)>]
+    let ``inner field parsing tests`` (input: string, expected: TechnoField) =
+        result {
+            let! res = runResult innerField input
+            res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
+        } |> Result.runTest
+
+
     [<TestCaseSource(typeof<ParserTestCases>, nameof ParserTestCases.LogTests)>]
     let ``log parsing tests`` (input: string, expected: Log) =
         result {

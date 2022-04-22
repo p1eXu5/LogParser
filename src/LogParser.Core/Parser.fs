@@ -67,7 +67,7 @@ let customQuotelessStringField pIdentifier =
 
 let customIntField pIdentifier =
     pIdentifier
-    .>> fieldDelimiter
+    .>>? fieldDelimiter
     .>>.? pint32
     .>> ws
     .>>? followedBy (skipChar ',' <|> skipChar '}' <|> eof <|> skipNewline)
@@ -328,11 +328,12 @@ let innerField : Parser<TechnoField, unit> =
         attempt(array (fieldIdentifier "\\\"") "\\\"")
         attempt(arrayInt (fieldIdentifier "\\\""))
         customStringField (fieldIdentifier "\\\"") "\\\""
-        customIntField (fieldIdentifier "\\\"")
+        attempt(customIntField (fieldIdentifier "\\\""))
         customBoolField (fieldIdentifier "\\\"") true 
         customBoolField (fieldIdentifier "\\\"") false
         json innerJson (fieldIdentifier "\\\"")
         nullField (fieldIdentifier "\\\"")
+        customQuotelessStringField (fieldIdentifier "\\\"")
     ]
     .>> ws
 
@@ -342,7 +343,7 @@ let parameterField =
         attempt(array identifier "\\\"")
         attempt(arrayInt identifier)
         customStringField identifier "\\\""
-        customIntField identifier
+        attempt(customIntField identifier)
         customBoolField identifier true 
         customBoolField identifier false
         nullField identifier

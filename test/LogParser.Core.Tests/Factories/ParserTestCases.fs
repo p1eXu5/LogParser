@@ -9,6 +9,25 @@ open System.Net
 
 type ParserTestCases () =
 
+    static member InnerField : IEnumerable =
+        seq {
+            TestCaseData(
+                """ \"customString\": \"foo\"}""",
+                TechnoField.String ("customString", "foo")
+            ).SetName("inner field parsing. String with quotes")
+
+            TestCaseData(
+                """ \"customString\": foo}""",
+                TechnoField.String ("customString", "foo")
+            ).SetName("inner field parsing. String with no quotes")
+
+            TestCaseData(
+                """ \"customString\":1502960368146}""",
+                TechnoField.String ("customString", "1502960368146")
+            ).SetName("inner field parsing. String numeric")
+        }
+
+
     static member FieldTests : IEnumerable =
         seq {
             // -------
@@ -328,13 +347,45 @@ type ParserTestCases () =
 
                     TestCaseData(
                         """
+                            "body":"{
+                                   \"enrollment\":{
+                                       \"reference\":\"49ed2e31-c172-11ec-badf-005056a147d6\"
+                                   },
+                                   \"tnc\":{
+                                       \"reference\":\"ad74bb5b-f9d6-4a0d-aa41-0512fea0d44e\",
+                                       \"timestamp\":1502960368146
+                                   }
+                               }"
+                        """,
+                        TechnoField.Body (
+                            jsonLog { 
+                                Field "enrollment"
+                                    (
+                                        jsonLog {
+                                            Field "reference" "49ed2e31-c172-11ec-badf-005056a147d6"
+                                        }
+                                    )
+
+                                Field "tnc"
+                                    (
+                                        jsonLog {
+                                            Field "reference" "ad74bb5b-f9d6-4a0d-aa41-0512fea0d44e"
+                                            Field "timestamp" "1502960368146"
+                                        }
+                                    )
+                            } 
+                            |> Log.fieldList)
+                    ).SetName("field parsing. Body with array")
+
+                    TestCaseData(
+                        """
                             "body": "
                                 {
-                                    \"authLevelReasons\": [ \"USER_ACCOUNT_AND_CARD_TOO_NEW\" ]
+                                    \"rabbitmq_node\": \"5672\"
                                 }"
                         """,
-                        TechnoField.Body (jsonLog { Field "authLevelReasons" ["USER_ACCOUNT_AND_CARD_TOO_NEW"] } |> Log.fieldList)
-                    ).SetName("field parsing. Body with array")
+                        TechnoField.Body (jsonLog { Field "rabbitmq_node" "5672" } |> Log.fieldList)
+                    ).SetName("field parsing. Body with nested json")
                 }
 
 
@@ -786,6 +837,3 @@ type ParserTestCases () =
                 } |> Log.TechnoLog
             ).SetName("log parsing. log with message parameterized with json")
         }
-
-
-
