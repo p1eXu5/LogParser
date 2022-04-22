@@ -80,6 +80,7 @@ type TechnoField =
         | Bool of key: string * value: bool
         | Array of key: string * value: string list
         | ArrayInt of key: string * value: int list
+        | ArrayJson of key: string * value: TechnoField list list
         | Null of key: string
         | Json of key: string * value: TechnoField list
         | TypeJson of TypeJson
@@ -118,6 +119,15 @@ type TechnoField =
                 | Array (k, v) -> 
                     let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
                     $"\"{k}\": [\n    {values}\n]"
+                | ArrayJson (k, v) ->
+                    let values = 
+                        let xs =
+                            v
+                            |> List.map (TechnoFields.toString 1)
+                        String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
+
+                    $"\"{k}\": [\n    {values}\n]"
+
                 | Null k -> $"\"{k}\": null"
                 | Json (k, v) -> $"\"{k}\": {v |> TechnoFields.toString 1}"
                 | TypeJson (tj) -> $"%O{tj}"
@@ -145,6 +155,16 @@ module TechnoFields =
                 state.Result.Append(tab).Append($"\"{key}\": {{\n") |> ignore
                 fold folder fields {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
                 state.Result.Append("\n").Append(tab).Append("}") |> ignore
+
+            | ArrayJson (key, fields) ->
+                state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore
+
+                fields
+                |> List.iter (fun f ->
+                    fold folder f {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
+                )
+                
+                state.Result.Append("\n").Append(tab).Append("]") |> ignore
 
             | TypeJson tj ->
                 state.Result.Append(tab).Append($"\"{tj.Key}\": {tj.TypeName} {{\n") |> ignore
@@ -199,6 +219,15 @@ module TechnoFields =
             let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
             $"[\n    {values}\n]"
 
+        | ArrayJson (_, v) -> 
+            let values = 
+                let xs =
+                    v
+                    |> List.map (TechnoFields.toString 1)
+                String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
+
+            $"[\n    {values}\n]"
+
         | Timespan (Timespan.Null)
         | Null _ -> "null"
 
@@ -242,6 +271,7 @@ module TechnoFields =
         | String (k, _)
         | Int (k, _)
         | Bool (k, _)
+        | ArrayJson (k, _)
         | ArrayInt (k, _)
         | Array (k, _)
         | Null k
@@ -281,6 +311,7 @@ module TechnoFields =
         | Int (k, _)
         | Bool (k, _)
         | ArrayInt (k, _)
+        | ArrayJson (k, _)
         | Array (k, _)
         | Null k
         | Json (k, _) -> capitalize k

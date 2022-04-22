@@ -25,6 +25,13 @@ type ParserTestCases () =
                 """ \"customString\":1502960368146}""",
                 TechnoField.String ("customString", "1502960368146")
             ).SetName("inner field parsing. String numeric")
+
+            //TestCaseData(
+            //    """ \"methods\":[{\"reference\":\"4bcd9d12-c172-11ec-badf-005056a147d6\",\"type\":\"CODE\",\"value\":\"(###)###4567\",\"scheme\":\"TEXT_ME\"}]}""",
+            //    TechnoField.ArrayJson ("customString", "1502960368146")
+            //).SetName("inner field parsing. Array of objects")
+
+            
         }
 
 

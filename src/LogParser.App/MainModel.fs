@@ -146,8 +146,10 @@ module internal Program =
         | InputChanged _ ->
             {model with Logs = []; Input = None; ProcessId = Guid.Empty}, Cmd.none
 
+
         | LogsChanged (logs, processId) when processId = model.ProcessId ->
             {model with Logs = logs; Loading = false}, Cmd.none
+
 
         | PastFromClipboardRequested ->
             let v = Clipboard.GetText() |> Some

@@ -103,6 +103,8 @@ let arrayInt pIdentifier =
     |>> TechnoField.ArrayInt
 
 
+
+
 let nullField pIdentifier =
     pIdentifier
     .>> fieldDelimiter
@@ -117,6 +119,17 @@ let nullField pIdentifier =
 let log, logR = createParserForwardedToRef()
 let innerJson, innerJsonR = createParserForwardedToRef()
 let parameterJson, parameterJsonR = createParserForwardedToRef()
+
+
+let arrayJson pIdentifier =
+    pIdentifier
+    .>>? fieldDelimiter
+    .>>? skipChar '['
+    .>> ws
+    .>>.? sepEndBy (innerJson) (attempt(ws >>. skipChar ',' >>. ws))
+    .>> ws
+    .>> skipChar ']'
+    |>> TechnoField.ArrayJson
 
 
 let json log pIdentifier =
@@ -313,11 +326,13 @@ let field : Parser<TechnoField, unit> =
         json innerJson (fieldIdentifier "\"")
         attempt(array (fieldIdentifier "\"") "\"")
         attempt(arrayInt (fieldIdentifier "\""))
+        attempt(arrayJson (fieldIdentifier "\""))
         customStringField (fieldIdentifier "\"") "\""
-        customIntField (fieldIdentifier "\"")
+        attempt(customIntField (fieldIdentifier "\""))
         customBoolField (fieldIdentifier "\"") true 
         customBoolField (fieldIdentifier "\"") false
         nullField (fieldIdentifier "\"")
+        customQuotelessStringField (fieldIdentifier "\"")
     ]
     .>> ws
 
@@ -327,6 +342,7 @@ let innerField : Parser<TechnoField, unit> =
     >>. choice [
         attempt(array (fieldIdentifier "\\\"") "\\\"")
         attempt(arrayInt (fieldIdentifier "\\\""))
+        attempt(arrayJson (fieldIdentifier "\\\""))
         customStringField (fieldIdentifier "\\\"") "\\\""
         attempt(customIntField (fieldIdentifier "\\\""))
         customBoolField (fieldIdentifier "\\\"") true 
@@ -342,6 +358,7 @@ let parameterField =
     >>. choice [
         attempt(array identifier "\\\"")
         attempt(arrayInt identifier)
+        attempt(arrayJson identifier)
         customStringField identifier "\\\""
         attempt(customIntField identifier)
         customBoolField identifier true 

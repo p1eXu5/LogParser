@@ -12,7 +12,7 @@
     
     <DataTemplate x:Key="dt_TextLog">
         <Border>
-            <TextBlock Text="{Binding Log}" />
+            <TextBox Text="{Binding Log}" IsReadOnly="True" BorderThickness="0" />
         </Border>
     </DataTemplate>
     
