@@ -392,8 +392,13 @@ let logList =
                 log |>> (fun t -> {Source = None; Fields = t} |> Log.TechnoLog)
                 many1Satisfy ((<>) '\n') |>> Log.TextLog
             ]
-        ) 
-        (newline >>. ws)
+        )
+        (
+            choice [
+                skipChar ',' >>. newline >>. ws
+                newline >>. ws
+            ]
+        )
     .>> eof
 
 let parse input =

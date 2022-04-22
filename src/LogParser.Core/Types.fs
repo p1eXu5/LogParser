@@ -297,11 +297,11 @@ module TechnoFields =
         | SourceContext _ -> nameof(SourceContext)
         | RequestId _ -> nameof(RequestId)
         | RequestPath _ -> nameof(RequestPath)
-        | SpanId _ -> nameof(SpanId)
-        | TraceId _ -> nameof(TraceId)
-        | ParentId _ -> nameof(ParentId)
+        | SpanId _ -> "4"
+        | TraceId _ -> "5"
+        | ParentId _ -> "3"
         | ConnectionId _ -> nameof(ConnectionId)
-        | HierarchicalTraceId _ -> nameof(HierarchicalTraceId)
+        | HierarchicalTraceId _ -> "6"
         | StatusCode _ -> nameof(StatusCode)
         | Port _ -> nameof(Port)
         | Body _ -> nameof(Body)

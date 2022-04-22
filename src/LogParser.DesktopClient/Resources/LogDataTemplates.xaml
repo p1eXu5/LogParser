@@ -30,7 +30,23 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="16" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="16" TextTrimming="CharacterEllipsis"
+                                   ToolTipService.InitialShowDelay="3000"
+                                   ToolTipService.ShowDuration="7000"
+                                   ToolTipService.VerticalOffset="10"
+                                   ToolTipService.HasDropShadow="true"
+                                   ToolTipService.ShowOnDisabled="true" 
+                                   ToolTipService.IsEnabled="true"
+                                   >
+                            <TextBlock.ToolTip>
+                                <ToolTip Background="#0E0E0E"
+                                         Foreground="#E6E6E6"
+                                         MaxWidth="800"
+                                         >
+                                    <TextBlock Text="{Binding Header}" TextWrapping="WrapWithOverflow"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <Button Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0" IsHitTestVisible="True">
                             <materialDesign:PackIcon Kind="ContentCopy" />
                         </Button>
