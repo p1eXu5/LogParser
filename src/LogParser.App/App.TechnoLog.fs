@@ -31,23 +31,7 @@ module Program =
                 | TechnoField.MessageParameterized _ -> true
                 | _ -> false
             )
-            |> (fun t ->
-                let traced, other =
-                    snd t
-                    |> List.partition (fun f -> 
-                        match f.TechnoField with
-                        | TechnoField.ParentId _
-                        | TechnoField.TraceId _
-                        | TechnoField.SpanId _
-                        | TechnoField.HierarchicalTraceId _
-                        | _ -> false
-                    )
 
-                (
-                    fst t,
-                    traced @ other
-                )
-            )
 
         let valueOf k =
             mainFields |> List.tryFind (fun f -> f.TechnoField |> TechnoFields.order |> (=) k) |> Option.bind (fun f -> f.Text) |> Option.defaultValue "___"
