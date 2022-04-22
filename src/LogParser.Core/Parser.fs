@@ -395,8 +395,9 @@ let logList =
         )
         (
             choice [
-                skipChar ',' >>. newline >>. ws
+                skipChar ',' >>? newline >>. ws
                 newline >>. ws
+                skipChar ','
             ]
         )
     .>> eof
