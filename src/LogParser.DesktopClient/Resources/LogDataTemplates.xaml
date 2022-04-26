@@ -85,7 +85,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0">
-                <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Left"/>
             </Border>
             <Button  Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0">
                 <materialDesign:PackIcon Kind="ContentCopy" />
@@ -118,7 +118,7 @@
     
     <DataTemplate x:Key="dt_AnnotatedJson">
         <StackPanel Orientation="Vertical" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
-            <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}"/>
+            <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" TextAlignment="Left" TextWrapping="Wrap"/>
             <Expander HorizontalAlignment="Stretch" Margin="0,10" IsExpanded="False" >
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal" >
