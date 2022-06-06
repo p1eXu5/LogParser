@@ -57,6 +57,7 @@ type TechnoField =
         | Timespan of Timespan
         | Message of string
         | MessageBoddied of header: string * body: TechnoField list
+        | MessageBoddiedWithPostfix of header: string * body: TechnoField list * postfix: string
         /// { "message": "Some text, parameters: [(\"request\": TypeName { TypeProperty: \"value\", ... })]. " }
         | MessageParameterized of header: string * parameters: MessageParameter list
         | Level of LogLevel
@@ -91,6 +92,7 @@ type TechnoField =
                 | Timespan (Timespan.Null) -> $"\"timespan\": null"
                 | Message v -> $"\"message\": \"{v}\""
                 | MessageBoddied (k, v) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}\""
+                | MessageBoddiedWithPostfix (k, v, p) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}{p}\""
                 | MessageParameterized (header, v) ->
                     let content = v |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
                     $"\"message\": \"{header} [{content}]\""
@@ -155,6 +157,32 @@ module TechnoFields =
                 state.Result.Append(tab).Append($"\"{key}\": {{\n") |> ignore
                 fold folder fields {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
                 state.Result.Append("\n").Append(tab).Append("}") |> ignore
+
+            | ArrayInt (key, fields) ->
+                state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore
+
+                let innerTab = String.replicate ((state.TabLevel + 1) * 4) " "
+
+                fields
+                |> List.take (fields.Length - 1)
+                |> List.iter (fun f ->
+                    state.Result.Append(innerTab).Append($"{f},\n") |> ignore
+                )
+                
+                state.Result.Append(innerTab).Append($"{List.last fields}\n").Append(tab).Append("]") |> ignore
+
+            | Array (key, fields) ->
+                state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore
+
+                let innerTab = String.replicate ((state.TabLevel + 1) * 4) " "
+
+                fields
+                |> List.take (fields.Length - 1)
+                |> List.iter (fun f ->
+                    state.Result.Append(innerTab).Append($"\"{f}\",\n") |> ignore
+                )
+                
+                state.Result.Append(innerTab).Append($"\"{List.last fields}\"\n").Append(tab).Append("]") |> ignore
 
             | ArrayJson (key, fields) ->
                 state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore
@@ -232,6 +260,7 @@ module TechnoFields =
         | Null _ -> "null"
 
         | MessageBoddied (v, fl) -> $"{v}\n{fl |> toString 1}"
+        | MessageBoddiedWithPostfix (v, fl, p) -> $"{v}\n{fl |> toString 1}{p}"
         | MessageParameterized (v, tj) ->
             let content = tj |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
             $"{v}\n{content}"
@@ -279,6 +308,7 @@ module TechnoFields =
 
         | Message _
         | MessageBoddied _
+        | MessageBoddiedWithPostfix _
         | MessageParameterized _ -> "Message"
 
         | TypeJson v -> capitalize v.Key
@@ -289,6 +319,7 @@ module TechnoFields =
         | Level _ -> "1"
         | MessageParameterized _
         | MessageBoddied _
+        | MessageBoddiedWithPostfix _
         | Message _ -> "2"
         | Json (k, _) when k.Equals("message", StringComparison.InvariantCultureIgnoreCase) -> "2"
         | Method _ -> nameof(Method)

@@ -22,15 +22,37 @@ type TechnoLogBuilder () =
     [<CustomOperation("timestamp")>]
     member _.Timestamp(log: TechnoLog, value: string) = { log with Fields = log.Fields @ [(value |> (Timespan.Value >> TechnoField.Timespan))] }
 
+    /// <summary>
+    /// "message" : "some text"
+    /// </summary>
     [<CustomOperation("message")>]
     member _.Message(log: TechnoLog, value: string) = { log with Fields = log.Fields @ [(value |> TechnoField.Message)] }
 
+    /// <summary>
+    /// Buddied message field:
+    /// <code>
+    /// "message" : "some text { &lt;inner_json&gt; }"
+    /// </code>
+    /// </summary>
     [<CustomOperation("message")>]
     member _.Message(log: TechnoLog, value: string, body: TechnoLog) = { log with Fields = log.Fields @ [((value, body.Fields) |> TechnoField.MessageBoddied)] }
 
+    /// <summary>
+    /// Message field with parameters:
+    /// <code>
+    /// "message" : "some text value, <b>parameters</b>: [ (\"key\": Type { &lt;json&gt; }), ... ]. "
+    /// </code>
+    /// </summary>
     [<CustomOperation("message")>]
-    member _.Message(log: TechnoLog, value: string, parameters: TypeJson) = { log with Fields = log.Fields @ [((value, [parameters  |> MessageParameter.TypeJson]) |> TechnoField.MessageParameterized)] }
+    member _.Message(log: TechnoLog, value: string, parameters: TypeJson) =
+        { log with Fields = log.Fields @ [((value, [parameters  |> MessageParameter.TypeJson]) |> TechnoField.MessageParameterized)] }
 
+    /// <summary>
+    /// Message field with parameters:
+    /// <code>
+    /// "message" : "some text value, <b>parameters</b>: [ (\"key\": Type { &lt;json&gt; }), (\"key\": value), ... ]. "
+    /// </code>
+    /// </summary>
     [<CustomOperation("message")>]
     member _.Message(log: TechnoLog, value: string, parameters: MessageParameter list) = { log with Fields = log.Fields @ [((value, parameters) |> TechnoField.MessageParameterized)] }
 

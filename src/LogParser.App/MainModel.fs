@@ -66,8 +66,8 @@ module internal Program =
         Cmd.none
 
     // TODO: move to parser
-    let fixStringData (s: string) =
-        s.Replace('\u00a0', ' ')
+    //let fixStringData (s: string) =
+    //    s.Replace('\u00a0', ' ')
 
 
     let update (msg: Msg) (model: MainModel) =
@@ -119,7 +119,7 @@ module internal Program =
         | InputChanged (Some v) when not (String.IsNullOrWhiteSpace(v)) ->
             let ``process`` (v, processId) =
                 async {
-                    match parse (fixStringData v) with
+                    match parse (v) with
                     | Ok xlog ->
                 
                         let logs =

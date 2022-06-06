@@ -31,12 +31,10 @@ type ParserTestCases () =
                 TechnoField.String ("customString", "1502960368146")
             ).SetName("inner field parsing. String numeric")
 
-            //TestCaseData(
-            //    """ \"methods\":[{\"reference\":\"4bcd9d12-c172-11ec-badf-005056a147d6\",\"type\":\"CODE\",\"value\":\"(###)###4567\",\"scheme\":\"TEXT_ME\"}]}""",
-            //    TechnoField.ArrayJson ("customString", "1502960368146")
-            //).SetName("inner field parsing. Array of objects")
-
-            
+            TestCaseData(
+                """ \"CardData.OpaqueInfo\":[\"The OpaqueInfo field is required.\"]}""",
+                TechnoField.Array ("CardData.OpaqueInfo", ["The OpaqueInfo field is required."])
+            ).SetName("inner field parsing. String array with qualified identifier")
         }
 
 
@@ -64,7 +62,6 @@ type ParserTestCases () =
                                         Field "Message" "Bad status code 404: " 
                                     } |> Log.fieldList
                             } |> MessageParameter.TypeJson])
-                
                     ).SetName("field parsing. Message with curly brackets")
 
                     TestCaseData(
@@ -75,6 +72,19 @@ type ParserTestCases () =
                         """,
                         TechnoField.MessageBoddied ("Returning next host:", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
                     ).SetName("field parsing. MessageBoddied")
+
+                    TestCaseData(
+                        """ "message": 
+                                "Returning next host: {
+                                        \"rabbitmq_node\":5672
+                                    } (status=Error)"
+                        """,
+                        TechnoField.MessageBoddiedWithPostfix (
+                            "Returning next host:",
+                            (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList),
+                            " (status=Error)"
+                        )
+                    ).SetName("field parsing. MessageBoddied with postfix")
 
                     TestCaseData(
                         """ "message": 
@@ -150,8 +160,7 @@ type ParserTestCases () =
                         TechnoField.MessageParameterized (
                             "Incoming POST request to /abc/v1.0/deploy/1234abcd-abcd-11ff-bada-000011112222, parameters:", 
                             [
-                                TechnoField.String ("tokenId", "11b145b64-44gh-36wg-7rja-33654rerw34") |> MessageParameter.TechnoField
-                                
+                                TechnoField.String ("tokenId", "11b145b64-44gh-36wg-7rja-33654rerw34") |> MessageParameter.TechnoField;
                                 {
                                     Key = "request"
                                     TypeName = "RequestDto"
@@ -180,6 +189,35 @@ type ParserTestCases () =
                             ]
                         )
                     ).SetName("field parsing. MessageParameter2")
+
+                    TestCaseData(
+                        """
+                            "message": "foo {
+                                \"rabbitmq_node\":{
+                                    \"bar\": \"5672\",
+                                    \"baz\": {
+                                        \"port\": 1234
+                                    }
+                                }
+                            }"
+                        """,
+                        jsonLog {
+                            message
+                                "foo"
+                                (jsonLog {
+                                    Field
+                                        "rabbitmq_node"
+                                        (jsonLog {
+                                             Field "bar" "5672"
+                                             Field 
+                                                "baz"
+                                                (jsonLog {
+                                                    Field "port" 1234
+                                                })
+                                        })
+                                })
+                        } |> Log.fieldList |> List.head
+                    ).SetName("field parsing. Message with nested json")
 
                     TestCaseData(
                         """

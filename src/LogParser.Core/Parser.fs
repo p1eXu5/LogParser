@@ -11,16 +11,17 @@ open System.Net
 /// Skips over any sequence of *zero* or more whitespaces (space (' '), tab ('\t')
 /// or newline ("\n", "\r\n" or "\r")).
 ///</summary> 
-let ws    = spaces
-let ws1   = spaces1
+let ws = unicodeSpaces // skipManySatisfy (fun ch -> Char.IsWhiteSpace(ch))
+let ws1 = unicodeSpaces1 // Parser<unit, unit> = skipMany1Satisfy (fun ch -> Char.IsWhiteSpace(ch))
 let str s = pstring s
+
 
 
 // ----------------
 // identifier setup
 // ----------------
 let isAsciiIdStart    = fun c -> isAsciiLetter c || c = '_' || c = '$' || isDigit c
-let isAsciiIdContinue = fun c -> isAsciiLetter c || isDigit c || c = '_'
+let isAsciiIdContinue = fun c -> isAsciiLetter c || isDigit c || c = '_' || c = '.'
 
 let identifier : Parser<string, unit> =
     FParsec.CharParsers.identifier (IdentifierOptions(isAsciiIdStart = isAsciiIdStart, isAsciiIdContinue = isAsciiIdContinue))
@@ -171,14 +172,25 @@ let message =
     |>> TechnoField.Message
 
 
-let messageBuddied =
+let pmessageBuddied =
     skipString "\"message\""
     >>? fieldDelimiter
     >>? skipChar '\"'
     >>? manyCharsTill anyChar (nextCharSatisfies ((=) '[') <|> nextCharSatisfies ((=) '{') <|> nextCharSatisfies ((=) '\"'))
     .>>.? attempt(innerJson)
-    .>> skipChar '\"'
+
+
+let messageBuddied =
+    pmessageBuddied
+    .>>? skipChar '\"'
     |>> (fun t -> TechnoField.MessageBoddied ((fst t).Trim(), (snd t)))
+
+let messageBuddiedWithPostfix =
+    pmessageBuddied
+    .>>.? manyCharsTill anyChar (nextCharSatisfies ((=) '\"'))
+    |>> (fun t -> 
+        let ((k, fl), p) = t
+        TechnoField.MessageBoddiedWithPostfix (k.Trim(), fl, p))
 
 
 let typeJson p =
@@ -305,6 +317,7 @@ let field : Parser<TechnoField, unit> =
         predefinedNullField "timestamp" (TechnoField.Timespan Timespan.Null)
         messageParameterized
         messageBuddied
+        messageBuddiedWithPostfix
         message
         predefinedStringField "host" TechnoField.Host
         predefinedStringField "sourceContext" TechnoField.SourceContext
