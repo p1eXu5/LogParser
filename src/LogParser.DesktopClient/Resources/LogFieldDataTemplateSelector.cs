@@ -28,6 +28,9 @@ public class LogFieldDataTemplateSelector : DataTemplateSelector
 
                 case Tag.AnnotatedJsonField:
                     return element.FindResource("dt_AnnotatedJson") as DataTemplate;
+
+                case Tag.WithPostfixAnnotatedJsonField:
+                    return element.FindResource("dt_WithPostfixAnnotatedJson") as DataTemplate;
             } 
         }
         return null;

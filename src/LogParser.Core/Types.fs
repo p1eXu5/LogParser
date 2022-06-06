@@ -84,6 +84,7 @@ type TechnoField =
         | ArrayJson of key: string * value: TechnoField list list
         | Null of key: string
         | Json of key: string * value: TechnoField list
+        | JsonAnnotated of key: string * header: string * body: TechnoField list
         | TypeJson of TypeJson
         with
             override this.ToString() =
@@ -132,6 +133,7 @@ type TechnoField =
 
                 | Null k -> $"\"{k}\": null"
                 | Json (k, v) -> $"\"{k}\": {v |> TechnoFields.toString 1}"
+                | JsonAnnotated (k, h, v) -> $"\"{k}\": \"{h}{v |> TechnoFields.toString 1}\""
                 | TypeJson (tj) -> $"%O{tj}"
 
 module TechnoFields =
@@ -157,6 +159,11 @@ module TechnoFields =
                 state.Result.Append(tab).Append($"\"{key}\": {{\n") |> ignore
                 fold folder fields {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
                 state.Result.Append("\n").Append(tab).Append("}") |> ignore
+
+            | JsonAnnotated (key, header, fields) ->
+                state.Result.Append(tab).Append($"\"{key}\": \"{header} {{\n") |> ignore
+                fold folder fields {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
+                state.Result.Append("\n").Append(tab).Append("}\"") |> ignore
 
             | ArrayInt (key, fields) ->
                 state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore
@@ -264,6 +271,7 @@ module TechnoFields =
         | MessageParameterized (v, tj) ->
             let content = tj |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
             $"{v}\n{content}"
+        | JsonAnnotated (_, h, v) -> $"{h}\n{v |> toString 1}"
         | Body v
         | Json (_, v) -> v |> toString 1
         | TypeJson v -> v.ToString()
@@ -304,6 +312,7 @@ module TechnoFields =
         | ArrayInt (k, _)
         | Array (k, _)
         | Null k
+        | JsonAnnotated (k, _, _)
         | Json (k, _) -> capitalize k
 
         | Message _
@@ -346,5 +355,6 @@ module TechnoFields =
         | Array (k, _)
         | Null k
         | Json (k, _) -> capitalize k
+        | JsonAnnotated (k, _, _) -> capitalize k
 
         | TypeJson v -> capitalize v.Key

@@ -38,6 +38,16 @@ type TechnoLogBuilder () =
     member _.Message(log: TechnoLog, value: string, body: TechnoLog) = { log with Fields = log.Fields @ [((value, body.Fields) |> TechnoField.MessageBoddied)] }
 
     /// <summary>
+    /// Buddied message field with postfix:
+    /// <code>
+    /// "message" : "some text { &lt;inner_json&gt; } postfix"
+    /// </code>
+    /// </summary>
+    [<CustomOperation("message")>]
+    member _.Message(log: TechnoLog, value: string, body: TechnoLog, postfix: string) =
+        { log with Fields = log.Fields @ [((value, body.Fields, postfix) |> TechnoField.MessageBoddiedWithPostfix)] }
+
+    /// <summary>
     /// Message field with parameters:
     /// <code>
     /// "message" : "some text value, <b>parameters</b>: [ (\"key\": Type { &lt;json&gt; }), ... ]. "

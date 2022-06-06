@@ -12,12 +12,14 @@ type Model =
         Text: string option
         Json: string option
         Tag: Tag
+        Postfix: string option
     }
 and
     Tag =
         | SimpleField = 0
         | JsonField = 1
         | AnnotatedJsonField = 2
+        | WithPostfixAnnotatedJsonField = 3
 
 type Msg = CopyValueRequested
 
@@ -32,7 +34,7 @@ module Program =
         
 
         match technoField with
-        | TechnoField.Json (key, fields) ->
+        | TechnoField.Json (_, fields) ->
             { 
                 TechnoField = technoField 
                 Tag = Tag.JsonField; 
@@ -40,6 +42,17 @@ module Program =
                 Header = "json object" |> Some; 
                 Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = None
+                Postfix = None
+            }
+        | TechnoField.JsonAnnotated (_, header, fields) ->
+            { 
+                TechnoField = technoField 
+                Tag = Tag.AnnotatedJsonField; 
+                Key = technoField |> TechnoFields.key; 
+                Header = "json object" |> Some; 
+                Json = fields |> TechnoFields.toString 1 |> Some; 
+                Text = header |> Some
+                Postfix = None
             }
         | TechnoField.Body fields ->
             { 
@@ -49,6 +62,7 @@ module Program =
                 Header = "json object" |> Some; 
                 Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = None
+                Postfix = None
             }
         | TechnoField.MessageBoddied (text, fields) ->
             { 
@@ -58,6 +72,18 @@ module Program =
                 Header = "json object" |> Some; 
                 Json = fields |> TechnoFields.toString 1 |> Some; 
                 Text = text |> Some
+                Postfix = None
+            }
+
+        | TechnoField.MessageBoddiedWithPostfix (text, fields, postfix) ->
+            { 
+                TechnoField = technoField 
+                Tag = Tag.WithPostfixAnnotatedJsonField;
+                Key = technoField |> TechnoFields.key; 
+                Header = "json object" |> Some; 
+                Json = fields |> TechnoFields.toString 1 |> Some; 
+                Text = text |> Some
+                Postfix = postfix |> Some
             }
 
         | TechnoField.MessageParameterized (text, typeJson) ->
@@ -70,6 +96,7 @@ module Program =
                 Header = $"parameters:" |> Some; 
                 Json = parameter |> Some; 
                 Text = text |> Some
+                Postfix = None
             }
 
         | _ ->
@@ -80,6 +107,7 @@ module Program =
                 Key = technoField |> TechnoFields.key; 
                 Text = technoField |> TechnoFields.value |> Some;
                 Json = None
+                Postfix = None
             }
 
 
@@ -106,6 +134,7 @@ module Program =
             "Key" |> Binding.oneWay (fun m -> m.Key)
             "Text" |> Binding.oneWayOpt (fun m -> m.Text)
             "Header" |> Binding.oneWayOpt (fun m -> m.Header)
+            "Postfix" |> Binding.oneWayOpt (fun m -> m.Postfix)
             "Json" |> Binding.oneWayOpt (fun m -> m.Json)
             "CopyCommand" |> Binding.cmd Msg.CopyValueRequested
         ]

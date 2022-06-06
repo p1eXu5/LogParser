@@ -531,6 +531,15 @@ type ParserTestCases () =
                                 })
                         } |> Log.fieldList |> List.head
                     ).SetName("field parsing. Json nested")
+
+                    TestCaseData(
+                        """
+                            "foo": "Error: {
+                                \"rabbitmq_node\":5672
+                            }"
+                        """,
+                        TechnoField.JsonAnnotated ("foo", "Error: ", (jsonLog { Field "rabbitmq_node" 5672 } |> Log.fieldList))
+                    ).SetName("field parsing. Json annotated")
                 }
         }
 
@@ -553,7 +562,47 @@ type ParserTestCases () =
             TestCaseData(
                 """
                     {
-                        "timestamp":"2022-04-14T13:25:31.115Z",
+                        "message":
+                            "Response to POST /v8/rock/and/roll 200 
+                                {
+                                    \"bin\": \"123456\",
+                                    \"productId\":\"prd\",
+                                    \"metadata\":{
+                                        \"lastDigits\":\"8945\",
+                                        \"exp\":\"1234\",
+                                        \"expFormat\":\"MMYY\"
+                                },
+                                \"cardId\":\"a3ca84ba-6d18-4cd4-a5d4-4dd097ad3eb9\",
+                                \"issuerId\":\"482386d9-3507-4bef-a227-7bcdb01f1e70\",
+                                \"designId\":\"DF09987BC2F\"
+                            } (status=Error)"
+                    }
+                """,
+                jsonLog {
+                    message
+                        "Response to POST /v8/rock/and/roll 200"
+                        (jsonLog {
+                            Field "bin" "123456"
+                            Field "productId" "prd"
+                            Field 
+                                "metadata"
+                                (jsonLog {
+                                    Field "lastDigits" "8945"
+                                    Field "exp" "1234"
+                                    Field "expFormat" "MMYY"
+                                })
+                            
+                            Field "cardId" "a3ca84ba-6d18-4cd4-a5d4-4dd097ad3eb9"
+                            Field "issuerId" "482386d9-3507-4bef-a227-7bcdb01f1e70"
+                            Field "designId" "DF09987BC2F"
+                        })
+                        " (status=Error)"
+                } |> Log.TechnoLog
+            ).SetName("log parsing. with buddied message with postfix")
+
+            TestCaseData(
+                """
+                    {
                         "message":
                             "Response to POST /v8/rock/and/roll 200 
                                 {
@@ -571,7 +620,6 @@ type ParserTestCases () =
                     }
                 """,
                 jsonLog {
-                    timestamp "2022-04-14T13:25:31.115Z"
                     message
                         "Response to POST /v8/rock/and/roll 200"
                         (jsonLog {

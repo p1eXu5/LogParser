@@ -136,6 +136,28 @@
             </Expander> 
         </StackPanel>
     </DataTemplate>
-    
-    
+
+    <DataTemplate x:Key="dt_WithPostfixAnnotatedJson">
+        <StackPanel Orientation="Vertical" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
+            <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" TextAlignment="Left" TextWrapping="Wrap"/>
+            <Expander HorizontalAlignment="Stretch" Margin="0,10" IsExpanded="False" >
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal" >
+                        <Border>
+                            <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="14" VerticalAlignment="Center"/>
+                        </Border>
+                        <Button Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0">
+                            <materialDesign:PackIcon Kind="ContentCopy" />
+                        </Button>
+                    </StackPanel>
+                </Expander.Header>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Json}" Margin="22,10" />
+                </ScrollViewer>
+            </Expander>
+            <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Postfix}" TextAlignment="Left" TextWrapping="Wrap"/>
+        </StackPanel>
+    </DataTemplate>
+
+
 </ResourceDictionary>

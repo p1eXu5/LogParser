@@ -30,6 +30,9 @@ let fieldStringValue (q: string) =
     skipString q
     >>. manyCharsTill anyChar (previousCharSatisfiesNot ((=) '\\') >>. skipString q)
 
+/// <summary>
+/// identifier between q
+/// </summary>
 let fieldIdentifier (q: string) =
     between (skipString q) (skipString q) identifier
 
@@ -172,7 +175,7 @@ let message =
     |>> TechnoField.Message
 
 
-let pmessageBuddied =
+let pMessageBuddied =
     skipString "\"message\""
     >>? fieldDelimiter
     >>? skipChar '\"'
@@ -180,14 +183,29 @@ let pmessageBuddied =
     .>>.? attempt(innerJson)
 
 
+let pBuddied =
+    fieldIdentifier "\""
+    .>>? fieldDelimiter
+    .>>? skipChar '\"'
+    .>>.? many1CharsTill anyChar (nextCharSatisfies ((=) '[') <|> nextCharSatisfies ((=) '{') <|> nextCharSatisfies ((=) '\"'))
+    .>>.? attempt(innerJson)
+
+let jsonAnnotated =
+    pBuddied
+    .>>? skipChar '\"'
+    |>> (fun t -> 
+        let ((key, header), fl) = t
+        TechnoField.JsonAnnotated (key.Trim(), header, fl))
+
 let messageBuddied =
-    pmessageBuddied
+    pMessageBuddied
     .>>? skipChar '\"'
     |>> (fun t -> TechnoField.MessageBoddied ((fst t).Trim(), (snd t)))
 
 let messageBuddiedWithPostfix =
-    pmessageBuddied
-    .>>.? manyCharsTill anyChar (nextCharSatisfies ((=) '\"'))
+    pMessageBuddied
+    .>>.? many1CharsTill anyChar (nextCharSatisfies ((=) '\"'))
+    .>>? skipChar '\"'
     |>> (fun t -> 
         let ((k, fl), p) = t
         TechnoField.MessageBoddiedWithPostfix (k.Trim(), fl, p))
@@ -336,6 +354,7 @@ let field : Parser<TechnoField, unit> =
         statusCodeField
         body
         notWrappedJson (fieldIdentifier "\"")
+        jsonAnnotated
         json innerJson (fieldIdentifier "\"")
         attempt(array (fieldIdentifier "\"") "\"")
         attempt(arrayInt (fieldIdentifier "\""))
