@@ -17,6 +17,11 @@ type ParserTestCases () =
             ).SetName("inner field parsing. String with quotes")
 
             TestCaseData(
+                """ \"customString\": \"12345\"}""",
+                TechnoField.String ("customString", "12345")
+            ).SetName("inner field parsing. String int with quotes")
+
+            TestCaseData(
                 """ \"customString\": foo}""",
                 TechnoField.String ("customString", "foo")
             ).SetName("inner field parsing. String with no quotes")
@@ -354,6 +359,16 @@ type ParserTestCases () =
 
                     TestCaseData(
                         """
+                            "body":"
+                                {
+                                    \"rabbitmq_node\": \"5672\"
+                                }"
+                        """,
+                        TechnoField.Body (jsonLog { Field "rabbitmq_node" "5672" } |> Log.fieldList)
+                    ).SetName("field parsing. Body with nested json 2")
+
+                    TestCaseData(
+                        """
                             "body":"{
                                    \"enrollment\":{
                                        \"reference\":\"49ed2e31-c172-11ec-badf-005056a147d6\"
@@ -383,16 +398,6 @@ type ParserTestCases () =
                             } 
                             |> Log.fieldList)
                     ).SetName("field parsing. Body with array")
-
-                    TestCaseData(
-                        """
-                            "body": "
-                                {
-                                    \"rabbitmq_node\": \"5672\"
-                                }"
-                        """,
-                        TechnoField.Body (jsonLog { Field "rabbitmq_node" "5672" } |> Log.fieldList)
-                    ).SetName("field parsing. Body with nested json")
                 }
 
 
@@ -746,7 +751,6 @@ type ParserTestCases () =
                 } |> Log.TechnoLog
             ).SetName("log parsing. complex log with array")
 
-
             TestCaseData(
                 """
                     {
@@ -843,4 +847,56 @@ type ParserTestCases () =
                         })
                 } |> Log.TechnoLog
             ).SetName("log parsing. log with message parameterized with json")
+
+            // TODO: will be fixed when '\u00a0' whitespace will be added to parser
+            TestCaseData(
+                """
+                {
+                    "body":"{\"recipient\": \"sdf\"}"
+                }
+                """,
+
+                jsonLog {
+                    body (
+                        jsonLog {
+                            Field "recipient" "sdf"
+                        }
+                    )
+                } |> Log.TechnoLog
+                
+            ).SetName("log parsing. body with simple json field")
+
+            // TODO: will be fixed when '\u00a0' whitespace will be added to parser
+            TestCaseData(
+                """
+                {
+                    "body":"{
+                        \"requestInfo\": { 
+                            \"id\": \"14d0b39f-06d3-41d4-a9ec-3242408da069\", 
+                            \"recipient\": \"12345\", 
+                            \"sender\": \"APAY\", 
+                            \"ts\": \"2022-6-3T06:49:16.655Z\", 
+                            \"exchangeId\": \"a2ae9efe-1efc-405e-8236-cbd58b329a69\" 
+                        }
+                    }"
+                }
+                """,
+
+                jsonLog {
+                    body (
+                        jsonLog {
+                            Field "requestInfo" (
+                                jsonLog {
+                                    Field "id" "14d0b39f-06d3-41d4-a9ec-3242408da069"
+                                    Field "recipient" "12345"
+                                    Field "sender" "APAY"
+                                    Field "ts" "2022-6-3T06:49:16.655Z"
+                                    Field "exchangeId" "a2ae9efe-1efc-405e-8236-cbd58b329a69"
+                                }
+                            )
+                        }
+                    )
+                } |> Log.TechnoLog
+                
+            ).SetName("log parsing. body with nested json")
         }

@@ -21,6 +21,7 @@ type LogFile =
 
 type internal MainModel =
     {
+        AssemblyVersion: string
         LogFile: LogFile
         Input: string option
         //Output: string option
@@ -51,7 +52,10 @@ type Msg =
 module internal Program =
 
     let init () =
+
+        let assemblyVer = "Version" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
         {
+            AssemblyVersion = assemblyVer
             LogFile = LogFile.New
             Input = None
             //Output = None
@@ -61,6 +65,9 @@ module internal Program =
         },
         Cmd.none
 
+    // TODO: move to parser
+    let fixStringData (s: string) =
+        s.Replace('\u00a0', ' ')
 
 
     let update (msg: Msg) (model: MainModel) =
@@ -112,7 +119,7 @@ module internal Program =
         | InputChanged (Some v) when not (String.IsNullOrWhiteSpace(v)) ->
             let ``process`` (v, processId) =
                 async {
-                    match parse v with
+                    match parse (fixStringData v) with
                     | Ok xlog ->
                 
                         let logs =
@@ -190,6 +197,8 @@ module internal Program =
 
     let bindings () : Binding<MainModel, Msg> list =
         [
+            "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
+
             "Input" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
             //"Output" |> Binding.oneWayOpt (fun m -> m.Output)
 
