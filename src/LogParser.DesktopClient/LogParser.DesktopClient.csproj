@@ -8,8 +8,8 @@
     <PackageIcon>gnomelogs_103380.ico</PackageIcon>
     <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
     <Title>Log Parser</Title>
-    <AssemblyVersion>1.0.10</AssemblyVersion>
-    <FileVersion>1.0.10.0</FileVersion>
+    <AssemblyVersion>1.0.11</AssemblyVersion>
+    <FileVersion>1.0.11.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
   </PropertyGroup>
 
