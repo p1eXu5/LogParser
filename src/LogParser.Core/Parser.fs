@@ -159,6 +159,7 @@ let body =
     >>? skipChar '\"'
     >>. ws
     >>? innerJson
+    .>> ws
     .>> skipChar '\"'
     |>> TechnoField.Body
 
