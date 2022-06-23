@@ -11,10 +11,12 @@ type LogMessage =
     }
 
 
-let searchLogs (uri: string) (dt: DateTime option) (traceId: string) =
+let searchLogs (uri: string) (dt: DateTime option) (login: string) (password: string) (traceId: string) =
     task {
         let node = Uri(uri)
         use settings = new ConnectionSettings(node)
+        settings.DefaultFieldNameInferrer(id).BasicAuthentication(login, password) |> ignore
+
         dt |> Option.iter(fun dt -> settings.DefaultIndex(sprintf "filebeat-%i.%i.%i" dt.Year dt.Month dt.Day) |> ignore)
         let client = ElasticClient(settings)
 

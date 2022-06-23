@@ -56,7 +56,7 @@ type Msg =
     | SaveFileAs
     | SaveFile
     | NewFile
-    | SearchKibanaLogs of Operation<(string * string * DateTime option), string seq>
+    | SearchKibanaLogs of Operation<unit, string seq>
     | SetTraceId of string option
     | SetLogsDate of DateTime option
     | SetKibanaBaseUri of string option
@@ -211,8 +211,18 @@ module internal Program =
         | SetKibanaLogin login -> { model with KibanaLogin = login }, Cmd.none
         | SetKibanaPassword pass -> { model with KibanaPassword = pass }, Cmd.none
 
-        | SearchKibanaLogs (Start (traceId, uri, logsDate)) ->
-            model, Cmd.OfTask.perform (Kibana.searchLogs uri logsDate) traceId (Finish >> SearchKibanaLogs)
+        | SearchKibanaLogs (Start ()) ->
+            model
+            , Cmd.OfTask.perform 
+                (
+                    Kibana.searchLogs 
+                        (model.KibanaBaseUri |> Option.get) 
+                        model.LogsDate 
+                        (model.KibanaLogin |> Option.get) 
+                        (model.KibanaPassword |> Option.get)
+                ) 
+                (model.TraceId |> Option.get) 
+                (Finish >> SearchKibanaLogs)
 
         | SearchKibanaLogs (Finish logs) when logs |> (not << Seq.isEmpty) ->
             let logMessage = String.Join(Environment.NewLine, logs) |> Some
@@ -310,7 +320,7 @@ module internal Program =
                 m.KibanaPassword
                 |> Option.bind (fun _ -> m.KibanaLogin)
                 |> Option.bind (fun _ -> m.KibanaBaseUri)
-                |> Option.bind (fun uri -> m.TraceId |> Option.map (fun traceId -> (traceId, uri)))
-                |> Option.map (fun t -> (fst t, snd t, m.LogsDate) |> Start |> SearchKibanaLogs)
+                |> Option.bind (fun _ -> m.TraceId)
+                |> Option.map (fun _ -> Start () |> SearchKibanaLogs)
             )
         ]
