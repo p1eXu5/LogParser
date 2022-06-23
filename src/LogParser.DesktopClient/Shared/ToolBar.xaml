@@ -57,13 +57,13 @@
                      MinWidth="200"
                      Margin="10,0,0,10"
                      />
-            <TextBox Text="{Binding KibanaPassword, UpdateSourceTrigger=PropertyChanged}" 
-                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                     materialDesign:HintAssist.Hint="Password" 
-                     VerticalAlignment="Center" 
-                     MinWidth="200"
-                     Margin="10,0,0,10"
-                     />
+            <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"
+                         Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                         materialDesign:HintAssist.Hint="Password" 
+                         VerticalAlignment="Center" 
+                         MinWidth="200"
+                         Margin="10,0,0,10"
+                         />
         </ToolBar>
     </ToolBarTray>
 </UserControl>

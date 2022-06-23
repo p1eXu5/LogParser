@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LogParser.App\LogParser.DesktopClient.ElmishApp.fsproj" />
+    <ProjectReference Include="..\LogParser.DesktopClient.ElmishApp\LogParser.DesktopClient.ElmishApp.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

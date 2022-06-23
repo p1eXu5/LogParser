@@ -303,7 +303,7 @@ module internal Program =
             "LogsDate" |> Binding.twoWayOpt ((fun m -> m.LogsDate), SetLogsDate)
             "KibanaBaseUri" |> Binding.twoWayOpt ((fun m -> m.KibanaBaseUri), SetKibanaBaseUri)
             "KibanaLogin" |> Binding.twoWayOpt ((fun m -> m.KibanaLogin), SetKibanaLogin)
-            "KibanaPassword" |> Binding.twoWayOpt ((fun m -> m.KibanaPassword), SetKibanaPassword)
+            "KibanaPassword" |> Binding.oneWayToSourceOpt (SetKibanaPassword)
 
             "SearchKibanaLogsCommand" 
             |> Binding.cmdIf (fun m ->
