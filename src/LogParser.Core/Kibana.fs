@@ -2,6 +2,7 @@
 
 open Nest
 open System
+open Elasticsearch.Net
 
 type LogMessage =
     {
@@ -31,6 +32,11 @@ let searchLogs (uri: string) (dt: DateTime option) (traceId: string) =
                 )
             )
             |> ignore
+
+        let queryJson = 
+            client
+                .RequestResponseSerializer
+                .SerializeToString(searchDescriptor, SerializationFormatting.Indented);
 
         let! result = client.SearchAsync<LogMessage>(searchDescriptor)
 
