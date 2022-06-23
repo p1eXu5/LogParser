@@ -6,9 +6,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:LogParser.DesktopClient.Shared"
              mc:Ignorable="d" 
-             d:DesignHeight="60" d:DesignWidth="500"
+             d:DesignHeight="160" d:DesignWidth="1600"
              >
-    <ToolBarTray VerticalAlignment="Center">
+    <ToolBarTray VerticalAlignment="Top">
         <ToolBar Style="{DynamicResource MaterialDesignToolBar}"
                  ClipToBounds="False"
                  >
@@ -19,6 +19,51 @@
             <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding ClearInputCommand}">
                 <materialDesign:PackIcon Kind="DeleteOutline" />
             </Button>
+        </ToolBar>
+        <ToolBar>
+            <TextBox Text="{Binding TraceId, UpdateSourceTrigger=PropertyChanged}" 
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                     materialDesign:HintAssist.Hint="Trace ID" 
+                     VerticalAlignment="Center" 
+                     MinWidth="300"
+                     Margin="10,0,10,10"
+                     />
+
+            <DatePicker Width="100"
+                        materialDesign:HintAssist.Hint="Pick Date"
+                        materialDesign:TextFieldAssist.HasClearButton="True"
+                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" 
+                        Margin="10,0,10,10"
+                        SelectedDate="{Binding LogsDate, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+            <Button Content="Request" 
+                    Style="{StaticResource MaterialDesignPaperSecondaryButton}" 
+                    Margin="10,0"
+                    Command="{Binding SearchKibanaLogsCommand}"
+                    />
+            <Separator />
+            <TextBox Text="{Binding KibanaBaseUri, UpdateSourceTrigger=PropertyChanged}" 
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                     materialDesign:HintAssist.Hint="Kibana Base URI" 
+                     VerticalAlignment="Center" 
+                     MinWidth="200"
+                     Margin="10,0,0,10"
+                     />
+            <TextBox Text="{Binding KibanaLogin, UpdateSourceTrigger=PropertyChanged}" 
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                     materialDesign:HintAssist.Hint="Login" 
+                     VerticalAlignment="Center" 
+                     MinWidth="200"
+                     Margin="10,0,0,10"
+                     />
+            <TextBox Text="{Binding KibanaPassword, UpdateSourceTrigger=PropertyChanged}" 
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                     materialDesign:HintAssist.Hint="Password" 
+                     VerticalAlignment="Center" 
+                     MinWidth="200"
+                     Margin="10,0,0,10"
+                     />
         </ToolBar>
     </ToolBarTray>
 </UserControl>

@@ -17,6 +17,8 @@
         <materialDesign:BooleanToVisibilityConverter x:Key="conv_BoolToVis"/>
     </Window.Resources>
     <DockPanel LastChildFill="True">
+        
+        <!-- MainMenu -->
         <DockPanel DockPanel.Dock="Top">
             <TextBlock DockPanel.Dock="Right" 
                        Text="{Binding AssemblyVersion}" 
@@ -25,8 +27,13 @@
                        Margin="0,0,10,0"/>
             <shared:MainMenu DataContext="{Binding}" Height="35" />
         </DockPanel>
+
+        <!-- ToolBar -->
         <shared:ToolBar DockPanel.Dock="Top" DataContext="{Binding}" />
+        
         <Border DockPanel.Dock="Top" BorderBrush="#191919" BorderThickness="1"></Border>
+
+        <!-- Content -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />

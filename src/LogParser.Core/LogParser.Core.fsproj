@@ -9,12 +9,14 @@
     <Compile Include="Types.fs" />
     <Compile Include="Dsl.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="Kibana.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FParsec" Version="1.1.1" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="2.13.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="NEST" Version="7.17.2" />
   </ItemGroup>
 
   <ItemGroup>

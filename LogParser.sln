@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{AD329E05-1
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "LogParser.Core.Tests", "test\LogParser.Core.Tests\LogParser.Core.Tests.fsproj", "{A652C3DD-F324-412D-A7CA-EA68298F2B9E}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "LogParser.App", "src\LogParser.App\LogParser.App.fsproj", "{DAE3C2B7-97F8-4F95-8C53-4A1E92B6CADE}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "LogParser.DesktopClient.ElmishApp", "src\LogParser.App\LogParser.DesktopClient.ElmishApp.fsproj", "{DAE3C2B7-97F8-4F95-8C53-4A1E92B6CADE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogParser.DesktopClient", "src\LogParser.DesktopClient\LogParser.DesktopClient.csproj", "{38244684-CC18-40BB-8D44-A59846146326}"
 EndProject

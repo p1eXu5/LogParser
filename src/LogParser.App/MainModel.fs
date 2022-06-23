@@ -12,6 +12,7 @@ open Microsoft.Win32
 open System.IO
 open Elmish.Extensions
 open System
+open LogParser.Core
 
 
 type LogFile =
@@ -28,6 +29,13 @@ type internal MainModel =
         Logs: LogModel list
         ProcessId: Guid
         Loading: bool
+
+        TraceId: string option
+        LogsDate: DateTime option
+        KibanaBaseUri: string option
+        KibanaLogin: string option
+        KibanaPassword: string option
+
     }
 and
     LogModel =
@@ -48,6 +56,13 @@ type Msg =
     | SaveFileAs
     | SaveFile
     | NewFile
+    | SearchKibanaLogs of Operation<(string * string * DateTime option), string seq>
+    | SetTraceId of string option
+    | SetLogsDate of DateTime option
+    | SetKibanaBaseUri of string option
+    | SetKibanaLogin of string option
+    | SetKibanaPassword of string option
+    
 
 module internal Program =
 
@@ -62,6 +77,12 @@ module internal Program =
             Logs = []
             ProcessId = Guid.Empty
             Loading = false
+
+            TraceId = None
+            LogsDate = None
+            KibanaBaseUri = None
+            KibanaLogin = None
+            KibanaPassword = None
         },
         Cmd.none
 
@@ -72,8 +93,8 @@ module internal Program =
 
     let update (msg: Msg) (model: MainModel) =
         match msg with
-        | NewFile ->
-            init ()
+        | NewFile -> init ()
+
         | OpenFile ->
             let fd = OpenFileDialog()
             fd.Filter <- "text files (*.txt)|*.txt|All files (*.*)|*.*"
@@ -153,10 +174,8 @@ module internal Program =
         | InputChanged _ ->
             {model with Logs = []; Input = None; ProcessId = Guid.Empty}, Cmd.none
 
-
         | LogsChanged (logs, processId) when processId = model.ProcessId ->
             {model with Logs = logs; Loading = false}, Cmd.none
-
 
         | PastFromClipboardRequested ->
             let v = Clipboard.GetText() |> Some
@@ -186,6 +205,18 @@ module internal Program =
 
             Clipboard.SetText(log.Log.Fields |> TechnoFields.toString 1)
             model, Cmd.none
+        | SetTraceId traceId -> { model with TraceId = traceId }, Cmd.none
+        | SetLogsDate logsDate -> { model with LogsDate = logsDate }, Cmd.none
+        | SetKibanaBaseUri uri -> { model with KibanaBaseUri = uri }, Cmd.none
+        | SetKibanaLogin login -> { model with KibanaLogin = login }, Cmd.none
+        | SetKibanaPassword pass -> { model with KibanaPassword = pass }, Cmd.none
+
+        | SearchKibanaLogs (Start (traceId, uri, logsDate)) ->
+            model, Cmd.OfTask.perform (Kibana.searchLogs uri logsDate) traceId (Finish >> SearchKibanaLogs)
+
+        | SearchKibanaLogs (Finish logs) when logs |> (not << Seq.isEmpty) ->
+            let logMessage = String.Join(Environment.NewLine, logs) |> Some
+            model, Cmd.ofMsg (InputChanged logMessage)
 
         | _ -> model, Cmd.none
 
@@ -266,5 +297,20 @@ module internal Program =
                         TechnoField.Program.bindings
                      )
                 ])
+            )
+
+            "TraceId" |> Binding.twoWayOpt ((fun m -> m.TraceId), SetTraceId)
+            "LogsDate" |> Binding.twoWayOpt ((fun m -> m.LogsDate), SetLogsDate)
+            "KibanaBaseUri" |> Binding.twoWayOpt ((fun m -> m.KibanaBaseUri), SetKibanaBaseUri)
+            "KibanaLogin" |> Binding.twoWayOpt ((fun m -> m.KibanaLogin), SetKibanaLogin)
+            "KibanaPassword" |> Binding.twoWayOpt ((fun m -> m.KibanaPassword), SetKibanaPassword)
+
+            "SearchKibanaLogsCommand" 
+            |> Binding.cmdIf (fun m ->
+                m.KibanaPassword
+                |> Option.bind (fun _ -> m.KibanaLogin)
+                |> Option.bind (fun _ -> m.KibanaBaseUri)
+                |> Option.bind (fun uri -> m.TraceId |> Option.map (fun traceId -> (traceId, uri)))
+                |> Option.map (fun t -> (fst t, snd t, m.LogsDate) |> Start |> SearchKibanaLogs)
             )
         ]
