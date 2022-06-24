@@ -10,7 +10,7 @@
              >
     <ToolBarTray VerticalAlignment="Top">
         <ToolBar Style="{DynamicResource MaterialDesignToolBar}"
-                 ClipToBounds="False"
+                 ClipToBounds="True"
                  >
             <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding PasteFromClipboardCommand}">
                 <materialDesign:PackIcon Kind="ContentCopy" />
@@ -19,8 +19,16 @@
             <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding ClearInputCommand}">
                 <materialDesign:PackIcon Kind="DeleteOutline" />
             </Button>
+
+            <Button Content="Copy Search Request" 
+                    Style="{StaticResource MaterialDesignPaperSecondaryButton}" 
+                    Margin="10,0,0,0"
+                    Command="{Binding CopyKibanaRequestToClipboardCommand}"
+                    ToolTip="Copy Kibana search request for DevTools"
+                    />
         </ToolBar>
-        <ToolBar>
+
+        <ToolBar Style="{DynamicResource MaterialDesignToolBar}">
             <TextBox Text="{Binding TraceId, UpdateSourceTrigger=PropertyChanged}" 
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                      materialDesign:HintAssist.Hint="Trace ID" 
@@ -29,7 +37,7 @@
                      Margin="10,0,10,10"
                      />
 
-            <DatePicker Width="100"
+            <DatePicker Width="100"  IsEnabled="False"
                         materialDesign:HintAssist.Hint="Pick Date"
                         materialDesign:TextFieldAssist.HasClearButton="True"
                         Style="{StaticResource MaterialDesignFloatingHintDatePicker}" 
@@ -37,7 +45,7 @@
                         SelectedDate="{Binding LogsDate, UpdateSourceTrigger=PropertyChanged}"
                         />
 
-            <Button Content="Request" 
+            <Button Content="Request"  IsEnabled="False"
                     Style="{StaticResource MaterialDesignPaperSecondaryButton}" 
                     Margin="10,0"
                     Command="{Binding SearchKibanaLogsCommand}"
@@ -49,6 +57,7 @@
                      VerticalAlignment="Center" 
                      MinWidth="200"
                      Margin="10,0,0,10"
+                      IsEnabled="False"
                      />
             <TextBox Text="{Binding KibanaLogin, UpdateSourceTrigger=PropertyChanged}" 
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
@@ -56,6 +65,7 @@
                      VerticalAlignment="Center" 
                      MinWidth="200"
                      Margin="10,0,0,10"
+                      IsEnabled="False"
                      />
             <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"
                          Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
@@ -63,6 +73,7 @@
                          VerticalAlignment="Center" 
                          MinWidth="200"
                          Margin="10,0,0,10"
+                          IsEnabled="False"
                          />
         </ToolBar>
     </ToolBarTray>

@@ -27,10 +27,10 @@
                        Margin="0,0,10,0"/>
             <shared:MainMenu DataContext="{Binding}" Height="35" />
         </DockPanel>
-
+        
         <!-- ToolBar -->
         <shared:ToolBar DockPanel.Dock="Top" DataContext="{Binding}" />
-        
+
         <Border DockPanel.Dock="Top" BorderBrush="#191919" BorderThickness="1"></Border>
 
         <!-- Content -->
@@ -40,17 +40,38 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition MinWidth="500" />
             </Grid.ColumnDefinitions>
+
+            <TabControl Grid.Column="0"
+                        materialDesign:ColorZoneAssist.Mode="SecondaryDark"
+                        Style="{StaticResource MaterialDesignFilledTabControl}"
+                        SelectedIndex="{Binding SelectedInput}"
+                        >
+                <TabItem Header="Docker">
+                        <!-- Input -->
+                        <TextBox 
+                            TextWrapping="Wrap"
+                            VerticalAlignment="Stretch"
+                            MinWidth="280"
+                            AcceptsReturn="True"
+                            VerticalScrollBarVisibility="Auto"
+                            materialDesign:HintAssist.Hint="Log text"
+                            TextAlignment="Left"
+                            Text="{Binding DockerInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="#E6E6E6" />
+                </TabItem>
+                <TabItem Header="Kibana">
+                        <!-- Input -->
+                        <TextBox 
+                            TextWrapping="Wrap"
+                            VerticalAlignment="Stretch"
+                            MinWidth="280"
+                            AcceptsReturn="True"
+                            VerticalScrollBarVisibility="Auto"
+                            materialDesign:HintAssist.Hint="Log text"
+                            TextAlignment="Left"
+                            Text="{Binding KibanaInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="#E6E6E6" />
+                </TabItem>
+            </TabControl>
             
-            <!-- Input -->
-            <TextBox 
-                TextWrapping="Wrap"
-                VerticalAlignment="Stretch"
-                MinWidth="280"
-                AcceptsReturn="True"
-                VerticalScrollBarVisibility="Auto"
-                materialDesign:HintAssist.Hint="Log text"
-                TextAlignment="Left"
-                Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="#E6E6E6" />
             
             <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
             

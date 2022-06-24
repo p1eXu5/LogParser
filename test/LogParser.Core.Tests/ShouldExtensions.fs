@@ -54,7 +54,7 @@ module FParsec =
             | Success (ok,_,_) -> Result.Ok ok
             | Failure (err,_,_) -> Result.Error err
 
-[<AutoOpen>]
+[<RequireQualifiedAccess>]
 module Result =
 
     let runTest = function
@@ -69,6 +69,11 @@ module Result =
     [<DebuggerStepThrough>]
     let inline shouldBe expected = function
         | Result.Ok ok -> ok |> FsUnit.shouldL be expected ""
+        | Result.Error err -> raise (AssertionException($"Should be %A{expected} but there is an error: %A{err}"))
+
+    [<DebuggerStepThrough>]
+    let inline should ``constraint`` expected = function
+        | Result.Ok ok -> ok |> FsUnit.shouldL ``constraint`` expected ""
         | Result.Error err -> raise (AssertionException($"Should be %A{expected} but there is an error: %A{err}"))
 
 

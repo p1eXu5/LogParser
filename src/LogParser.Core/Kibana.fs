@@ -1,8 +1,9 @@
 ﻿module LogParser.Core.Kibana
 
-open Nest
 open System
 open Elasticsearch.Net
+
+
 
 type LogMessage =
     {
@@ -10,6 +11,62 @@ type LogMessage =
         FullMessage: string
     }
 
+
+
+open FParsec
+
+let fullMessage =
+    between (skipString "\"\"\"") (skipString "\"\"\"") (manyCharsTill anyChar (followedBy (manyMinMaxSatisfy 3 3 ((=) '\"') )))
+
+let kibanaOutput =
+    skipCharsTillString "\"\"\"" false 2048
+    >>. sepEndBy fullMessage (attempt(skipCharsTillString "\"\"\"" false 2048)) 
+    .>> skipMany anyChar
+    .>> eof
+
+let parse input =
+    run kibanaOutput input
+    |> function
+        | Success (ok,_,_) -> Result.Ok ok
+        | Failure (err,_,_) -> Result.Error err
+
+
+
+let searchRequest logCount traceId =
+    $"""
+GET /filebeat-*/_search
+{{
+  "query": {{
+    "bool": {{
+      "filter": [
+        {{
+          "term": {{
+            "TraceId": {{
+              "value": "{traceId}"
+            }}
+          }}
+        }}
+      ]
+    }}
+  }},
+  "size": {logCount},
+  "sort": [
+    {{
+      "@timestamp": {{
+        "order": "asc"
+      }}
+    }}
+  ],
+  "_source": [
+    "@timestamp",
+    "TraceId",
+    "fullMessage"
+  ]
+}}
+    """
+
+
+open Nest
 
 let searchLogs (uri: string) (dt: DateTime option) (login: string) (password: string) (traceId: string) =
     task {

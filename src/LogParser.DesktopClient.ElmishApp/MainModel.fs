@@ -4,6 +4,7 @@ open System
 open System.Windows;
 
 open Elmish
+open FsToolkit.ErrorHandling
 
 open LogParser.App
 open LogParser.Core.Parser
@@ -24,14 +25,20 @@ type internal MainModel =
     {
         AssemblyVersion: string
         LogFile: LogFile
+
         Input: string option
+        KibanaInput: string option
+        SelectedInput: int
+
         //Output: string option
         Logs: LogModel list
         ProcessId: Guid
         Loading: bool
 
         TraceId: string option
+        LogCount: int
         LogsDate: DateTime option
+
         KibanaBaseUri: string option
         KibanaLogin: string option
         KibanaPassword: string option
@@ -45,6 +52,8 @@ and
 
 type Msg =
     | InputChanged of string option
+    | KibanaInputChanged of string option
+    | SetSelectedInput of int
     | LogsChanged of (LogModel list * Guid)
     | PastFromClipboardRequested
     | CleanInputRequested
@@ -62,6 +71,7 @@ type Msg =
     | SetKibanaBaseUri of string option
     | SetKibanaLogin of string option
     | SetKibanaPassword of string option
+    | CopyKibanaRequestToClipboard
     
 
 module internal Program =
@@ -72,14 +82,21 @@ module internal Program =
         {
             AssemblyVersion = assemblyVer
             LogFile = LogFile.New
+
             Input = None
+            KibanaInput = None
+            SelectedInput = 0
+
             //Output = None
             Logs = []
             ProcessId = Guid.Empty
             Loading = false
 
             TraceId = None
+            LogCount = 500
+
             LogsDate = None
+
             KibanaBaseUri = None
             KibanaLogin = None
             KibanaPassword = None
@@ -108,6 +125,7 @@ module internal Program =
                 {
                     model with 
                         LogFile = LogFile.Existing fd.FileName
+                        SelectedInput = 1
                         Loading = true
                 }, Cmd.OfTask.perform ``process`` () InputChanged
             else 
@@ -137,8 +155,18 @@ module internal Program =
 
             (model, Cmd.none)
 
+        | SetSelectedInput ind -> { model with SelectedInput = ind }, Cmd.none
+
+        | KibanaInputChanged (Some v) when not (String.IsNullOrWhiteSpace(v)) ->
+            Kibana.parse v
+            |> Result.map (fun l -> String.Join(Environment.NewLine, l))
+            |> Result.map (fun s ->
+                { model with KibanaInput = v |> Some }, Cmd.ofMsg (InputChanged (Some s))
+            )
+            |> Result.defaultValue (model, Cmd.none)
+
         | InputChanged (Some v) when not (String.IsNullOrWhiteSpace(v)) ->
-            let ``process`` (v, processId) =
+            let parseAsync (v, processId) =
                 async {
                     match parse (v) with
                     | Ok xlog ->
@@ -169,7 +197,7 @@ module internal Program =
                     ProcessId = processId
                     Loading = true
             }
-            , Cmd.OfAsync.perform ``process`` (v, processId) LogsChanged
+            , Cmd.OfAsync.perform parseAsync (v, processId) LogsChanged
 
         | InputChanged _ ->
             {model with Logs = []; Input = None; ProcessId = Guid.Empty}, Cmd.none
@@ -179,10 +207,17 @@ module internal Program =
 
         | PastFromClipboardRequested ->
             let v = Clipboard.GetText() |> Some
-            model, Cmd.ofMsg (InputChanged v)
+            match model.SelectedInput with
+            | 0 -> model, Cmd.ofMsg (InputChanged v)
+            | 1 -> model, Cmd.ofMsg (KibanaInputChanged v)
+            | _ -> model, Cmd.none
+
+        | CopyKibanaRequestToClipboard ->
+            do Clipboard.SetText(Kibana.searchRequest model.LogCount (model.TraceId |> Option.get))
+            model, Cmd.none
 
         | CleanInputRequested ->
-            {model with Input = None; Logs = []; ProcessId = Guid.Empty; Loading = false}, Cmd.none
+            {model with Input = None; KibanaInput = None; Logs = []; ProcessId = Guid.Empty; Loading = false}, Cmd.none
 
         | TechnoLogMsg (id, TechnoFieldMsg (key, msg)) ->
             let log =
@@ -205,6 +240,7 @@ module internal Program =
 
             Clipboard.SetText(log.Log.Fields |> TechnoFields.toString 1)
             model, Cmd.none
+
         | SetTraceId traceId -> { model with TraceId = traceId }, Cmd.none
         | SetLogsDate logsDate -> { model with LogsDate = logsDate }, Cmd.none
         | SetKibanaBaseUri uri -> { model with KibanaBaseUri = uri }, Cmd.none
@@ -240,7 +276,16 @@ module internal Program =
         [
             "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
 
-            "Input" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
+            "DockerInput" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
+            "KibanaInput" |> Binding.twoWayOpt ((fun m -> m.KibanaInput), Msg.KibanaInputChanged)
+            "SelectedInput" |> Binding.twoWay ((fun m -> m.SelectedInput), Msg.SetSelectedInput)
+            
+            "CopyKibanaRequestToClipboardCommand" 
+            |> Binding.cmdIf (fun m ->
+                m.TraceId
+                |> Option.map (fun _ -> Msg.CopyKibanaRequestToClipboard)
+            )
+
             //"Output" |> Binding.oneWayOpt (fun m -> m.Output)
 
             "Loading" |> Binding.oneWay (fun m -> m.Loading)

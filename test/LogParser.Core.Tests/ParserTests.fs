@@ -1,5 +1,7 @@
 ﻿namespace LogParser.Core.Tests
 
+open LogParser.Core
+
 
 module ParserTests =
 
@@ -211,6 +213,7 @@ module ParserTests =
             res |> List.head |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (res |> List.head) expected)
         } |> Result.runTest
 
+
     [<Test>]
     let ``docker log test`` () =
         result {
@@ -243,6 +246,7 @@ module ParserTests =
 
         } |> Result.runTest
 
+
     [<Test>]
     let ``empty log source test`` () =
         result {
@@ -259,3 +263,65 @@ module ParserTests =
                 return! Result.Error "wrong log type. Log type is TextLog"
 
         } |> Result.runTest
+
+
+    [<Test>]
+    let ``kibana fullMessage test`` () =
+        let log = """{"traceId":"9fdl11e047ace655822c5417d02843f7","timestamp":"2012-07-23T09:03:06.036Z"}"""
+        let fullMessage = $"\"\"\"{log}\"\"\""
+
+        FParsec.runResult Kibana.fullMessage fullMessage
+        |> Result.shouldEqual log
+
+
+    [<Test>]
+    let ``kibana log test`` () =
+        let log = """{"traceId":"9fdl11e047ace655822c5417d02843f7","timestamp":"2012-07-23T09:03:06.036Z"}"""
+        
+        let kibana =
+
+            let fm = $"\"\"\"{log}\"\"\""
+            $"""
+            {{
+              "took" : 1073,
+              "timed_out" : false,
+              "_shards" : {{
+                "total" : 13,
+                "successful" : 13,
+                "skipped" : 0,
+                "failed" : 0
+              }},
+              "hits" : {{
+                "total" : {{
+                  "value" : 42,
+                  "relation" : "eq"
+                }},
+                "max_score" : 0.0,
+                "hits" : [
+                  {{
+                    "_index" : "filebeat-2022.06.23",
+                    "_type" : "_doc",
+                    "_id" : "5ifNj4EB-fw2kdSFBGZD",
+                    "_score" : 0.0,
+                    "_source" : {{
+                      "fullMessage" : {fm},
+                      "TraceId" : "9fde11e047ace615822c5417d02843f7"
+                    }}
+                  }},
+                  {{
+                    "_index" : "filebeat-2022.06.23",
+                    "_type" : "_doc",
+                    "_id" : "DifNj4EB-fw2kdSFBGdD",
+                    "_score" : 0.0,
+                    "_source" : {{
+                      "fullMessage" : {fm},
+                      "TraceId" : "9fde11e047ace615822c5417d02843f7"
+                    }}
+                  }}
+                ]
+              }}
+            }}
+            """
+
+        Kibana.parse kibana
+        |> Result.should equivalent [log; log]
