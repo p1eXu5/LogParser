@@ -30,23 +30,33 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Foreground="#FF8C00" Text="{Binding Header}" FontSize="16" TextTrimming="CharacterEllipsis"
-                                   ToolTipService.InitialShowDelay="3000"
-                                   ToolTipService.ShowDuration="7000"
-                                   ToolTipService.VerticalOffset="10"
-                                   ToolTipService.HasDropShadow="true"
-                                   ToolTipService.ShowOnDisabled="true" 
-                                   ToolTipService.IsEnabled="true"
-                                   >
-                            <TextBlock.ToolTip>
+
+                        <Grid TextElement.Foreground="#FF8C00" TextElement.FontSize="16"
+                              ToolTipService.InitialShowDelay="3000"
+                              ToolTipService.ShowDuration="7000"
+                              ToolTipService.VerticalOffset="10"
+                              ToolTipService.HasDropShadow="true"
+                              ToolTipService.ShowOnDisabled="true" 
+                              ToolTipService.IsEnabled="true"
+                              VerticalAlignment="Center"
+                              >
+                            <Grid.ToolTip>
                                 <ToolTip Background="#0E0E0E"
                                          Foreground="#E6E6E6"
                                          MaxWidth="800"
                                          >
-                                    <TextBlock Text="{Binding Header}" TextWrapping="WrapWithOverflow"/>
+                                    <TextBlock Text="{Binding Message}" TextWrapping="WrapWithOverflow"/>
                                 </ToolTip>
-                            </TextBlock.ToolTip>
-                        </TextBlock>
+                            </Grid.ToolTip>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock><Run Text="{Binding LogLevel}"/><Run>:</Run></TextBlock>
+                            <TextBlock Grid.Column="1" Text="{Binding Timestamp}" />
+                            <TextBlock Grid.Column="2" Text="{Binding Message}" TextTrimming="CharacterEllipsis" />
+                        </Grid>
                         <Button Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0" IsHitTestVisible="True">
                             <materialDesign:PackIcon Kind="ContentCopy" />
                         </Button>

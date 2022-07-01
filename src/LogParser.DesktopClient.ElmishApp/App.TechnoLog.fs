@@ -9,7 +9,9 @@ type Model =
     {
         Id: Guid
         IsExpanded: bool
-        Header: string
+        LogLevel: string
+        Timestamp: string
+        Message: string
         Log: TechnoLog
         Fields: TechnoField.Model list
     }
@@ -36,14 +38,17 @@ module Program =
         let valueOf k =
             mainFields |> List.tryFind (fun f -> f.TechnoField |> TechnoFields.order |> (=) k) |> Option.bind (fun f -> f.Text) |> Option.defaultValue "___"
 
-        let timespan = valueOf "0"
+        let timestamp = valueOf "0"
         let level = valueOf "1"
         let message = valueOf "2"
+
 
         {
             Id = Guid.NewGuid()
             IsExpanded = false
-            Header = $"{level}:    {timespan} - {message}"
+            LogLevel = level
+            Timestamp = timestamp
+            Message = message
             Log = log
             Fields = mainFields @ otherFields
         }

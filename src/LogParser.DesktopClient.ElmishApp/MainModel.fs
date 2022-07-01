@@ -358,9 +358,21 @@ module internal Program =
 
                     "IsTechnoLog" |> Binding.oneWay (function LogModel.TechnoLog _ -> true | _ -> false)
 
-                    "Header" |> Binding.oneWayOpt (fun l ->
+                    "LogLevel" |> Binding.oneWayOpt (fun l ->
                         match l with
-                        | LogModel.TechnoLog tl -> tl.Header |> Some
+                        | LogModel.TechnoLog tl -> tl.LogLevel |> Some
+                        | LogModel.TextLog _ -> None
+                    )
+
+                    "Timestamp" |> Binding.oneWayOpt (fun l ->
+                        match l with
+                        | LogModel.TechnoLog tl -> tl.Timestamp |> Some
+                        | LogModel.TextLog _ -> None
+                    )
+
+                    "Message" |> Binding.oneWayOpt (fun l ->
+                        match l with
+                        | LogModel.TechnoLog tl -> tl.Message |> Some
                         | LogModel.TextLog _ -> None
                     )
 
