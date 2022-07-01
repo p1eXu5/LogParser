@@ -35,18 +35,19 @@
 
         <!-- Content -->
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition MinWidth="500" />
-            </Grid.ColumnDefinitions>
+            <Grid Visibility="{Binding ShowAll, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition MinWidth="500" />
+                </Grid.ColumnDefinitions>
 
-            <TabControl Grid.Column="0"
+                <TabControl Grid.Column="0"
                         materialDesign:ColorZoneAssist.Mode="SecondaryDark"
                         Style="{StaticResource MaterialDesignFilledTabControl}"
                         SelectedIndex="{Binding SelectedInput}"
                         >
-                <TabItem Header="Docker">
+                    <TabItem Header="Docker">
                         <!-- Input -->
                         <TextBox 
                             TextWrapping="Wrap"
@@ -57,8 +58,8 @@
                             materialDesign:HintAssist.Hint="Log text"
                             TextAlignment="Left"
                             Text="{Binding DockerInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="#E6E6E6" />
-                </TabItem>
-                <TabItem Header="Kibana">
+                    </TabItem>
+                    <TabItem Header="Kibana">
                         <!-- Input -->
                         <TextBox 
                             TextWrapping="Wrap"
@@ -69,18 +70,38 @@
                             materialDesign:HintAssist.Hint="Log text"
                             TextAlignment="Left"
                             Text="{Binding KibanaInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="#E6E6E6" />
-                </TabItem>
-            </TabControl>
-            
-            
-            <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
-            
-            <!-- Logs -->
-            <Grid Grid.Column="2" >
-                
-                <ListBox x:Name="m_LogList"
-                     
-                         ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}" 
+                    </TabItem>
+                </TabControl>
+
+
+                <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+
+                <!-- Logs -->
+                <Grid Grid.Column="2" >
+
+                    <ListBox ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}" 
+                             ItemsSource="{Binding Logs}" 
+                             Background="#1E1E1E"
+                             ScrollViewer.CanContentScroll="False"
+                             >
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Width="100"
+                             Height="100"
+                             Value="0"
+                             Visibility="{Binding Loading, Converter={StaticResource conv_BoolToVis}}"
+                             IsIndeterminate="True" />
+                </Grid>
+            </Grid>
+
+            <Grid Visibility="{Binding ShowOnlyParsedLogs, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ListBox ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}" 
                          ItemsSource="{Binding Logs}" 
                          Background="#1E1E1E"
                          ScrollViewer.CanContentScroll="False"

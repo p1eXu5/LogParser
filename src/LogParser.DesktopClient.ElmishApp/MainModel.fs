@@ -43,11 +43,16 @@ type internal MainModel =
         KibanaLogin: string option
         KibanaPassword: string option
 
+        ShowMode: ShowMode
     }
 and
     LogModel =
         | TechnoLog of TechnoLog.Model
         | TextLog of TextLog.Model
+and
+    ShowMode =
+        | All
+        | OnlyParsedLogs
 
 
 type Msg =
@@ -72,6 +77,7 @@ type Msg =
     | SetKibanaLogin of string option
     | SetKibanaPassword of string option
     | CopyKibanaRequestToClipboard
+    | ToggleShowAll of bool
     
 
 module internal Program =
@@ -100,12 +106,25 @@ module internal Program =
             KibanaBaseUri = None
             KibanaLogin = None
             KibanaPassword = None
+
+            ShowMode = ShowMode.All
         },
         Cmd.none
 
     // TODO: move to parser
     //let fixStringData (s: string) =
     //    s.Replace('\u00a0', ' ')
+
+
+    let showAll model =
+        match model.ShowMode with
+        | ShowMode.All -> true
+        | _ -> false
+
+    let showOnlyParsedLogs model =
+        match model.ShowMode with
+        | ShowMode.OnlyParsedLogs -> true
+        | _ -> false
 
 
     let update (msg: Msg) (model: MainModel) =
@@ -264,6 +283,12 @@ module internal Program =
             let logMessage = String.Join(Environment.NewLine, logs) |> Some
             model, Cmd.ofMsg (InputChanged logMessage)
 
+        | ToggleShowAll v ->
+            if v then
+                { model with ShowMode = ShowMode.All }, Cmd.none
+            else
+                { model with ShowMode = ShowMode.OnlyParsedLogs }, Cmd.none
+
         | _ -> model, Cmd.none
 
 
@@ -368,4 +393,7 @@ module internal Program =
                 |> Option.bind (fun _ -> m.TraceId)
                 |> Option.map (fun _ -> Start () |> SearchKibanaLogs)
             )
+
+            "ShowAll" |> Binding.twoWay ((fun m -> showAll m), ToggleShowAll)
+            "ShowOnlyParsedLogs" |> Binding.oneWay (fun m -> showOnlyParsedLogs m)
         ]
