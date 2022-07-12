@@ -20,7 +20,7 @@ let str s = pstring s
 // ----------------
 // identifier setup
 // ----------------
-let isAsciiIdStart    = fun c -> isAsciiLetter c || c = '_' || c = '$' || isDigit c
+let isAsciiIdStart    = fun c -> isAsciiLetter c || c = '_' || c = '$' || isDigit c || c = '@'
 let isAsciiIdContinue = fun c -> isAsciiLetter c || isDigit c || c = '_' || c = '.'
 
 let identifier : Parser<string, unit> =
@@ -122,6 +122,7 @@ let nullField pIdentifier =
 
 let log, logR = createParserForwardedToRef()
 let innerJson, innerJsonR = createParserForwardedToRef()
+let quotelessJson, quotelessJsonR = createParserForwardedToRef()
 let parameterJson, parameterJsonR = createParserForwardedToRef()
 
 
@@ -143,6 +144,15 @@ let json log pIdentifier =
         skipChar '\"' >>? log .>> skipChar '\"'
         log
     ]
+    |>> TechnoField.Json
+
+
+let kibanaJson =
+    between (skipChar '\"') (skipChar '\"') (pstring "fullMessage")
+    .>>? fieldDelimiter
+    .>>? skipString "\"\"\""
+    .>>.? log 
+    .>> skipString "\"\"\""
     |>> TechnoField.Json
 
 
@@ -197,6 +207,26 @@ let jsonAnnotated =
     |>> (fun t -> 
         let ((key, header), fl) = t
         TechnoField.JsonAnnotated (key.Trim(), header, fl))
+
+
+let pKibanaBuddied =
+    fieldIdentifier "\""
+    .>>? fieldDelimiter
+    .>>? skipString "\"\"\""
+    .>>.? many1CharsTill anyChar (nextCharSatisfies ((=) '[') <|> nextCharSatisfies ((=) '{') <|> (followedBy (manyMinMaxSatisfy 3 3 ((=) '\"') )))
+    .>>.? attempt(quotelessJson)
+
+let kibanaJsonAnnotated =
+    pKibanaBuddied
+    .>>? skipString "\"\"\""
+    |>> (fun t -> 
+        let ((key, header), fl) = t
+        let keyTrimmed = key.Trim()
+        if keyTrimmed.Equals("message", StringComparison.OrdinalIgnoreCase) then
+            TechnoField.MessageBoddied (header, fl)
+        else
+            TechnoField.JsonAnnotated (key.Trim(), header, fl))
+
 
 let messageBuddied =
     pMessageBuddied
@@ -282,6 +312,7 @@ let messageParameterized =
 
 
 
+
 let predefinedStringField name f =
     skipStringCI $"\"{name}\""
     >>. fieldDelimiter
@@ -331,9 +362,13 @@ let statusCodeField =
 let field : Parser<TechnoField, unit> =
     ws
     >>. choice [
+        attempt (kibanaJson)
+        // attempt (kibanaJsonAnnotated) - moved to filtering in logList
         predefinedIntField "port" TechnoField.Port
         predefinedStringField "timestamp" (Timespan.Value >> TechnoField.Timespan)
         predefinedNullField "timestamp" (TechnoField.Timespan Timespan.Null)
+        predefinedStringField "@timestamp" (Timespan.Value >> TechnoField.Timespan)
+        predefinedNullField "@timestamp" (TechnoField.Timespan Timespan.Null)
         messageParameterized
         messageBuddied
         messageBuddiedWithPostfix
@@ -371,7 +406,10 @@ let field : Parser<TechnoField, unit> =
 
 
 let innerField : Parser<TechnoField, unit> =
-    ws
+    choice [
+        skipString "\\n" >>. ws
+        ws
+    ]
     >>. choice [
         attempt(array (fieldIdentifier "\\\"") "\\\"")
         attempt(arrayInt (fieldIdentifier "\\\""))
@@ -384,7 +422,34 @@ let innerField : Parser<TechnoField, unit> =
         nullField (fieldIdentifier "\\\"")
         customQuotelessStringField (fieldIdentifier "\\\"")
     ]
-    .>> ws
+    .>> choice [
+        skipString "\\n" >>. ws
+        ws
+    ]
+
+
+let quotelessField : Parser<TechnoField, unit> =
+    choice [
+        skipString "\\n" >>. ws
+        ws
+    ]
+    >>. choice [
+        attempt(array identifier "\\\"")
+        attempt(arrayInt identifier)
+        attempt(arrayJson identifier)
+        customStringField identifier "\""
+        attempt(customIntField identifier)
+        customBoolField identifier true 
+        customBoolField identifier false
+        // json innerJson (fieldIdentifier "\\\"")
+        nullField identifier
+        customQuotelessStringField identifier
+    ]
+    .>> choice [
+        skipString "\\n" >>. ws
+        ws
+    ]
+
 
 let parameterField =
     ws
@@ -405,6 +470,29 @@ let parameterField =
 
 
 let logList =
+    let processFullMessage fieldList = 
+        fieldList
+        |> List.partition (fun f ->
+            match f with
+            | TechnoField.Json (key, _) when key = "fullMessage" -> true // when there is kibana fillMessage
+            | _ -> false
+        )
+        |> (fun (fullMessageJson, other) ->
+            let fullMessageFields =
+                fullMessageJson
+                |> List.tryHead // only one field can be
+                |> Option.map (fun f ->
+                    match f with
+                    | TechnoField.Json (key, fl) ->
+                        f :: fl
+                    | _ -> []
+                )
+                |> Option.defaultValue []
+
+            (fullMessageFields @ other)
+            |> List.distinctBy (fun f -> f |> TechnoFields.key)
+        )
+
     ws
     >>? sepEndBy 
         (   choice [
@@ -412,14 +500,16 @@ let logList =
                     manyCharsTill anyChar (nextCharSatisfies ((=) '{')) 
                     .>>.? 
                     log 
-                    |>> (fun t -> 
+                    |>> (fun (source, fieldList) -> 
                         {
+                            // start part of docker log:
+                            // PMB_WAN_foo_stub.1.o9sjfn7@srv-baz2.technics.bos    | {"timestamp":"2022-07-13T09:06:13.475Z","message":"...
                             Source =
-                                if String.IsNullOrWhiteSpace (fst t) then
+                                if String.IsNullOrWhiteSpace(source) then
                                     None
                                 else
-                                    (fst t).Trim() |> Some; 
-                            Fields = snd t
+                                    source.Trim() |> Some; 
+                            Fields = processFullMessage fieldList
                         } |> Log.TechnoLog)
                 )
                 log |>> (fun t -> {Source = None; Fields = t} |> Log.TechnoLog)
@@ -447,6 +537,9 @@ do
 
     innerJsonR :=
         between (skipChar '{') (skipChar '}') (sepEndBy innerField (skipChar ','))
+
+    quotelessJsonR :=
+        between (skipChar '{') (skipChar '}') (sepEndBy quotelessField (skipChar ','))
 
     parameterJsonR :=
         between (skipChar '{') (skipChar '}') (sepEndBy parameterField (skipChar ','))

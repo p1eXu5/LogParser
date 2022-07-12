@@ -15,7 +15,8 @@
             <TextBox Text="{Binding Log}" IsReadOnly="True" BorderThickness="0" TextWrapping="Wrap" TextAlignment="Left" Margin="5"/>
         </Border>
     </DataTemplate>
-    
+
+    <!-- dt_TechnoLog -->
     <DataTemplate x:Key="dt_TechnoLog">
         <Border HorizontalAlignment="Stretch" 
                 Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}"
@@ -23,11 +24,13 @@
             <Behaviors:Interaction.Behaviors>
                 <local:IgnoreMouseWheelBehavior/>
             </Behaviors:Interaction.Behaviors>
+            
             <Expander HorizontalAlignment="Stretch">
                 <Expander.Header>
-                    <Grid HorizontalAlignment="Left">
+                    <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
@@ -50,18 +53,22 @@
                             </Grid.ToolTip>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="200" />
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="200" MinWidth="100" />
+                                <ColumnDefinition Width="*" MinWidth="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock><Run Text="{Binding LogLevel}"/><Run>:</Run></TextBlock>
                             <TextBlock Grid.Column="1" Text="{Binding Timestamp}" />
                             <TextBlock Grid.Column="2" Text="{Binding Message}" TextTrimming="CharacterEllipsis" />
                         </Grid>
-                        <Button Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0" IsHitTestVisible="True">
+                        <TextBlock Grid.Column="1" DockPanel.Dock="Right" Margin="10,0" TextTrimming="CharacterEllipsis" Foreground="#EEEEE2" VerticalAlignment="Center">
+                            <Run Text="{Binding PinnedValue}" />
+                        </TextBlock>
+                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0" IsHitTestVisible="True">
                             <materialDesign:PackIcon Kind="ContentCopy" />
                         </Button>
                     </Grid>
                 </Expander.Header>
+                
                 <ListBox ItemsSource="{Binding Fields}" Grid.IsSharedSizeScope="True" Margin="20, 10" >
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
@@ -87,24 +94,39 @@
             </Expander> 
         </Border>
     </DataTemplate>
-    
+
+    <!-- dt_SimpleField -->
     <DataTemplate x:Key="dt_SimpleField">
         <Grid HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+            
             <Border Grid.Column="0">
                 <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Left"/>
             </Border>
-            <Button  Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightButton}" Command="{Binding CopyCommand}" Margin="10,0">
-                <materialDesign:PackIcon Kind="ContentCopy" />
-            </Button>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Style="{StaticResource MaterialDesignFlatLightButton}" 
+                        Command="{Binding PinCommand}" 
+                        Margin="10,0,0,0"
+                        Padding="10,0"
+                        >
+                    <materialDesign:PackIcon Kind="PinOutline" />
+                </Button>
+                <Button Style="{StaticResource MaterialDesignFlatLightButton}" 
+                        Command="{Binding CopyCommand}" 
+                        Margin="0,0,0,0"
+                        Padding="10,0"
+                        >
+                    <materialDesign:PackIcon Kind="ContentCopy" />
+                </Button>
+            </StackPanel>
         </Grid>
     </DataTemplate>
-    
-    
-    
+
+    <!-- dt_Json -->
     <DataTemplate x:Key="dt_Json">
         <Border Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
             <Expander HorizontalAlignment="Stretch" IsExpanded="False">
@@ -125,7 +147,7 @@
         </Border>
     </DataTemplate>
 
-    
+    <!-- dt_AnnotatedJson -->
     <DataTemplate x:Key="dt_AnnotatedJson">
         <StackPanel Orientation="Vertical" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
             <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" TextAlignment="Left" TextWrapping="Wrap"/>
@@ -147,6 +169,7 @@
         </StackPanel>
     </DataTemplate>
 
+    <!-- dt_WithPostfixAnnotatedJson -->
     <DataTemplate x:Key="dt_WithPostfixAnnotatedJson">
         <StackPanel Orientation="Vertical" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=ActualWidth}">
             <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Text}" TextAlignment="Left" TextWrapping="Wrap"/>

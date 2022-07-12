@@ -44,6 +44,8 @@ type internal MainModel =
         KibanaPassword: string option
 
         ShowMode: ShowMode
+
+        PinnedFieldName: string option
     }
 and
     LogModel =
@@ -108,6 +110,8 @@ module internal Program =
             KibanaPassword = None
 
             ShowMode = ShowMode.All
+
+            PinnedFieldName = None
         },
         Cmd.none
 
@@ -177,10 +181,10 @@ module internal Program =
         | SetSelectedInput ind -> { model with SelectedInput = ind }, Cmd.none
 
         | KibanaInputChanged (Some v) when not (String.IsNullOrWhiteSpace(v)) ->
-            Kibana.parse v
+            Kibana.parse2 v
             |> Result.map (fun l -> String.Join(Environment.NewLine, l))
             |> Result.map (fun s ->
-                { model with KibanaInput = v |> Some }, Cmd.ofMsg (InputChanged (Some s))
+                { model with KibanaInput = v |> Some; Loading = true }, Cmd.ofMsg (InputChanged (Some s))
             )
             |> Result.defaultValue (model, Cmd.none)
 
@@ -239,17 +243,22 @@ module internal Program =
             {model with Input = None; KibanaInput = None; Logs = []; ProcessId = Guid.Empty; Loading = false}, Cmd.none
 
         | TechnoLogMsg (id, TechnoFieldMsg (key, msg)) ->
-            let log =
-                model.Logs
-                |> List.choose (function LogModel.TechnoLog tl -> tl |> Some | _ -> None)
-                |> List.find (fun l -> l.Id = id)
+            match msg with
+            | TechnoField.Msg.PinFieldValueInHeader key ->
+                { model with PinnedFieldName = key |> Some }, Cmd.none
+            | _ ->    
+                let log =
+                    model.Logs
+                    |> List.choose (function LogModel.TechnoLog tl -> tl |> Some | _ -> None)
+                    |> List.find (fun l -> l.Id = id)
                 
-            let field =
-                log.Fields
-                |> List.find (fun f -> f.Key = key)
+                let field =
+                    log.Fields
+                    |> List.find (fun f -> f.Key = key)
 
-            let newField = TechnoField.Program.update msg field // TODO: update list when field changing
-            model, Cmd.none
+                let newField = TechnoField.Program.update msg field // TODO: update list when field changing
+
+                model, Cmd.none
 
         | TechnoLogMsg (id, Msg.CopyLogCommand) ->
             let log =
@@ -346,41 +355,57 @@ module internal Program =
 
             "Logs" |> Binding.subModelSeq (
                 (fun m -> m.Logs),
-                (fun (m, l) -> l),
-                (function LogModel.TechnoLog l -> l.Id | LogModel.TextLog l -> l.Id),
+                (fun (m, l) -> {| LogModel = l; PinnedFieldName = m.PinnedFieldName |} ),
+                (fun bm ->
+                    match bm.LogModel with
+                    | LogModel.TechnoLog l -> l.Id 
+                    | LogModel.TextLog l -> l.Id
+                ),
                 (Msg.TechnoLogMsg),
                 (fun () -> [
-                    "Log" |> Binding.oneWayOpt (fun l ->
-                        match l with
+                    "Log" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
+                        match l.LogModel with
                         | LogModel.TechnoLog tl -> tl.Fields |> List.map (fun f -> f.TechnoField) |> LogParser.Core.Types.TechnoFields.toString 1 |> Some
                         | LogModel.TextLog t -> t.Log |> Some
                     )
 
-                    "IsTechnoLog" |> Binding.oneWay (function LogModel.TechnoLog _ -> true | _ -> false)
+                    "IsTechnoLog" |> Binding.oneWay (fun l -> l.LogModel |> function LogModel.TechnoLog _ -> true | _ -> false)
 
-                    "LogLevel" |> Binding.oneWayOpt (fun l ->
-                        match l with
+                    "LogLevel" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
+                        match l.LogModel with
                         | LogModel.TechnoLog tl -> tl.LogLevel |> Some
                         | LogModel.TextLog _ -> None
                     )
 
-                    "Timestamp" |> Binding.oneWayOpt (fun l ->
-                        match l with
+                    "Timestamp" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
+                        match l.LogModel with
                         | LogModel.TechnoLog tl -> tl.Timestamp |> Some
                         | LogModel.TextLog _ -> None
                     )
 
-                    "Message" |> Binding.oneWayOpt (fun l ->
-                        match l with
+                    "Message" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
+                        match l.LogModel with
                         | LogModel.TechnoLog tl -> tl.Message |> Some
                         | LogModel.TextLog _ -> None
                     )
+
+                    "PinnedValue" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
+                        l.PinnedFieldName
+                        |> Option.bind (fun fn ->
+                            match l.LogModel with
+                            | LogModel.TechnoLog tl -> 
+                                tl.Fields
+                                |> List.tryFind(fun f -> f.Key = fn)
+                                |> Option.bind (fun f -> f.Text )
+                            | LogModel.TextLog _ -> None
+                        )
+                    ) 
 
                     "CopyCommand" |> Binding.cmd Msg.CopyLogCommand
 
                     "Fields" |> Binding.subModelSeq (
                         (fun l ->
-                             match l with
+                             match l.LogModel with
                              | LogModel.TextLog _ -> []
                              | LogModel.TechnoLog t -> t.Fields),
                         (fun (_, f: TechnoField.Model) -> f),

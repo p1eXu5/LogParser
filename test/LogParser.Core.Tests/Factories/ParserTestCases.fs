@@ -504,6 +504,36 @@ type ParserTestCases () =
 
                     TestCaseData(
                         """
+                            "errorDetails":"{\n  \"errorCode\": \"0005\",\n  \"message\": \"Request rejected\"\n}"
+                        """,
+                        jsonLog {
+                            Field
+                                "errorDetails"
+                                (jsonLog {
+                                    Field "errorCode" "0005"
+                                    Field "message" "Request rejected"
+                                        
+                                })
+                        } |> Log.fieldList |> List.head
+                    ).SetName("field parsing. Json with escaped new line")
+
+                    // ,\"0\":\"srv-mysqlent.techno.mos\"
+
+                    TestCaseData(
+                        "\"fullMessage\":\"\"\"{\"traceId\":\"791b789add8cbd88c9bf1ea07d43d3f6\",\"0\":\"srv-mysqlent.techno.mos\"}\"\"\"",
+                        jsonLog {
+                            Field
+                                "fullMessage"
+                                (jsonLog {
+                                    traceId "791b789add8cbd88c9bf1ea07d43d3f6"
+                                    Field "0" "srv-mysqlent.techno.mos"
+                                        
+                                })
+                        } |> Log.fieldList |> List.head
+                    ).SetName("field parsing. Json kibana fullMessage")
+
+                    TestCaseData(
+                        """
                             "foo": {
                                 "rabbitmq_node":5672
                             }
@@ -531,6 +561,12 @@ type ParserTestCases () =
                                 })
                         } |> Log.fieldList |> List.head
                     ).SetName("field parsing. Json nested")
+
+
+
+                    // --------------
+                    // json annotated
+                    // --------------
 
                     TestCaseData(
                         """

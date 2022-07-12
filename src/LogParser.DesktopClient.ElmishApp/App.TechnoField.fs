@@ -21,7 +21,9 @@ and
         | AnnotatedJsonField = 2
         | WithPostfixAnnotatedJsonField = 3
 
-type Msg = CopyValueRequested
+type Msg =
+    | CopyValueRequested
+    | PinFieldValueInHeader of key: string
 
 module Program =
 
@@ -30,8 +32,6 @@ module Program =
 
 
     let init (technoField: TechnoField) =
-
-        
 
         match technoField with
         | TechnoField.Json (_, fields) ->
@@ -123,7 +123,8 @@ module Program =
             | _ -> 
                 Clipboard.SetText(model.Text |> Option.defaultValue "")
 
-            model
+        | _ ->
+            ()
 
 
     open Elmish.WPF
@@ -137,4 +138,5 @@ module Program =
             "Postfix" |> Binding.oneWayOpt (fun m -> m.Postfix)
             "Json" |> Binding.oneWayOpt (fun m -> m.Json)
             "CopyCommand" |> Binding.cmd Msg.CopyValueRequested
+            "PinCommand" |> Binding.cmd (fun m -> Msg.PinFieldValueInHeader m.Key)
         ]

@@ -12,8 +12,8 @@ type LogMessage =
     }
 
 
-
 open FParsec
+
 
 let fullMessage =
     between (skipString "\"\"\"") (skipString "\"\"\"") (manyCharsTill anyChar (followedBy (manyMinMaxSatisfy 3 3 ((=) '\"') )))
@@ -24,12 +24,34 @@ let kibanaOutput =
     .>> skipMany anyChar
     .>> eof
 
+
+let fullJson =
+    between 
+        (skipChar '{') 
+        (skipString "}," >>. unicodeSpaces1 >>. skipString @"""sort"" : [") 
+        (manyCharsTill anyChar (followedBy (skipString "}," >>. unicodeSpaces1 >>. skipString @"""sort"" : [")))
+
+
+let kibanaOutput2 =
+    skipCharsTillString @"""_source"" : " true 2048
+    >>. sepEndBy fullJson (attempt(skipCharsTillString  @"""_source"" : " true 2048)) 
+    .>> skipMany anyChar
+    .>> eof
+    |>> (List.map (fun s -> sprintf "{%s}" (s.Trim())))
+    
+
 let parse input =
     run kibanaOutput input
     |> function
         | Success (ok,_,_) -> Result.Ok ok
         | Failure (err,_,_) -> Result.Error err
 
+
+let parse2 input =
+    run kibanaOutput2 input
+    |> function
+        | Success (ok,_,_) -> Result.Ok ok
+        | Failure (err,_,_) -> Result.Error err
 
 
 let searchRequest logCount traceId =
@@ -59,8 +81,11 @@ GET /filebeat-*/_search
   ],
   "_source": [
     "@timestamp",
+    "level",
+    "fullMessage",
     "TraceId",
-    "fullMessage"
+    "servicename",
+    "container"
   ]
 }}
     """

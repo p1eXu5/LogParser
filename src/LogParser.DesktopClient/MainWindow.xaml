@@ -83,6 +83,7 @@
                              ItemsSource="{Binding Logs}" 
                              Background="#1E1E1E"
                              ScrollViewer.CanContentScroll="False"
+                             Grid.IsSharedSizeScope="True"
                              >
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
@@ -105,6 +106,7 @@
                          ItemsSource="{Binding Logs}" 
                          Background="#1E1E1E"
                          ScrollViewer.CanContentScroll="False"
+                         Grid.IsSharedSizeScope="True"
                          >
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
