@@ -8,17 +8,17 @@
     <PackageIcon>gnomelogs_103380.ico</PackageIcon>
     <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
     <Title>Log Parser</Title>
-    <AssemblyVersion>1.3.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
+    <AssemblyVersion>1.4.0</AssemblyVersion>
+    <FileVersion>1.4.0.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Resource Include="Resources\gnomelogs_103380.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="4.5.0-ci153" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.6.0-ci234" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
   </ItemGroup>
 

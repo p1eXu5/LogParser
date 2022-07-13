@@ -526,6 +526,7 @@ let logList =
     .>> eof
 
 let parse input =
+
     run logList input
     |> function
         | Success (ok,_,_) -> Result.Ok ok

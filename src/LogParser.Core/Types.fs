@@ -53,6 +53,29 @@ type Timespan =
     | Null
 
 
+[<RequireQualifiedAccess>]
+type TechnoFieldType =
+    | Timespan
+    | Message
+    | Level
+    | Method
+    | StatusCode
+    | Path
+    | Host
+    | Port
+    | Body
+    | SourceContext
+    | RequestId
+    | RequestPath
+    | SpanId
+    | TraceId
+    | EventId
+    | ParentId
+    | ConnectionId
+    | HierarchicalTraceId
+    // | Custom of key: string
+
+
 type TechnoField =
         | Timespan of Timespan
         | Message of string
@@ -136,10 +159,10 @@ type TechnoField =
                 | JsonAnnotated (k, h, v) -> $"\"{k}\": \"{h}{v |> TechnoFields.toString 1}\""
                 | TypeJson (tj) -> $"%O{tj}"
 
+
 module TechnoFields =
 
     open System.Text
-
 
     let toString (initTabLevel: int) (fields: TechnoField list) =
         let fold folder fields state =
@@ -323,6 +346,8 @@ module TechnoFields =
         | TypeJson v -> capitalize v.Key
 
 
+
+
     let order = function
         | Timespan _ -> "0"
         | Level _ -> "1"
@@ -358,3 +383,38 @@ module TechnoFields =
         | JsonAnnotated (k, _, _) -> capitalize k
 
         | TypeJson v -> capitalize v.Key
+
+
+module Log =
+
+    let tryFind fieldType log =
+        match log with
+        | Log.TextLog _ -> None
+        | Log.TechnoLog technoLog ->
+            technoLog.Fields
+            |> List.tryPick (fun field -> 
+                match fieldType, field with
+                | TechnoFieldType.Timespan, TechnoField.Timespan (Timespan.Value v)
+                | TechnoFieldType.Message, TechnoField.Message v 
+                | TechnoFieldType.Method, TechnoField.Method v
+                | TechnoFieldType.Path, TechnoField.Path v
+                | TechnoFieldType.Host, TechnoField.Host v
+                | TechnoFieldType.SourceContext, TechnoField.SourceContext v
+                | TechnoFieldType.RequestId, TechnoField.RequestId v
+                | TechnoFieldType.RequestPath, TechnoField.RequestPath v
+                | TechnoFieldType.SpanId, TechnoField.SpanId v
+                | TechnoFieldType.TraceId, TechnoField.TraceId v
+                | TechnoFieldType.EventId, TechnoField.EventId v
+                | TechnoFieldType.ParentId, TechnoField.ParentId v
+                | TechnoFieldType.ConnectionId, TechnoField.ConnectionId v
+                | TechnoFieldType.HierarchicalTraceId, TechnoField.HierarchicalTraceId v 
+                    -> 
+                        Some v
+
+                | TechnoFieldType.StatusCode, TechnoField.StatusCode v -> Some (v.ToString())
+                | TechnoFieldType.Level, TechnoField.Level v -> Some (v.ToString())
+                | TechnoFieldType.Port, TechnoField.Port v -> Some (v.ToString())
+                | _ -> None
+            )
+
+    let hierarchicalTraceId = tryFind TechnoFieldType.HierarchicalTraceId

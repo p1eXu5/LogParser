@@ -43,7 +43,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TabControl Grid.Column="0"
-                        materialDesign:ColorZoneAssist.Mode="SecondaryDark"
+                        materialDesign:ColorZoneAssist.Mode="Dark"
                         Style="{StaticResource MaterialDesignFilledTabControl}"
                         SelectedIndex="{Binding SelectedInput}"
                         >

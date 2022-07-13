@@ -375,9 +375,14 @@ type ParserTestCases () =
                     ).SetName("field parsing. ConnectionId")
 
                     TestCaseData(
-                        "\"HierarchicalTraceId\": \"MassTransit\"",
-                        TechnoField.HierarchicalTraceId "MassTransit"
+                        "\"HierarchicalTraceId\":\"|835674ebb32a89144396ba52f55405ef.457.c49360ab_\"",
+                        TechnoField.HierarchicalTraceId "|835674ebb32a89144396ba52f55405ef.457.c49360ab_"
                     ).SetName("field parsing. HierarchicalTraceId")
+
+                    TestCaseData(
+                        "\"hierarchicalTraceId\":\"|835674ebb32a89144396ba52f55405ef.457.c49360ab_\"",
+                        TechnoField.HierarchicalTraceId "|835674ebb32a89144396ba52f55405ef.457.c49360ab_"
+                    ).SetName("field parsing. hierarchicalTraceId")
                 }
 
             // ------------
@@ -578,6 +583,7 @@ type ParserTestCases () =
                     ).SetName("field parsing. Json annotated")
                 }
         }
+
 
     static member LogTests : IEnumerable =
         seq {
@@ -970,7 +976,6 @@ type ParserTestCases () =
                 } |> Log.TechnoLog
             ).SetName("log parsing. log with message parameterized with json")
 
-            // TODO: will be fixed when '\u00a0' whitespace will be added to parser
             TestCaseData(
                 """
                 {
@@ -988,7 +993,6 @@ type ParserTestCases () =
                 
             ).SetName("log parsing. body with simple json field")
 
-            // TODO: will be fixed when '\u00a0' whitespace will be added to parser
             TestCaseData(
                 """
                 {
@@ -1021,4 +1025,17 @@ type ParserTestCases () =
                 } |> Log.TechnoLog
                 
             ).SetName("log parsing. body with nested json")
+
+            TestCaseData(
+                """
+                {
+                    "hierarchicalTraceId":"|835674ebb32a89144396ba52f55405ef.457.c49360ab_"
+                }
+                """,
+
+                jsonLog {
+                    hierarchicalTraceId "|835674ebb32a89144396ba52f55405ef.457.c49360ab_"
+                } |> Log.TechnoLog
+                
+            ).SetName("log parsing. single hierarchicalTraceId")
         }

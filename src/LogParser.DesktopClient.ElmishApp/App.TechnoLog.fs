@@ -12,12 +12,32 @@ type Model =
         LogLevel: string
         Timestamp: string
         Message: string
+        HierarchicalTraceId: string // TODO: remove after make log model hierarchy
         Log: TechnoLog
         Fields: TechnoField.Model list
+        Children: Model list
+        IsNestedLog: bool // TODO: remove after make log model hierarchy
+        HierarchyLevel: int
     }
 
 
 module Program =
+
+    let hierarchyLevel (hierarchicalTraceId: string) =
+        hierarchicalTraceId
+        |> Seq.fold (fun level ch ->
+           if ch = '.' then level + 1
+           else level
+        ) -1
+        |> (fun level ->
+            hierarchicalTraceId 
+            |> Seq.tryLast 
+            |> Option.map (fun ch ->
+                if ch = '.' then level
+                else level + 1
+            )
+            |> Option.defaultValue level
+        )
 
     let init (log: TechnoLog) =
         let (mainFields, otherFields) =
@@ -28,6 +48,7 @@ module Program =
                 match f.TechnoField with
                 | TechnoField.Timespan _
                 | TechnoField.Level _
+                | TechnoField.HierarchicalTraceId _ // TODO: remove after make log model hierarchy
                 | TechnoField.Message _
                 | TechnoField.MessageBoddied _
                 | TechnoField.MessageParameterized _ -> true
@@ -41,7 +62,11 @@ module Program =
         let timestamp = valueOf "0"
         let level = valueOf "1"
         let message = valueOf "2"
-
+        
+        // TODO: remove after make log model hierarchy
+        let hierarchicalTraceId = valueOf "6"
+        let hierarchyLevel = hierarchyLevel hierarchicalTraceId
+        let isNestedLog = hierarchyLevel > 0
 
         {
             Id = Guid.NewGuid()
@@ -49,6 +74,10 @@ module Program =
             LogLevel = level
             Timestamp = timestamp
             Message = message
+            HierarchicalTraceId = hierarchicalTraceId
             Log = log
             Fields = mainFields @ otherFields
+            Children = []
+            IsNestedLog = isNestedLog
+            HierarchyLevel = hierarchyLevel
         }

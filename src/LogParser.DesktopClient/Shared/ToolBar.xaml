@@ -29,6 +29,15 @@
                              Width="66"
                              Padding="0"
                              />
+
+                <ListBoxItem Content="{materialDesign:PackIcon Kind=FileTree}" 
+                             IsSelected="{Binding ShowInnerHierarchyLogs}" 
+                             Style="{DynamicResource MaterialDesignNavigationPrimaryListBoxItem}"
+                             HorizontalContentAlignment="Center"
+                             Height="38"
+                             Width="66"
+                             Padding="0"
+                             />
             </ListBox>
 
         </ToolBar>

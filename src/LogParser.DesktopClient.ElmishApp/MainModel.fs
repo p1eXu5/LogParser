@@ -46,6 +46,8 @@ type internal MainModel =
         ShowMode: ShowMode
 
         PinnedFieldName: string option
+
+        ShowInnerHierarchyLogs: bool
     }
 and
     LogModel =
@@ -80,6 +82,7 @@ type Msg =
     | SetKibanaPassword of string option
     | CopyKibanaRequestToClipboard
     | ToggleShowAll of bool
+    | ToggleShowInnerHierarchyLogs of bool
     
 
 module internal Program =
@@ -112,6 +115,8 @@ module internal Program =
             ShowMode = ShowMode.All
 
             PinnedFieldName = None
+
+            ShowInnerHierarchyLogs = true
         },
         Cmd.none
 
@@ -129,6 +134,19 @@ module internal Program =
         match model.ShowMode with
         | ShowMode.OnlyParsedLogs -> true
         | _ -> false
+
+
+    let private toLogModels logs =
+        logs
+        |> List.map (fun l -> 
+            match l with
+            | Log.TechnoLog l ->
+                let technoLogModel = TechnoLog.Program.init (l)
+                LogModel.TechnoLog technoLogModel
+            | Log.TextLog l ->
+                let (textLogModel, _) = TextLog.Program.init (l)
+                LogModel.TextLog textLogModel
+        )
 
 
     let update (msg: Msg) (model: MainModel) =
@@ -193,19 +211,7 @@ module internal Program =
                 async {
                     match parse (v) with
                     | Ok xlog ->
-                
-                        let logs =
-                            xlog
-                            |> List.map (function
-                                | Log.TechnoLog l ->
-                                    let technoLogModel = TechnoLog.Program.init (l)
-                                    LogModel.TechnoLog technoLogModel
-                                | Log.TextLog l ->
-                                    let (textLogModel, _) = TextLog.Program.init (l)
-                                    LogModel.TextLog textLogModel
-                            )
-                        //{model with Logs = logs; Input = v |> Some}, Cmd.none
-                        return logs, processId
+                        return (toLogModels xlog), processId
 
                     | Error err ->
                         let (textLogModel, _) = TextLog.Program.init (err)
@@ -298,6 +304,9 @@ module internal Program =
             else
                 { model with ShowMode = ShowMode.OnlyParsedLogs }, Cmd.none
 
+        | ToggleShowInnerHierarchyLogs v ->
+            { model with ShowInnerHierarchyLogs = v }, Cmd.none
+
         | _ -> model, Cmd.none
 
 
@@ -353,8 +362,24 @@ module internal Program =
                 | _ -> "Untitled"
             )
 
+
+            "ShowInnerHierarchyLogs" |> Binding.twoWay ((fun m -> m.ShowInnerHierarchyLogs), Msg.ToggleShowInnerHierarchyLogs) // TODO: remove after make log model hierarchy
+
+
             "Logs" |> Binding.subModelSeq (
-                (fun m -> m.Logs),
+                (fun m -> 
+                    if m.ShowInnerHierarchyLogs then // TODO: remove after make log model hierarchy
+                        m.Logs 
+                    else 
+                        m.Logs 
+                        |> List.choose (fun logModel ->
+                            match logModel with
+                            | LogModel.TechnoLog l ->
+                                if l.IsNestedLog then None
+                                else logModel |> Some
+                            | LogModel.TextLog _ -> logModel |> Some
+                        )
+                ),
                 (fun (m, l) -> {| LogModel = l; PinnedFieldName = m.PinnedFieldName |} ),
                 (fun bm ->
                     match bm.LogModel with
@@ -401,7 +426,14 @@ module internal Program =
                         )
                     ) 
 
+                    "HierarchyLevel" |> Binding.oneWay (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
+                        match l.LogModel with
+                        | LogModel.TechnoLog tl -> tl.HierarchyLevel
+                        | LogModel.TextLog _ -> 0
+                    )
+
                     "CopyCommand" |> Binding.cmd Msg.CopyLogCommand
+
 
                     "Fields" |> Binding.subModelSeq (
                         (fun l ->
@@ -413,6 +445,7 @@ module internal Program =
                         (Msg.TechnoFieldMsg),
                         TechnoField.Program.bindings
                      )
+
                 ])
             )
 
