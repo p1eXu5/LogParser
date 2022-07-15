@@ -201,7 +201,7 @@ module TechnoFields =
                 
                 state.Result.Append(innerTab).Append($"{List.last fields}\n").Append(tab).Append("]") |> ignore
 
-            | Array (key, fields) ->
+            | Array (key, fields) when fields.Length > 0 ->
                 state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore
 
                 let innerTab = String.replicate ((state.TabLevel + 1) * 4) " "
@@ -213,6 +213,9 @@ module TechnoFields =
                 )
                 
                 state.Result.Append(innerTab).Append($"\"{List.last fields}\"\n").Append(tab).Append("]") |> ignore
+
+            | Array (key, fields) when fields.Length = 0 ->
+                state.Result.Append(tab).Append($"\"{key}\": []") |> ignore
 
             | ArrayJson (key, fields) ->
                 state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore

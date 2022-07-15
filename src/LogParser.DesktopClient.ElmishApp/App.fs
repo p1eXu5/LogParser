@@ -6,7 +6,7 @@ open Serilog.Extensions.Logging
 open Elmish.WPF
 open LogParser.App.MainModel
 
-let main (window) =
+let main (window, errorQueue) =
     let logger =
         LoggerConfiguration()
           .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Verbose)
@@ -19,8 +19,6 @@ let main (window) =
     let loggerFactory = new SerilogLoggerFactory(logger)
     //let store = Infrastruture.FsStatementInMemoryStore.store
 
-
-
-    WpfProgram.mkProgram Program.init Program.update Program.bindings
+    WpfProgram.mkProgram (Program.init errorQueue) Program.update Program.bindings
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.startElmishLoop window

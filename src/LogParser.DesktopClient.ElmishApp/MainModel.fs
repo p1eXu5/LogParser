@@ -14,6 +14,8 @@ open System.IO
 open Elmish.Extensions
 open System
 open LogParser.Core
+open LogParser.DesktopClient.ElmishApp
+open LogParser.DesktopClient.ElmishApp.Interfaces
 
 
 type LogFile =
@@ -48,6 +50,8 @@ type internal MainModel =
         PinnedFieldName: string option
 
         ShowInnerHierarchyLogs: bool
+
+        ErrorMessageQueue : IErrorMessageQueue
     }
 and
     LogModel =
@@ -83,11 +87,12 @@ type Msg =
     | CopyKibanaRequestToClipboard
     | ToggleShowAll of bool
     | ToggleShowInnerHierarchyLogs of bool
+    | OnError of exn
     
 
 module internal Program =
 
-    let init () =
+    let init (errorMessageQueue: Interfaces.IErrorMessageQueue) (_: unit) =
 
         let assemblyVer = "Version" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
         {
@@ -117,18 +122,17 @@ module internal Program =
             PinnedFieldName = None
 
             ShowInnerHierarchyLogs = true
+
+            ErrorMessageQueue = errorMessageQueue
         },
         Cmd.none
-
-    // TODO: move to parser
-    //let fixStringData (s: string) =
-    //    s.Replace('\u00a0', ' ')
 
 
     let showAll model =
         match model.ShowMode with
         | ShowMode.All -> true
         | _ -> false
+
 
     let showOnlyParsedLogs model =
         match model.ShowMode with
@@ -151,7 +155,7 @@ module internal Program =
 
     let update (msg: Msg) (model: MainModel) =
         match msg with
-        | NewFile -> init ()
+        | NewFile -> init model.ErrorMessageQueue ()
 
         | OpenFile ->
             let fd = OpenFileDialog()
@@ -181,8 +185,9 @@ module internal Program =
                 use sw = File.CreateText(fd.FileName)
                 sw.Write(content)
                 sw.Flush()
-
-            (model, Cmd.none)
+                { model with LogFile = LogFile.Existing fd.FileName }, Cmd.none
+            else
+                (model, Cmd.none)
 
         | SaveFile ->
             match model.LogFile with
@@ -226,7 +231,7 @@ module internal Program =
                     ProcessId = processId
                     Loading = true
             }
-            , Cmd.OfAsync.perform parseAsync (v, processId) LogsChanged
+            , Cmd.OfAsync.either parseAsync (v, processId) LogsChanged Msg.OnError
 
         | InputChanged _ ->
             {model with Logs = []; Input = None; ProcessId = Guid.Empty}, Cmd.none
@@ -306,6 +311,10 @@ module internal Program =
 
         | ToggleShowInnerHierarchyLogs v ->
             { model with ShowInnerHierarchyLogs = v }, Cmd.none
+
+        | Msg.OnError ex ->
+            model.ErrorMessageQueue.EnqueuError(ex.Message)
+            model, Cmd.none
 
         | _ -> model, Cmd.none
 
@@ -466,4 +475,6 @@ module internal Program =
 
             "ShowAll" |> Binding.twoWay ((fun m -> showAll m), ToggleShowAll)
             "ShowOnlyParsedLogs" |> Binding.oneWay (fun m -> showOnlyParsedLogs m)
+
+            "ErrorMessageQueue" |> Binding.oneWay (fun m -> m.ErrorMessageQueue)
         ]

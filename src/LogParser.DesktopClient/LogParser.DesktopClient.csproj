@@ -8,8 +8,8 @@
     <PackageIcon>gnomelogs_103380.ico</PackageIcon>
     <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
     <Title>Log Parser</Title>
-    <AssemblyVersion>1.4.1</AssemblyVersion>
-    <FileVersion>1.4.1.0</FileVersion>
+    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <FileVersion>1.5.0.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
   </PropertyGroup>
   
@@ -27,6 +27,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Update="Resources\gnomelogs_103380.ico">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

@@ -6,7 +6,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:LogParser.DesktopClient.Shared"
              mc:Ignorable="d" 
-             d:DesignHeight="160" d:DesignWidth="1600"
+             d:DesignHeight="160" d:DesignWidth="1800"
              >
     <ToolBarTray VerticalAlignment="Top">
         <ToolBar Style="{DynamicResource MaterialDesignToolBar}"
@@ -50,15 +50,8 @@
                      MinWidth="300"
                      Margin="10,0,10,10"
                      />
-            
-            <Button Content="Copy Search Request" 
-                    Style="{StaticResource MaterialDesignPaperSecondaryButton}" 
-                    Margin="10,0,0,0"
-                    Command="{Binding CopyKibanaRequestToClipboardCommand}"
-                    ToolTip="Copy Kibana search request for DevTools"
-                    />
 
-            <DatePicker Width="100"  IsEnabled="False"
+            <DatePicker Width="100" 
                         materialDesign:HintAssist.Hint="Pick Date"
                         materialDesign:TextFieldAssist.HasClearButton="True"
                         Style="{StaticResource MaterialDesignFloatingHintDatePicker}" 
@@ -66,35 +59,43 @@
                         SelectedDate="{Binding LogsDate, UpdateSourceTrigger=PropertyChanged}"
                         />
 
-            <Button Content="Request"  IsEnabled="False"
+            <Button Content="Request"
                     Style="{StaticResource MaterialDesignPaperSecondaryButton}" 
                     Margin="10,0"
                     Command="{Binding SearchKibanaLogsCommand}"
                     />
-            <Separator />
+            
+            <Button Content="Copy Search Request" 
+                    Style="{StaticResource MaterialDesignPaperSecondaryButton}" 
+                    Margin="10,0,0,0"
+                    Command="{Binding CopyKibanaRequestToClipboardCommand}"
+                    ToolTip="Copy Kibana search request for DevTools"
+                    />
+        </ToolBar>
+
+        <ToolBar Style="{DynamicResource MaterialDesignToolBar}">
             <TextBox Text="{Binding KibanaBaseUri, UpdateSourceTrigger=PropertyChanged}" 
-                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                     materialDesign:HintAssist.Hint="Kibana Base URI" 
-                     VerticalAlignment="Center" 
-                     MinWidth="200"
-                     Margin="10,0,0,10"
-                      IsEnabled="False"
-                     />
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                        materialDesign:HintAssist.Hint="Kibana Base URI" 
+                        VerticalAlignment="Center" 
+                        MinWidth="200"
+                        Margin="10,0,0,10"
+                        />
+            
             <TextBox Text="{Binding KibanaLogin, UpdateSourceTrigger=PropertyChanged}" 
-                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                     materialDesign:HintAssist.Hint="Login" 
-                     VerticalAlignment="Center" 
-                     MinWidth="200"
-                     Margin="10,0,0,10"
-                      IsEnabled="False"
-                     />
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                        materialDesign:HintAssist.Hint="Login" 
+                        VerticalAlignment="Center" 
+                        MinWidth="200"
+                        Margin="10,0,0,10"
+                        />
+            
             <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"
                          Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
                          materialDesign:HintAssist.Hint="Password" 
                          VerticalAlignment="Center" 
                          MinWidth="200"
                          Margin="10,0,0,10"
-                          IsEnabled="False"
                          />
         </ToolBar>
     </ToolBarTray>
