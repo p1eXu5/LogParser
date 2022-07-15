@@ -16,7 +16,7 @@ type Log =
 
 type TechnoLog =
         {
-            Source: string option
+            Source: TechnoField option
             Fields: TechnoField list
         }
         with

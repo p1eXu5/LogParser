@@ -508,7 +508,7 @@ let logList =
                                 if String.IsNullOrWhiteSpace(source) then
                                     None
                                 else
-                                    source.Trim() |> Some; 
+                                    ("logSource", source.Trim()) |> TechnoField.String |> Some; 
                             Fields = processFullMessage fieldList
                         } |> Log.TechnoLog)
                 )
