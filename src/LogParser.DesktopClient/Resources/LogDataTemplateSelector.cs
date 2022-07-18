@@ -1,10 +1,4 @@
-﻿using LogParser.App.MainModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace LogParser.DesktopClient.Resources;
@@ -21,7 +15,7 @@ public class LogDataTemplateSelector : DataTemplateSelector
             if (((dynamic)item).IsTechnoLog)
                 return element.FindResource("dt_TechnoLog") as DataTemplate;
 
-            return element.FindResource("dt_TextLog") as DataTemplate;   
+            return element.FindResource("dt_TextLog") as DataTemplate;
         }
         return null;
     }

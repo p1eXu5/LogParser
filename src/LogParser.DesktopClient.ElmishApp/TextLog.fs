@@ -1,18 +1,20 @@
-﻿namespace LogParser.App.TextLog
+﻿namespace LogParser.DesktopClient.ElmishApp.Models
 
 open System
 
-type Model =
+type TextLog =
     {
         Id: Guid
         Log: string
     }
 
-type Msg = Msg
 
-module Program =
+module TextLog =
+
+    type Msg = Msg
 
     open Elmish
+
 
     let init (log: string) =
         {
@@ -22,9 +24,17 @@ module Program =
         , Cmd.none
 
 
+
+namespace LogParser.DesktopClient.ElmishApp.TextLog
+
+open LogParser.DesktopClient.ElmishApp.Models
+
+module Program =
+
+
     open Elmish.WPF
 
-    let bindings : Binding<Model, Msg> list =
+    let bindings : Binding<TextLog, TextLog.Msg> list =
         [
             "Log" |> Binding.oneWay (fun m -> m.Log)
         ]

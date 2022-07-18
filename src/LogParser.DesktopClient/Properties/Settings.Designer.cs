@@ -22,5 +22,29 @@ namespace LogParser.DesktopClient.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string KibanaBaseUri {
+            get {
+                return ((string)(this["KibanaBaseUri"]));
+            }
+            set {
+                this["KibanaBaseUri"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string KibanaLogin {
+            get {
+                return ((string)(this["KibanaLogin"]));
+            }
+            set {
+                this["KibanaLogin"] = value;
+            }
+        }
     }
 }

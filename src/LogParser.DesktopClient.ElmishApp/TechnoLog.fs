@@ -1,11 +1,9 @@
-﻿namespace LogParser.App.TechnoLog
+﻿namespace LogParser.DesktopClient.ElmishApp.Models
 
 open System
+type CoreTechnoLog = LogParser.Core.Types.TechnoLog
 
-open LogParser.Core.Types
-open LogParser.App
-
-type Model =
+type TechnoLog =
     {
         Id: Guid
         IsExpanded: bool
@@ -13,15 +11,19 @@ type Model =
         Timestamp: string
         Message: string
         HierarchicalTraceId: string // TODO: remove after make log model hierarchy
-        Log: TechnoLog
-        Fields: TechnoField.Model list
-        Children: Model list
+        Log: CoreTechnoLog
+        Fields: TechnoField list
+        Children: TechnoLog list
         IsNestedLog: bool // TODO: remove after make log model hierarchy
         HierarchyLevel: int
     }
 
 
-module Program =
+module TechnoLog=
+
+    open LogParser.Core.Types
+    open LogParser.DesktopClient.ElmishApp
+
 
     let hierarchyLevel (hierarchicalTraceId: string) =
         hierarchicalTraceId
@@ -43,7 +45,7 @@ module Program =
         let (mainFields, otherFields) =
             log.Fields
             |> List.sortBy TechnoFields.order
-            |> List.map TechnoField.Program.init
+            |> List.map TechnoField.init
             |> List.partition (fun f -> 
                 match f.TechnoField with
                 | TechnoField.Timespan _
@@ -76,7 +78,7 @@ module Program =
             Message = message
             HierarchicalTraceId = hierarchicalTraceId
             Log = log
-            Fields = log.Source |> Option.map (fun s -> TechnoField.Program.init s :: (mainFields @ otherFields)) |> Option.defaultWith (fun () -> (mainFields @ otherFields))
+            Fields = log.Source |> Option.map (fun s -> TechnoField.init s :: (mainFields @ otherFields)) |> Option.defaultWith (fun () -> (mainFields @ otherFields))
             Children = []
             IsNestedLog = isNestedLog
             HierarchyLevel = hierarchyLevel

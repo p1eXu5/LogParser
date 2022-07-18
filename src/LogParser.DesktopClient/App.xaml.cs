@@ -1,4 +1,5 @@
 ﻿using LogParser.DesktopClient.ElmishApp.Interfaces;
+using NspkXsdGenerator.DesktopClient;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -33,7 +34,7 @@ public partial class App : Application
     private void StartElmish( object? sender, EventArgs e )
     {
         this.Activated -= StartElmish;
-        LogParser.App.Program.main(MainWindow, _errorMessageQueue);
+        LogParser.DesktopClient.ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance);
     }
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

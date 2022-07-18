@@ -77,87 +77,87 @@ type TechnoFieldType =
 
 
 type TechnoField =
-        | Timespan of Timespan
-        | Message of string
-        | MessageBoddied of header: string * body: TechnoField list
-        | MessageBoddiedWithPostfix of header: string * body: TechnoField list * postfix: string
-        /// { "message": "Some text, parameters: [(\"request\": TypeName { TypeProperty: \"value\", ... })]. " }
-        | MessageParameterized of header: string * parameters: MessageParameter list
-        | Level of LogLevel
-        | Method of string
-        | StatusCode of HttpStatusCode
-        | Path of string
-        | Host of string
-        | Port of int
-        | Body of TechnoField list
-        | SourceContext of string
-        | RequestId of string
-        | RequestPath of string
-        | SpanId of string
-        | TraceId of string
-        | EventId of string
-        | ParentId of string
-        | ConnectionId of string
-        | HierarchicalTraceId of string
-        | String of key: string * value: string
-        | Int of key: string * value: int
-        | Bool of key: string * value: bool
-        | Array of key: string * value: string list
-        | ArrayInt of key: string * value: int list
-        | ArrayJson of key: string * value: TechnoField list list
-        | Null of key: string
-        | Json of key: string * value: TechnoField list
-        | JsonAnnotated of key: string * header: string * body: TechnoField list
-        | TypeJson of TypeJson
-        with
-            override this.ToString() =
-                match this with
-                | Timespan (Timespan.Value v) -> $"\"timespan\": \"{v}\""
-                | Timespan (Timespan.Null) -> $"\"timespan\": null"
-                | Message v -> $"\"message\": \"{v}\""
-                | MessageBoddied (k, v) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}\""
-                | MessageBoddiedWithPostfix (k, v, p) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}{p}\""
-                | MessageParameterized (header, v) ->
-                    let content = v |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
-                    $"\"message\": \"{header} [{content}]\""
-                | Level v -> $"\"level\": \"{v}\""
-                | Method v -> $"\"method\": \"{v}\""
-                | StatusCode v -> $"\"statusCode\": \"{v}\""
-                | Path v -> $"\"path\": \"{v}\""
-                | Host v -> $"\"host\": \"{v}\""
-                | Port v -> $"\"port\": {v}"
-                | Body v -> $"\"body\": \"{v |> TechnoFields.toString 1}\""
-                | SourceContext v -> $"\"sourceContext\": \"{v}\"" 
-                | RequestId v -> $"\"requestId\": \"{v}\""
-                | RequestPath v -> $"\"requestPath\": \"{v}\""
-                | SpanId v -> $"\"spanId: \"{v}\""
-                | TraceId v -> $"\"traceId\": \"{v}\""
-                | ParentId v -> $"\"parentId\": \"{v}\""
-                | ConnectionId v -> $"\"connectionId\": \"{v}\""
-                | HierarchicalTraceId v -> $"\"hierarchicalTraceId\": \"{v}\""
-                | EventId v -> $"\"eventId: \"{v}\""
-                | String (k, v) -> $"\"{k}\": \"{v}\""
-                | Int (k, v) -> $"\"{k}\": {v}"
-                | Bool (k, v) -> $"\"{k}\": {v.ToString().ToLowerInvariant()}"
-                | ArrayInt (k, v) ->
-                    let values = String.Join(",\n    ",v)
-                    $"\"{k}\": [\n    {values}\n]"
-                | Array (k, v) -> 
-                    let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
-                    $"\"{k}\": [\n    {values}\n]"
-                | ArrayJson (k, v) ->
-                    let values = 
-                        let xs =
-                            v
-                            |> List.map (TechnoFields.toString 1)
-                        String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
+    | Timespan of Timespan
+    | Message of string
+    | MessageBoddied of header: string * body: TechnoField list
+    | MessageBoddiedWithPostfix of header: string * body: TechnoField list * postfix: string
+    /// { "message": "Some text, parameters: [(\"request\": TypeName { TypeProperty: \"value\", ... })]. " }
+    | MessageParameterized of header: string * parameters: MessageParameter list
+    | Level of LogLevel
+    | Method of string
+    | StatusCode of HttpStatusCode
+    | Path of string
+    | Host of string
+    | Port of int
+    | Body of TechnoField list
+    | SourceContext of string
+    | RequestId of string
+    | RequestPath of string
+    | SpanId of string
+    | TraceId of string
+    | EventId of string
+    | ParentId of string
+    | ConnectionId of string
+    | HierarchicalTraceId of string
+    | String of key: string * value: string
+    | Int of key: string * value: int
+    | Bool of key: string * value: bool
+    | Array of key: string * value: string list
+    | ArrayInt of key: string * value: int list
+    | ArrayJson of key: string * value: TechnoField list list
+    | Null of key: string
+    | Json of key: string * value: TechnoField list
+    | JsonAnnotated of key: string * header: string * body: TechnoField list
+    | TypeJson of TypeJson
+    with
+        override this.ToString() =
+            match this with
+            | Timespan (Timespan.Value v) -> $"\"timespan\": \"{v}\""
+            | Timespan (Timespan.Null) -> $"\"timespan\": null"
+            | Message v -> $"\"message\": \"{v}\""
+            | MessageBoddied (k, v) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}\""
+            | MessageBoddiedWithPostfix (k, v, p) -> $"\"message\": \"{k}\n, {v |> TechnoFields.toString 1}{p}\""
+            | MessageParameterized (header, v) ->
+                let content = v |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
+                $"\"message\": \"{header} [{content}]\""
+            | Level v -> $"\"level\": \"{v}\""
+            | Method v -> $"\"method\": \"{v}\""
+            | StatusCode v -> $"\"statusCode\": \"{v}\""
+            | Path v -> $"\"path\": \"{v}\""
+            | Host v -> $"\"host\": \"{v}\""
+            | Port v -> $"\"port\": {v}"
+            | Body v -> $"\"body\": \"{v |> TechnoFields.toString 1}\""
+            | SourceContext v -> $"\"sourceContext\": \"{v}\"" 
+            | RequestId v -> $"\"requestId\": \"{v}\""
+            | RequestPath v -> $"\"requestPath\": \"{v}\""
+            | SpanId v -> $"\"spanId: \"{v}\""
+            | TraceId v -> $"\"traceId\": \"{v}\""
+            | ParentId v -> $"\"parentId\": \"{v}\""
+            | ConnectionId v -> $"\"connectionId\": \"{v}\""
+            | HierarchicalTraceId v -> $"\"hierarchicalTraceId\": \"{v}\""
+            | EventId v -> $"\"eventId: \"{v}\""
+            | String (k, v) -> $"\"{k}\": \"{v}\""
+            | Int (k, v) -> $"\"{k}\": {v}"
+            | Bool (k, v) -> $"\"{k}\": {v.ToString().ToLowerInvariant()}"
+            | ArrayInt (k, v) ->
+                let values = String.Join(",\n    ",v)
+                $"\"{k}\": [\n    {values}\n]"
+            | Array (k, v) -> 
+                let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
+                $"\"{k}\": [\n    {values}\n]"
+            | ArrayJson (k, v) ->
+                let values = 
+                    let xs =
+                        v
+                        |> List.map (TechnoFields.toString 1)
+                    String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
 
-                    $"\"{k}\": [\n    {values}\n]"
+                $"\"{k}\": [\n    {values}\n]"
 
-                | Null k -> $"\"{k}\": null"
-                | Json (k, v) -> $"\"{k}\": {v |> TechnoFields.toString 1}"
-                | JsonAnnotated (k, h, v) -> $"\"{k}\": \"{h}{v |> TechnoFields.toString 1}\""
-                | TypeJson (tj) -> $"%O{tj}"
+            | Null k -> $"\"{k}\": null"
+            | Json (k, v) -> $"\"{k}\": {v |> TechnoFields.toString 1}"
+            | JsonAnnotated (k, h, v) -> $"\"{k}\": \"{h}{v |> TechnoFields.toString 1}\""
+            | TypeJson (tj) -> $"%O{tj}"
 
 
 module TechnoFields =

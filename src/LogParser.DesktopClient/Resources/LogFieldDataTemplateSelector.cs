@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using LogParser.App.TechnoField;
 using System.Windows.Media;
+using LogParser.DesktopClient.ElmishApp.Models;
+using static LogParser.DesktopClient.ElmishApp.Models.TechnoFieldModule;
 
 namespace LogParser.DesktopClient.Resources;
 
