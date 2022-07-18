@@ -33,6 +33,11 @@
 
         <Border DockPanel.Dock="Top" BorderBrush="#191919" BorderThickness="1"></Border>
 
+        <materialDesign:Snackbar DockPanel.Dock="Bottom" 
+                                 x:Name="SnackbarFour"
+                                 HorizontalAlignment="Stretch"
+                                 MessageQueue="{Binding ErrorMessageQueue}"/>
+
         <!-- Content -->
         <Grid>
             <Grid Visibility="{Binding ShowAll, Converter={StaticResource BooleanToVisibilityConverter}}">

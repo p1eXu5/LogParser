@@ -1,16 +1,6 @@
 ﻿module LogParser.Core.Kibana
 
 open System
-open Elasticsearch.Net
-
-
-
-type LogMessage =
-    {
-        TraceId: string
-        FullMessage: string
-    }
-
 
 open FParsec
 
@@ -91,9 +81,34 @@ GET /filebeat-*/_search
     """
 
 
+
+
+open Microsoft.Extensions.Logging
+open Elasticsearch.Net
 open Nest
 
-let searchLogs (uri: string) (dt: DateTime option) (login: string) (password: string) (traceId: string) =
+
+type LogMessage =
+    {
+        TraceId: string
+        [<Text(Name="fullMessage")>] FullMessage: string
+        [<Text(Name="servicename")>] ServiceName: string
+        [<Object(Name = "container")>] Container: Container
+    }
+and
+    Container =
+        {
+            [<Text(Name="id")>] Id: string
+            [<Object(Name = "image")>]Image: Image
+        }
+    and
+        Image = 
+            {
+                [<Text(Name="name")>] Name: string
+            }
+
+
+let searchLogs (logger: ILogger) (uri: string) (dt: DateTime option) (login: string) (password: string) (traceId: string) =
     task {
         let node = Uri(uri)
         use settings = new ConnectionSettings(node)
@@ -102,29 +117,47 @@ let searchLogs (uri: string) (dt: DateTime option) (login: string) (password: st
         dt |> Option.iter(fun dt -> settings.DefaultIndex(sprintf "filebeat-%i.%i.%i" dt.Year dt.Month dt.Day) |> ignore)
         let client = ElasticClient(settings)
 
-        let searchDescriptor = SearchDescriptor<LogMessage>()
+        let searchDescriptor = SearchDescriptor<LogMessage>("filebeat-*")
 
         do
-            searchDescriptor.Query(fun q -> 
-                q.Bool(fun b ->
-                    b.Filter(fun (f: QueryContainerDescriptor<LogMessage>) ->
-                        f.Term(
-                            field=(fun (l: LogMessage) -> l.TraceId),
-                            value=(box traceId)
+            searchDescriptor
+                .Query(fun q -> 
+                    q.Bool(fun b ->
+                        b.Filter(fun (f: QueryContainerDescriptor<LogMessage>) ->
+                            f.Term(
+                                field=(fun (l: LogMessage) -> l.TraceId),
+                                value=(box traceId)
+                            )
                         )
                     )
                 )
-            )
-            |> ignore
+                .Size(500)
+                .Sort(fun sd -> sd.Ascending("@timestamp"))
+                |> ignore
 
         let queryJson = 
             client
                 .RequestResponseSerializer
                 .SerializeToString(searchDescriptor, SerializationFormatting.Indented);
 
+        logger.LogDebug("Sending kibana request:\n{query}", queryJson)
+
         let! result = client.SearchAsync<LogMessage>(searchDescriptor)
 
         return
             result.Documents
-            |> Seq.map (fun d -> d.FullMessage)
+            |> Seq.map (fun d -> 
+                $"""
+                {{
+                    "fullMessage": {d.FullMessage},
+                    "servicename": {d.ServiceName},
+                    "container": {{
+                        "id": {d.Container.Id},
+                        "image": {{
+                            "name": {d.Container.Image.Name}
+                        }}
+                    }}
+                }}
+                """
+            )
     }

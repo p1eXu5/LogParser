@@ -1,40 +1,43 @@
-﻿namespace LogParser.App.TechnoField
+﻿namespace rec LogParser.DesktopClient.ElmishApp.Models
 
 open System
 open LogParser.Core.Types
-open Microsoft.Extensions.Logging
 
-type Model =
+
+module private Core =
+    type TechnoField = LogParser.Core.Types.TechnoField
+
+
+type TechnoField =
     {
-        TechnoField: TechnoField
+        TechnoField: Core.TechnoField
         Key: string
         Header: string option
         Text: string option
         Json: string option
-        Tag: Tag
+        Tag: TechnoField.Tag
         Postfix: string option
     }
-and
-    Tag =
-        | SimpleField = 0
-        | JsonField = 1
-        | AnnotatedJsonField = 2
-        | WithPostfixAnnotatedJsonField = 3
-
-type Msg =
-    | CopyValueRequested
-    | PinFieldValueInHeader of key: string
-
-module Program =
-
-    open Elmish
-    open Microsoft.FSharp.Reflection  
 
 
-    let init (technoField: TechnoField) =
+module TechnoField =
+
+    type Tag =
+            | SimpleField = 0
+            | JsonField = 1
+            | AnnotatedJsonField = 2
+            | WithPostfixAnnotatedJsonField = 3
+
+    type Msg =
+        | CopyValueRequested
+        | PinFieldValueInHeader of key: string
+
+
+
+    let init (technoField: Core.TechnoField) =
 
         match technoField with
-        | TechnoField.Json (_, fields) ->
+        | Core.TechnoField.Json (_, fields) ->
             { 
                 TechnoField = technoField 
                 Tag = Tag.JsonField; 
@@ -44,7 +47,7 @@ module Program =
                 Text = None
                 Postfix = None
             }
-        | TechnoField.JsonAnnotated (_, header, fields) ->
+        | Core.TechnoField.JsonAnnotated (_, header, fields) ->
             { 
                 TechnoField = technoField 
                 Tag = Tag.AnnotatedJsonField; 
@@ -54,7 +57,7 @@ module Program =
                 Text = header |> Some
                 Postfix = None
             }
-        | TechnoField.Body fields ->
+        | Core.TechnoField.Body fields ->
             { 
                 TechnoField = technoField 
                 Tag = Tag.JsonField; 
@@ -64,7 +67,7 @@ module Program =
                 Text = None
                 Postfix = None
             }
-        | TechnoField.MessageBoddied (text, fields) ->
+        | Core.TechnoField.MessageBoddied (text, fields) ->
             { 
                 TechnoField = technoField 
                 Tag = Tag.AnnotatedJsonField; 
@@ -75,7 +78,7 @@ module Program =
                 Postfix = None
             }
 
-        | TechnoField.MessageBoddiedWithPostfix (text, fields, postfix) ->
+        | Core.TechnoField.MessageBoddiedWithPostfix (text, fields, postfix) ->
             { 
                 TechnoField = technoField 
                 Tag = Tag.WithPostfixAnnotatedJsonField;
@@ -86,7 +89,7 @@ module Program =
                 Postfix = postfix |> Some
             }
 
-        | TechnoField.MessageParameterized (text, typeJson) ->
+        | Core.TechnoField.MessageParameterized (text, typeJson) ->
             let parameter = typeJson |> List.map (sprintf "%O") |> (fun l -> String.Join(",\n", l))
 
             { 
@@ -111,6 +114,14 @@ module Program =
             }
 
 
+namespace rec LogParser.DesktopClient.ElmishApp.TechnoField
+
+open LogParser.DesktopClient.ElmishApp.Models
+open LogParser.DesktopClient.ElmishApp.Models.TechnoField
+
+
+module Program =
+
     open System.Windows;
 
     let update msg model =
@@ -127,9 +138,11 @@ module Program =
             ()
 
 
+module Bindings =
+
     open Elmish.WPF
 
-    let bindings () : Binding<Model, Msg> list =
+    let bindings () : Binding<TechnoField, Msg> list =
         [
             "Tag" |> Binding.oneWay (fun m -> m.Tag)
             "Key" |> Binding.oneWay (fun m -> m.Key)

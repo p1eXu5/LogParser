@@ -7,11 +7,14 @@
 
   <ItemGroup>
     <Compile Include="Elmish.Extensions.fs" />
-    <Compile Include="App.TextLog.fs" />
-    <Compile Include="App.TechnoField.fs" />
-    <Compile Include="App.TechnoLog.fs" />
-    <Compile Include="MainModel.fs" />
-    <Compile Include="App.fs" />
+    <Compile Include="Interfaces.fs" />
+    <Compile Include="TextLog.fs" />
+    <Compile Include="TechnoField.fs" />
+    <Compile Include="TechnoLog.fs" />
+    <Compile Include="MainModel\MainModel.fs" />
+    <Compile Include="MainModel\MainModel.Program.fs" />
+    <Compile Include="MainModel\MainModel.Bindings.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +22,7 @@
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
   </ItemGroup>
 
