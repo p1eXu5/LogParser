@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="LogParser.DesktopClient.UserControls.LogsInput"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LogParser.DesktopClient.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="150"
+             d:DesignWidth="200"
+             mc:Ignorable="d"
+             >
+    <TabControl Grid.Column="0"
+                AllowDrop="true"
+                Drop="Window_Drop"
+                SelectedIndex="{Binding SelectedInput}"
+                materialDesign:ColorZoneAssist.Foreground="GreenYellow"
+                materialDesign:ColorZoneAssist.Mode="Custom"
+                >
+        <TabItem Header="Docker">
+            <!--  Input  -->
+            <TextBox MinWidth="280"
+                     VerticalAlignment="Stretch"
+                     materialDesign:HintAssist.Hint="Log text"
+                     AcceptsReturn="True"
+                     AllowDrop="true"
+                     Background="#1E1E1E"
+                     Foreground="#E6E6E6"
+                     PreviewDragOver="TextBox_PreviewDragOver"
+                     PreviewDrop="Window_Drop"
+                     Text="{Binding DockerInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     TextAlignment="Left"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     />
+        </TabItem>
+        <TabItem Header="Kibana">
+            <!--  Input  -->
+            <TextBox MinWidth="280"
+                     VerticalAlignment="Stretch"
+                     materialDesign:HintAssist.Hint="Kibana Logs"
+                     AcceptsReturn="True"
+                     AllowDrop="true"
+                     Background="#1E1E1E"
+                     Foreground="#E6E6E6"
+                     PreviewDragOver="TextBox_PreviewDragOver"
+                     PreviewDrop="Window_Drop"
+                     Text="{Binding KibanaInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     TextAlignment="Left"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     />
+        </TabItem>
+    </TabControl>
+</UserControl>

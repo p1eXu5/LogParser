@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="LogParser.DesktopClient.UserControls.LogCardList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LogParser.DesktopClient.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sel="clr-namespace:LogParser.DesktopClient.TemplateSelectors"
+             d:DesignHeight="150"
+             d:DesignWidth="200"
+             mc:Ignorable="d"
+             >
+    <UserControl.Resources>
+        <sel:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
+        <materialDesign:BooleanToVisibilityConverter x:Key="conv_BoolToVis" />
+    </UserControl.Resources>
+
+    <Grid>
+        <ListBox Background="#1E1E1E"
+                 Grid.IsSharedSizeScope="True"
+                 ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}"
+                 ItemsSource="{Binding Logs}"
+                 ScrollViewer.CanContentScroll="False"
+                 >
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.Template>
+                <ControlTemplate>
+                    <ScrollViewer VirtualizingStackPanel.IsVirtualizing="True"
+                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                  >
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ListBox.Template>
+
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=Background}" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+        <ProgressBar Width="100"
+                     Height="100"
+                     IsIndeterminate="True"
+                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     Visibility="{Binding Loading, Converter={StaticResource conv_BoolToVis}}"
+                     Value="0"
+                     />
+    </Grid>
+</UserControl>

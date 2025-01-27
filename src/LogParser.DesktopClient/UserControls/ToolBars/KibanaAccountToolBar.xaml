@@ -1,0 +1,41 @@
+﻿<ToolBar x:Class="LogParser.DesktopClient.UserControls.ToolBars.KibanaAccountToolBar"
+         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         xmlns:local="clr-namespace:LogParser.DesktopClient.UserControls.ToolBars"
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         d:Background="#1E1E1E"
+         d:DesignHeight="50"
+         d:DesignWidth="400"
+         d:Foreground="{DynamicResource MaterialDesignDarkForeground}"
+         Style="{DynamicResource MaterialDesignToolBar}"
+         mc:Ignorable="d"
+         >
+    <ComboBox Width="250"
+              Margin="10,0,10,10"
+              materialDesign:HintAssist.Hint="Kibana Account"
+              IsEditable="False"
+              IsTextSearchEnabled="False"
+              ItemsSource="{Binding KibanaAccounts}"
+              SelectedIndex="{Binding SelectedKibanaAccountIndex}"
+              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+              Text="{Binding SelectedKibanaBaseUri, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+              />
+
+    <TextBox MinWidth="200"
+             Margin="10,0,0,10"
+             VerticalAlignment="Center"
+             materialDesign:HintAssist.Hint="Login"
+             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+             Text="{Binding SelectedKibanaLogin, UpdateSourceTrigger=PropertyChanged}"
+             />
+
+    <PasswordBox x:Name="m_Password"
+                 MinWidth="200"
+                 Margin="10,0,0,10"
+                 VerticalAlignment="Center"
+                 materialDesign:HintAssist.Hint="Password"
+                 materialDesign:PasswordBoxAssist.Password="{Binding SelectedKibanaPassword, UpdateSourceTrigger=PropertyChanged}"
+                 />
+</ToolBar>

@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Elmish.Extensions.fs" />
+    <Compile Include="Interfaces.fs" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="TextLogModel.fs" />
+    <Compile Include="TechFieldModel.fs" />
+    <Compile Include="TechLogModel.fs" />
+    <Compile Include="FiltersModel.fs" />
+    <Compile Include="KibanaSearchModel.Services.fs" />
+    <Compile Include="KibanaSearchModel.fs" />
+    <Compile Include="MainModel\MainModel.fs" />
+    <Compile Include="MainModel\MainModel.Program.fs" />
+    <Compile Include="MainModel\MainModel.Bindings.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elmish.WPF" Version="4.0.0-beta-44" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LogParser.Core\LogParser.Core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="8.0.200" />
+  </ItemGroup>
+
+</Project>

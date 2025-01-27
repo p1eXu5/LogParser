@@ -1,0 +1,102 @@
+﻿<Window x:Class="LogParser.DesktopClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sel="clr-namespace:LogParser.DesktopClient.TemplateSelectors"
+        xmlns:uc="clr-namespace:LogParser.DesktopClient.UserControls"
+        xmlns:vm="clr-namespace:LogParser.DesktopClient.ElmishApp.Models;assembly=LogParser.DesktopClient.ElmishApp"
+        Title="{Binding DocumentName}"
+        Width="1800"
+        d:Height="800"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        Icon=".\Resources\gnomelogs_103380.ico"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d"
+        Background="#333333"
+        Foreground="{DynamicResource MaterialDesignDarkForeground}"
+        >
+    <Window.Resources>
+        <sel:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
+        <materialDesign:BooleanToVisibilityConverter x:Key="conv_BoolToVis" />
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+
+        <!--  MainMenu  -->
+        <DockPanel DockPanel.Dock="Top"
+                   LastChildFill="True"
+                   Background="{DynamicResource MaterialDesignDarkBackground}"
+                   >
+            <TextBlock DockPanel.Dock="Right"
+                       Margin="0,0,10,0"
+                       VerticalAlignment="Center"
+                       Text="{Binding AssemblyVersion}"
+                       Foreground="{StaticResource MaterialDesignDarkForeground}"
+                       />
+
+            <uc:MainMenu DockPanel.Dock="Left"
+                         Height="45"
+                         DataContext="{Binding}"
+                         />
+
+            <TextBox DockPanel.Dock="Left"
+                     MinWidth="250"
+                     Margin="50,0,0,0"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Center"
+                     materialDesign:HintAssist.Hint="Temp title"
+                     Text="{Binding TempTitle, UpdateSourceTrigger=PropertyChanged}"
+                     Foreground="{StaticResource MaterialDesignDarkForeground}"
+                     />
+        </DockPanel>
+
+        <!--  ToolBar  -->
+        <uc:LogParserToolBarTray DockPanel.Dock="Top" DataContext="{Binding}" />
+
+        <Border DockPanel.Dock="Top"
+                BorderBrush="#191919"
+                BorderThickness="1"
+                />
+
+        <materialDesign:Snackbar x:Name="SnackbarFour"
+                                 DockPanel.Dock="Bottom"
+                                 HorizontalAlignment="Stretch"
+                                 MessageQueue="{Binding ErrorMessageQueue}"
+                                 />
+
+        <Border DockPanel.Dock="Bottom" Background="#191919">
+            <TextBlock Margin="4,2" VerticalAlignment="Center">
+                <Run Text="Log count:" />
+                <Run Text="{Binding LogCount}" />
+            </TextBlock>
+        </Border>
+
+        <!--  Content  -->
+        <Grid>
+            <!--  split view  -->
+            <Grid Visibility="{Binding ShowAll, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition MinWidth="500" />
+                </Grid.ColumnDefinitions>
+
+                <uc:LogsInput DataContext="{Binding}" />
+
+                <GridSplitter Grid.Column="1"
+                              Width="4"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Stretch"
+                              />
+
+                <!--  Logs  -->
+                <uc:LogCardList Grid.Column="2" DataContext="{Binding}" />
+            </Grid>
+
+            <!--  only log cards view  -->
+            <uc:LogCardList DataContext="{Binding}" Visibility="{Binding ShowOnlyParsedLogs, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </Grid>
+    </DockPanel>
+</Window>

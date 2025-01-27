@@ -1,0 +1,23 @@
+﻿<ResourceDictionary x:Class="LogParser.DesktopClient.Resources.Colors"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    >
+
+    <Color x:Key="col_Background">#0E0E0E</Color>
+    <Color x:Key="col_Foreground">#E6E6E6</Color>
+    <Color x:Key="col_ForegroundLight">#EEEEE2</Color>
+
+    <Color x:Key="col_Warning">#FF8C00</Color>
+    <Color x:Key="col_Success">#87D778</Color>
+    <Color x:Key="col_Error">#E06795</Color>
+    <Color x:Key="col_Info">#92CAF4</Color>
+
+    <SolidColorBrush x:Key="br_Background" Color="{StaticResource col_Background}" />
+    <SolidColorBrush x:Key="br_Foreground" Color="{StaticResource col_Foreground}" />
+    <SolidColorBrush x:Key="br_ForegroundLight" Color="{StaticResource col_ForegroundLight}" />
+    <SolidColorBrush x:Key="br_Warning" Color="{StaticResource col_Warning}" />
+    <SolidColorBrush x:Key="br_Success" Color="{StaticResource col_Success}" />
+    <SolidColorBrush x:Key="br_Error" Color="{StaticResource col_Error}" />
+    <SolidColorBrush x:Key="br_Info" Color="{StaticResource col_Info}" />
+
+</ResourceDictionary>
