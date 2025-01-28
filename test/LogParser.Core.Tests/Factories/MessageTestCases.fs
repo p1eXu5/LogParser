@@ -8,6 +8,33 @@ open LogParser.Core.Dsl
 
 type MessageTestCases() =
 
+    /// 42. To split on two cases, Message, Message2 (fix Test Explorer Category splitting.)
+    static member MessageFactory(n: int) : IEnumerable =
+        let testCaseName = sprintf "%i - %s" n
+        let testCase msg expected =
+            TestCaseData(msg, TechField.Message expected).SetName(msg |> testCaseName)
+        seq {
+            testCase
+                "\"message\": \"Returning next host: rabbitmq_node:5672\""
+                "Returning next host: rabbitmq_node:5672"
+
+            testCase
+                "Message: \\\"Bad status code 404: \\\""
+                "Bad status code 404: "
+
+            testCase
+                "\"message\": \"!!!!!!!!!!!!!!!!\""
+                "!!!!!!!!!!!!!!!!"
+
+            testCase
+                "\"message\": \"Request:\nMethod: GET\nPathBase: \nPath: /api/v1/internal/groups\nQueryString: ?userId=84062c29-2e0c-42f0-9d0c-5a11c7c6baf0\""
+                "Request:\nMethod: GET\nPathBase: \nPath: /api/v1/internal/groups\nQueryString: ?userId=84062c29-2e0c-42f0-9d0c-5a11c7c6baf0"
+        }
+
+    static member Message : IEnumerable = MessageTestCases.MessageFactory(1)
+    static member Message2 : IEnumerable = MessageTestCases.MessageFactory(2)
+
+
     /// 41
     static member MessageJsonAnnotatedList : IEnumerable =
         seq {
@@ -59,29 +86,6 @@ type MessageTestCases() =
                 |> List.singleton
             ).SetName("MessageJsonAnnotatedList with double quotes nested")
         }
-
-    /// 42
-    static member MessageFactory(n: int) : IEnumerable =
-        let testCaseName = sprintf "%i - %s" n
-        seq {
-            TestCaseData(
-                "\"message\": \"Returning next host: rabbitmq_node:5672\"",
-                TechField.Message "Returning next host: rabbitmq_node:5672"
-            ).SetName("simple `message` field" |> testCaseName)
-
-            TestCaseData(
-                "Message: \\\"Bad status code 404: \\\"",
-                TechField.Message "Bad status code 404: "
-            ).SetName("`Message` key with no quotes" |> testCaseName)
-
-            TestCaseData(
-                "\"message\": \"!!!!!!!!!!!!!!!!\"",
-                TechField.Message "!!!!!!!!!!!!!!!!"
-            ).SetName("`message` contains only exclamation marks" |> testCaseName)
-        }
-
-    static member Message : IEnumerable = MessageTestCases.MessageFactory(1)
-    static member Message2 : IEnumerable = MessageTestCases.MessageFactory(2)
 
     /// 43
     static member MessageBodied : IEnumerable =
