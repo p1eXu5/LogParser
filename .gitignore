@@ -456,3 +456,4 @@ $RECYCLE.BIN/
 /NuGet.Config
 /utils/set-kibana-env.cmd
 /utils/set-kibana-env.ps1
+/docs/to_parse!
