@@ -2,15 +2,29 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <PackageIcon>gnomelogs_103380.ico</PackageIcon>
-    <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
+
     <Title>Log Parser</Title>
-    <AssemblyVersion>1.13.16</AssemblyVersion>
-    <FileVersion>1.13.16.0</FileVersion>
-    <Version>$(VersionPrefix)</Version>
+    <AssemblyName>LogParser.1.14.0</AssemblyName>
+    <TargetName>LogParser.1.14.0</TargetName>
+      
+    <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
+    <PackageIcon>gnomelogs_103380.ico</PackageIcon>
+
+    <Version>1.14.0</Version>
+    <AssemblyVersion>1.14.0</AssemblyVersion>
+    <FileVersion>1.14.0.0</FileVersion>
+
+    <Copyright>2023 Vladimir Likhatskiy</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/p1eXu5/LogParser</RepositoryUrl>
+    <PackageTags>logger;log;parser;windows;wpf</PackageTags>
+    <Configurations>Debug;Release;</Configurations>
+    <StartupObject>LogParser.DesktopClient.App</StartupObject>
+    <UserSecretsId></UserSecretsId>
   </PropertyGroup>
   
   <ItemGroup>
@@ -18,8 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.1-ci1190" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,5 +58,10 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+
+  <!--<Target Name="Rename" AfterTargets="AfterBuild" Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
+    <Move SourceFiles="$(OUTDIR)\$(MSBuildProjectName).exe" DestinationFiles="$(OUTDIR)\LogParser.exe" />
+    <Message Text="Renamed executable file." Importance="high" />
+  </Target>-->
 
 </Project>
