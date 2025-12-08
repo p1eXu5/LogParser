@@ -467,4 +467,21 @@ type MessageTestCases() =
                     "."
                 )
             ).SetName("MessageBodiedWithPostfix with complex list")
+
+            TestCaseData(
+                """"message": "События CardStatusChangedEvent успешно обработано: { \"cardId\": \"759062f9-c614-4c32-933a-995cd2ad07cf\", \"cardHmac\": \"aafe****\", \"status\": \"Inactive\", \"reason\": \"ByBank\", \"alias\": \"fromASBank\", \"privetPan\": \"aafecb7959b4ab2c8da09c6b526843a93e56d731508b5345c08eed547d7f73f1\" }. Идентификатор сообщения 14320000-9a3c-0005-2fd5-08de36408863, пользователь: 760acf97-daa4-4508-9c08-12eab130f8bb."
+                """,
+                TechField.MessageBoddiedWithPostfix (
+                    "События CardStatusChangedEvent успешно обработано:",
+                    jsonLog {
+                        Field "cardId" "759062f9-c614-4c32-933a-995cd2ad07cf"
+                        Field "cardHmac" "aafe****"
+                        Field "status" "Inactive"
+                        Field "reason" "ByBank"
+                        Field "alias" "fromASBank"
+                        Field "privetPan" "aafecb7959b4ab2c8da09c6b526843a93e56d731508b5345c08eed547d7f73f1"
+                    },
+                    ". Идентификатор сообщения 14320000-9a3c-0005-2fd5-08de36408863, пользователь: 760acf97-daa4-4508-9c08-12eab130f8bb."
+                )
+            ).SetName("MessageBodiedWithPostfix with complex list and postfix")
         }
