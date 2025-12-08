@@ -29,18 +29,10 @@
                     <materialDesign:ColorZone>
                         <Grid HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"
-                                                  Tag="Log Header"
-                                                  />
-                                <ColumnDefinition Width="Auto"
-                                                  Tag="Pinned Field"
-                                                  />
-                                <ColumnDefinition Width="Auto"
-                                                  Tag="Copy Button"
-                                                  />
-                                <ColumnDefinition Width="Auto"
-                                                  Tag="Exclamation Toggle Button"
-                                                  />
+                                <ColumnDefinition Width="*" Tag="Log Header" />
+                                <ColumnDefinition Width="Auto" Tag="Pinned Field" />
+                                <ColumnDefinition Width="Auto" Tag="Copy Button" />
+                                <ColumnDefinition Width="Auto" Tag="Exclamation Toggle Button" />
                             </Grid.ColumnDefinitions>
 
                             <!--  Log Header  -->
@@ -66,16 +58,9 @@
                                 </Grid.ToolTip>
 
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"
-                                                      Tag="Log Level"
-                                                      />
-                                    <ColumnDefinition Width="280"
-                                                      Tag="Timestamp"
-                                                      />
-                                    <ColumnDefinition Width="*"
-                                                      MinWidth="100"
-                                                      Tag="Message"
-                                                      />
+                                    <ColumnDefinition Width="100" Tag="Log Level" />
+                                    <ColumnDefinition Width="280" Tag="Timestamp" />
+                                    <ColumnDefinition Width="*" MinWidth="100" Tag="Message" />
                                 </Grid.ColumnDefinitions>
 
                                 <!--  Log Level  -->
@@ -100,8 +85,8 @@
                             </Grid>
 
                             <!--  Pinned Field  -->
-                            <TextBlock DockPanel.Dock="Right"
-                                       Grid.Column="1"
+                            <TextBlock Grid.Column="1"
+                                       DockPanel.Dock="Right"
                                        Margin="10,0"
                                        VerticalAlignment="Center"
                                        Foreground="{StaticResource br_ForegroundLight}"
@@ -161,18 +146,10 @@
                     <materialDesign:ColorZone>
                         <Grid HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"
-                                                  Tag="Log Header"
-                                                  />
-                                <ColumnDefinition Width="Auto"
-                                                  Tag="Pinned Field"
-                                                  />
-                                <ColumnDefinition Width="Auto"
-                                                  Tag="Copy Button"
-                                                  />
-                                <ColumnDefinition Width="Auto"
-                                                  Tag="Exclamation Toggle Button"
-                                                  />
+                                <ColumnDefinition Width="*" Tag="Log Header" />
+                                <ColumnDefinition Width="Auto" Tag="Pinned Field" />
+                                <ColumnDefinition Width="Auto" Tag="Copy Button" />
+                                <ColumnDefinition Width="Auto" Tag="Exclamation Toggle Button" />
                             </Grid.ColumnDefinitions>
 
                             <!--  Log Header  -->
@@ -203,9 +180,7 @@
                                     <!--  Timestamp  -->
                                     <ColumnDefinition Width="280" />
                                     <!--  Message  -->
-                                    <ColumnDefinition Width="*"
-                                                      MinWidth="100"
-                                                      />
+                                    <ColumnDefinition Width="*" MinWidth="100" />
                                 </Grid.ColumnDefinitions>
 
                                 <!--  Log Level  -->
@@ -230,8 +205,8 @@
                             </Grid>
 
                             <!--  Pinned Field  -->
-                            <TextBlock DockPanel.Dock="Right"
-                                       Grid.Column="1"
+                            <TextBlock Grid.Column="1"
+                                       DockPanel.Dock="Right"
                                        Margin="10,0"
                                        VerticalAlignment="Center"
                                        Foreground="{StaticResource br_ForegroundLight}"
@@ -282,9 +257,7 @@
                                   HorizontalAlignment="Stretch"
                                   >
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition MinWidth="100"
-                                                      SharedSizeGroup="A"
-                                                      />
+                                    <ColumnDefinition MinWidth="100" SharedSizeGroup="A" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <Border Margin="0,0,20,0">

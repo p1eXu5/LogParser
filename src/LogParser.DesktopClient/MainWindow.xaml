@@ -13,10 +13,9 @@
         AllowDrop="True"
         Drop="Window_Drop"
         Icon=".\Resources\gnomelogs_103380.ico"
+        Style="{StaticResource MaterialDesignWindow}"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
-        Background="#333333"
-        Foreground="{DynamicResource MaterialDesignDarkForeground}"
         >
     <Window.Resources>
         <sel:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
@@ -27,13 +26,12 @@
         <!--  MainMenu  -->
         <DockPanel DockPanel.Dock="Top"
                    LastChildFill="True"
-                   Background="{DynamicResource MaterialDesignDarkBackground}"
                    >
             <TextBlock DockPanel.Dock="Right"
                        Margin="0,0,10,0"
                        VerticalAlignment="Center"
+                       Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
                        Text="{Binding AssemblyVersion}"
-                       Foreground="{StaticResource MaterialDesignDarkForeground}"
                        />
 
             <uc:MainMenu DockPanel.Dock="Left"
@@ -47,13 +45,16 @@
                      HorizontalAlignment="Left"
                      VerticalAlignment="Center"
                      materialDesign:HintAssist.Hint="Temp title"
-                     Text="{Binding TempTitle, UpdateSourceTrigger=PropertyChanged}"
-                     Foreground="{StaticResource MaterialDesignDarkForeground}"
+                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+                     Text="{Binding TempTitle,
+                                    UpdateSourceTrigger=PropertyChanged}"
                      />
         </DockPanel>
 
         <!--  ToolBar  -->
-        <uc:LogParserToolBarTray DockPanel.Dock="Top" DataContext="{Binding}" />
+        <uc:LogParserToolBarTray DockPanel.Dock="Top"
+                                 DataContext="{Binding}"
+                                 />
 
         <Border DockPanel.Dock="Top"
                 BorderBrush="#191919"
@@ -66,8 +67,12 @@
                                  MessageQueue="{Binding ErrorMessageQueue}"
                                  />
 
-        <Border DockPanel.Dock="Bottom" Background="#191919">
-            <TextBlock Margin="4,2" VerticalAlignment="Center">
+        <Border DockPanel.Dock="Bottom"
+                Background="#191919"
+                >
+            <TextBlock Margin="4,2"
+                       VerticalAlignment="Center"
+                       >
                 <Run Text="Log count:" />
                 <Run Text="{Binding LogCount}" />
             </TextBlock>
@@ -76,7 +81,7 @@
         <!--  Content  -->
         <Grid>
             <!--  split view  -->
-            <Grid Visibility="{Binding ShowAll, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid Visibility="{Binding ShowAll, Converter={StaticResource conv_BoolToVis}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -92,11 +97,16 @@
                               />
 
                 <!--  Logs  -->
-                <uc:LogCardList Grid.Column="2" DataContext="{Binding}" />
+                <uc:LogCardList Grid.Column="2"
+                                DataContext="{Binding}"
+                                />
             </Grid>
 
             <!--  only log cards view  -->
-            <uc:LogCardList DataContext="{Binding}" Visibility="{Binding ShowOnlyParsedLogs, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <uc:LogCardList DataContext="{Binding}"
+                            Visibility="{Binding ShowOnlyParsedLogs,
+                                                 Converter={StaticResource conv_BoolToVis}}"
+                            />
         </Grid>
     </DockPanel>
 </Window>

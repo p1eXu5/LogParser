@@ -9,12 +9,14 @@
              d:DesignWidth="500"
              mc:Ignorable="d"
              >
-    <Grid Background="{StaticResource MaterialDesignDarkBackground}">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Menu VerticalAlignment="Center" IsMainMenu="True">
+        <Menu VerticalAlignment="Center"
+              IsMainMenu="True"
+              >
             <MenuItem Header="_File">
                 <MenuItem Command="{Binding NewFileCommand}"
                           Header="New"

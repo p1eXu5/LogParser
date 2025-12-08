@@ -12,12 +12,26 @@
     <Color x:Key="col_Error">#E06795</Color>
     <Color x:Key="col_Info">#92CAF4</Color>
 
-    <SolidColorBrush x:Key="br_Background" Color="{StaticResource col_Background}" />
-    <SolidColorBrush x:Key="br_Foreground" Color="{StaticResource col_Foreground}" />
-    <SolidColorBrush x:Key="br_ForegroundLight" Color="{StaticResource col_ForegroundLight}" />
-    <SolidColorBrush x:Key="br_Warning" Color="{StaticResource col_Warning}" />
-    <SolidColorBrush x:Key="br_Success" Color="{StaticResource col_Success}" />
-    <SolidColorBrush x:Key="br_Error" Color="{StaticResource col_Error}" />
-    <SolidColorBrush x:Key="br_Info" Color="{StaticResource col_Info}" />
+    <SolidColorBrush x:Key="br_Background"
+                     Color="{StaticResource col_Background}"
+                     />
+    <SolidColorBrush x:Key="br_Foreground"
+                     Color="{StaticResource col_Foreground}"
+                     />
+    <SolidColorBrush x:Key="br_ForegroundLight"
+                     Color="{StaticResource col_ForegroundLight}"
+                     />
+    <SolidColorBrush x:Key="br_Warning"
+                     Color="{StaticResource col_Warning}"
+                     />
+    <SolidColorBrush x:Key="br_Success"
+                     Color="{StaticResource col_Success}"
+                     />
+    <SolidColorBrush x:Key="br_Error"
+                     Color="{StaticResource col_Error}"
+                     />
+    <SolidColorBrush x:Key="br_Info"
+                     Color="{StaticResource col_Info}"
+                     />
 
 </ResourceDictionary>

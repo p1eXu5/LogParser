@@ -11,9 +11,9 @@
              mc:Ignorable="d"
              >
     <ToolBarTray VerticalAlignment="Top">
-        <local:KibanaSearchToolBar Band="0"
+        <local:KibanaSearchToolBar Width="1400"
+                                   Band="0"
                                    BandIndex="0"
-                                   Width="1400"
                                    DataContext="{Binding KibanaSearchModel}"
                                    />
         <local:KibanaAccountToolBar Band="0"

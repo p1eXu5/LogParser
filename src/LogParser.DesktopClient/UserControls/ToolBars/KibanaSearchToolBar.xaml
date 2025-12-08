@@ -8,7 +8,7 @@
          d:Background="#1E1E1E"
          d:DesignHeight="50"
          d:DesignWidth="1400"
-         d:Foreground="{DynamicResource MaterialDesignDarkForeground}"
+         d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
          Style="{DynamicResource MaterialDesignToolBar}"
          mc:Ignorable="d"
          >
@@ -18,7 +18,8 @@
              VerticalAlignment="Center"
              materialDesign:HintAssist.Hint="Trace ID or message (when starts with 'm:') "
              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-             Text="{Binding TraceId, UpdateSourceTrigger=PropertyChanged}"
+             Text="{Binding TraceId,
+                            UpdateSourceTrigger=PropertyChanged}"
              />
 
     <!--  Service name  -->
@@ -29,7 +30,9 @@
               IsTextSearchEnabled="True"
               ItemsSource="{Binding ServiceNames}"
               Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-              Text="{Binding SelectedServiceName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+              Text="{Binding SelectedServiceName,
+                             UpdateSourceTrigger=PropertyChanged,
+                             Mode=OneWayToSource}"
               />
 
     <Button Padding="8,0,0,0"
@@ -67,7 +70,8 @@
                 Margin="10,0,10,10"
                 materialDesign:HintAssist.Hint="Pick Date"
                 materialDesign:TextFieldAssist.HasClearButton="True"
-                SelectedDate="{Binding LogsDate, UpdateSourceTrigger=PropertyChanged}"
+                SelectedDate="{Binding LogsDate,
+                                       UpdateSourceTrigger=PropertyChanged}"
                 Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
                 />
 
@@ -76,7 +80,8 @@
                                materialDesign:HintAssist.Hint="Pick Start Time"
                                materialDesign:TextFieldAssist.HasClearButton="True"
                                Is24Hours="True"
-                               SelectedTime="{Binding LogsStartTime, UpdateSourceTrigger=PropertyChanged}"
+                               SelectedTime="{Binding LogsStartTime,
+                                                      UpdateSourceTrigger=PropertyChanged}"
                                Style="{StaticResource MaterialDesignFloatingHintTimePicker}"
                                WithSeconds="True"
                                />
@@ -86,7 +91,8 @@
                                materialDesign:HintAssist.Hint="Pick End Time"
                                materialDesign:TextFieldAssist.HasClearButton="True"
                                Is24Hours="True"
-                               SelectedTime="{Binding LogsEndTime, UpdateSourceTrigger=PropertyChanged}"
+                               SelectedTime="{Binding LogsEndTime,
+                                                      UpdateSourceTrigger=PropertyChanged}"
                                Style="{StaticResource MaterialDesignFloatingHintTimePicker}"
                                WithSeconds="True"
                                />

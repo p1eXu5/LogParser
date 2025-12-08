@@ -10,6 +10,11 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
+                <!--  for IntelliSense, must be placed before BundledTheme  -->
+                <!--
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />-->
+
                 <materialDesign:BundledTheme BaseTheme="Dark"
                                              PrimaryColor="BlueGrey"
                                              SecondaryColor="Lime"
@@ -21,7 +26,9 @@
                                                         />
                     </materialDesign:BundledTheme.ColorAdjustment>
                 </materialDesign:BundledTheme>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TimePicker.xaml" />
 
                 <ResourceDictionary Source="pack://application:,,,/LogParser.DesktopClient;component/Resources/Colors.xaml" />

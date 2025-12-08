@@ -48,7 +48,8 @@
                      Height="100"
                      IsIndeterminate="True"
                      Style="{StaticResource MaterialDesignCircularProgressBar}"
-                     Visibility="{Binding Loading, Converter={StaticResource conv_BoolToVis}}"
+                     Visibility="{Binding Loading,
+                                          Converter={StaticResource conv_BoolToVis}}"
                      Value="0"
                      />
     </Grid>

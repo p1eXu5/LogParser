@@ -37,8 +37,8 @@
                                materialDesign:HintAssist.Hint="Start Time"
                                materialDesign:TextFieldAssist.HasClearButton="True"
                                Is24Hours="True"
-                               WithSeconds="True"
                                SelectedTime="{Binding Start}"
+                               WithSeconds="True"
                                />
 
     <materialDesign:TimePicker Width="100"
@@ -46,8 +46,8 @@
                                materialDesign:HintAssist.Hint="End Time"
                                materialDesign:TextFieldAssist.HasClearButton="True"
                                Is24Hours="True"
-                               WithSeconds="True"
                                SelectedTime="{Binding End}"
+                               WithSeconds="True"
                                />
 
     <!--  Log Levels  -->

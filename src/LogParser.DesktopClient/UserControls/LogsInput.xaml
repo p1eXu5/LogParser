@@ -10,11 +10,11 @@
              mc:Ignorable="d"
              >
     <TabControl Grid.Column="0"
+                materialDesign:ColorZoneAssist.Foreground="GreenYellow"
+                materialDesign:ColorZoneAssist.Mode="Custom"
                 AllowDrop="true"
                 Drop="Window_Drop"
                 SelectedIndex="{Binding SelectedInput}"
-                materialDesign:ColorZoneAssist.Foreground="GreenYellow"
-                materialDesign:ColorZoneAssist.Mode="Custom"
                 >
         <TabItem Header="Docker">
             <!--  Input  -->
@@ -25,12 +25,14 @@
                      AllowDrop="true"
                      Background="#1E1E1E"
                      Foreground="#E6E6E6"
-                     PreviewDragOver="TextBox_PreviewDragOver"
-                     PreviewDrop="Window_Drop"
-                     Text="{Binding DockerInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding DockerInput,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}"
                      TextAlignment="Left"
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
+                     PreviewDragOver="TextBox_PreviewDragOver"
+                     PreviewDrop="Window_Drop"
                      />
         </TabItem>
         <TabItem Header="Kibana">
@@ -42,12 +44,14 @@
                      AllowDrop="true"
                      Background="#1E1E1E"
                      Foreground="#E6E6E6"
-                     PreviewDragOver="TextBox_PreviewDragOver"
-                     PreviewDrop="Window_Drop"
-                     Text="{Binding KibanaInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding KibanaInput,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}"
                      TextAlignment="Left"
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
+                     PreviewDragOver="TextBox_PreviewDragOver"
+                     PreviewDrop="Window_Drop"
                      />
         </TabItem>
     </TabControl>

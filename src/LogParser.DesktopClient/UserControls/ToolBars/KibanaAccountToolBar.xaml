@@ -8,7 +8,7 @@
          d:Background="#1E1E1E"
          d:DesignHeight="50"
          d:DesignWidth="400"
-         d:Foreground="{DynamicResource MaterialDesignDarkForeground}"
+         d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
          Style="{DynamicResource MaterialDesignToolBar}"
          mc:Ignorable="d"
          >
@@ -20,7 +20,9 @@
               ItemsSource="{Binding KibanaAccounts}"
               SelectedIndex="{Binding SelectedKibanaAccountIndex}"
               Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-              Text="{Binding SelectedKibanaBaseUri, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+              Text="{Binding SelectedKibanaBaseUri,
+                             UpdateSourceTrigger=PropertyChanged,
+                             Mode=OneWay}"
               />
 
     <TextBox MinWidth="200"
@@ -28,7 +30,8 @@
              VerticalAlignment="Center"
              materialDesign:HintAssist.Hint="Login"
              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-             Text="{Binding SelectedKibanaLogin, UpdateSourceTrigger=PropertyChanged}"
+             Text="{Binding SelectedKibanaLogin,
+                            UpdateSourceTrigger=PropertyChanged}"
              />
 
     <PasswordBox x:Name="m_Password"
@@ -36,6 +39,7 @@
                  Margin="10,0,0,10"
                  VerticalAlignment="Center"
                  materialDesign:HintAssist.Hint="Password"
-                 materialDesign:PasswordBoxAssist.Password="{Binding SelectedKibanaPassword, UpdateSourceTrigger=PropertyChanged}"
+                 materialDesign:PasswordBoxAssist.Password="{Binding SelectedKibanaPassword,
+                                                                     UpdateSourceTrigger=PropertyChanged}"
                  />
 </ToolBar>
