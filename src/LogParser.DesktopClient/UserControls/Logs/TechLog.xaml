@@ -149,6 +149,13 @@
                                                                 Converter={StaticResource conv_HeaderToBrush}}"
                                            >
                                     <Run Text="{Binding Key, Mode=OneWay}" /><Run>:</Run>
+                                    <TextBlock.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Command="{Binding DecodeCommand}"
+                                                      Header="Decode"
+                                                      />
+                                        </ContextMenu>
+                                    </TextBlock.ContextMenu>
                                 </TextBlock>
                             </Border>
 

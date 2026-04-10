@@ -5,10 +5,10 @@
          xmlns:local="clr-namespace:LogParser.DesktopClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         Style="{DynamicResource MaterialDesignToolBar}"
          d:Background="#1E1E1E"
          d:DesignHeight="50"
          d:DesignWidth="800"
-         Style="{DynamicResource MaterialDesignToolBar}"
          mc:Ignorable="d"
          >
     <!--  Log filters  -->
@@ -16,19 +16,19 @@
              VerticalAlignment="Center"
              SelectionMode="Extended"
              >
-        <ListBoxItem Width="66"
-                     HorizontalContentAlignment="Center"
-                     Content="{materialDesign:PackIcon Kind=Filter}"
-                     IsSelected="{Binding FilterOn}"
-                     Style="{DynamicResource MaterialDesignNavigationPrimaryListBoxItem}"
+        <ListBoxItem Content="{materialDesign:PackIcon Kind=Filter}"
                      ToolTip="Enable filtering by TraceId"
-                     />
-        <ListBoxItem Width="66"
-                     HorizontalContentAlignment="Center"
-                     Content="{materialDesign:PackIcon Kind=FileTree}"
-                     IsSelected="{Binding ShowInnerHierarchyLogs}"
                      Style="{DynamicResource MaterialDesignNavigationPrimaryListBoxItem}"
+                     Width="66"
+                     HorizontalContentAlignment="Center"
+                     IsSelected="{Binding FilterOn}"
+                     />
+        <ListBoxItem Content="{materialDesign:PackIcon Kind=FileTree}"
                      ToolTip="When disabled only root logs are shown"
+                     Style="{DynamicResource MaterialDesignNavigationPrimaryListBoxItem}"
+                     Width="66"
+                     HorizontalContentAlignment="Center"
+                     IsSelected="{Binding ShowInnerHierarchyLogs}"
                      />
     </ListBox>
 
@@ -51,36 +51,36 @@
                                />
 
     <!--  Log Levels  -->
-    <ComboBox Width="250"
+    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+              Width="250"
               Margin="10,0,10,10"
               materialDesign:HintAssist.Hint="Log Level"
               IsEditable="True"
               IsTextSearchEnabled="True"
               ItemsSource="{Binding LogLevels}"
-              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
               Text="{Binding SelectedLogLevel,
                              UpdateSourceTrigger=PropertyChanged,
                              Mode=OneWayToSource}"
               />
 
     <!--  Service name  -->
-    <ComboBox Width="250"
+    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+              Width="250"
               Margin="10,0,10,10"
               materialDesign:HintAssist.Hint="Service name"
               IsEditable="True"
               IsTextSearchEnabled="True"
               ItemsSource="{Binding ServiceNames}"
-              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
               Text="{Binding SelectedServiceName,
                              UpdateSourceTrigger=PropertyChanged,
                              Mode=OneWayToSource}"
               />
 
-    <ToggleButton Margin="4,2"
-                  Command="{Binding DataContext.OrderByTimestampCommand,
+    <ToggleButton Command="{Binding DataContext.OrderByTimestampCommand,
                                     RelativeSource={RelativeSource Mode=FindAncestor,
                                                                    AncestorType=Window}}"
                   Style="{StaticResource MaterialDesignFlatLightButton}"
+                  Margin="4,2"
                   >
         <materialDesign:PackIcon Kind="SortClockAscendingOutline" />
     </ToggleButton>

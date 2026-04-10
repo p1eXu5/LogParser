@@ -5,25 +5,25 @@
          xmlns:local="clr-namespace:LogParser.DesktopClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         Style="{DynamicResource MaterialDesignToolBar}"
          d:Background="#1E1E1E"
          d:DesignHeight="60"
          d:DesignWidth="400"
          ClipToBounds="True"
-         Style="{DynamicResource MaterialDesignToolBar}"
          mc:Ignorable="d"
          >
     <Button Grid.Column="2"
-            Margin="4,2"
             Command="{Binding PasteFromClipboardCommand}"
             Style="{StaticResource MaterialDesignFlatLightButton}"
+            Margin="4,2"
             >
         <materialDesign:PackIcon Kind="ContentCopy" />
     </Button>
 
     <Button Grid.Column="2"
-            Margin="4,2"
             Command="{Binding ClearInputCommand}"
             Style="{StaticResource MaterialDesignFlatLightButton}"
+            Margin="4,2"
             >
         <materialDesign:PackIcon Kind="DeleteOutline" />
     </Button>
@@ -33,11 +33,11 @@
              VerticalAlignment="Center"
              SelectionMode="Extended"
              >
-        <ListBoxItem Width="66"
-                     HorizontalContentAlignment="Center"
-                     Content="{materialDesign:PackIcon Kind=TextBoxOutline}"
-                     IsSelected="{Binding ShowAll}"
+        <ListBoxItem Content="{materialDesign:PackIcon Kind=TextBoxOutline}"
                      Style="{DynamicResource MaterialDesignNavigationPrimaryListBoxItem}"
+                     Width="66"
+                     HorizontalContentAlignment="Center"
+                     IsSelected="{Binding ShowAll}"
                      />
     </ListBox>
 </ToolBar>

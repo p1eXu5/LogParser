@@ -24,11 +24,11 @@ module TechFieldModel =
             | AnnotatedJsonField = 2
             | WithPostfixAnnotatedJsonField = 3
 
+    // Intensions. Currently processed in MainModel Program.
     type Msg =
-        | CopyValueRequested
+        | CopyValue
+        | DecodeValue
         | PinFieldValueInHeader of key: string
-
-
 
     let init (techField: TechField) =
 
@@ -99,40 +99,70 @@ module TechFieldModel =
 
 namespace rec LogParser.DesktopClient.ElmishApp.TechFieldModel
 
+open System.Windows.Input
+open LogParser.DesktopClient.ElmishApp
 open LogParser.DesktopClient.ElmishApp.Models
 open LogParser.DesktopClient.ElmishApp.Models.TechFieldModel
 
 
 module Program =
 
+    open System
     open System.Windows
 
     let update msg model =
         match msg with
-        | CopyValueRequested ->
+        | CopyValue ->
             match model.Tag with
             | Tag.JsonField
             | Tag.AnnotatedJsonField ->
                 Clipboard.SetText(model.Json |> Option.defaultValue "")
             | _ -> 
                 Clipboard.SetText(model.Text |> Option.defaultValue "")
-
+            model
+        | DecodeValue ->
+            { model with
+                Text =
+                    match model.Text with
+                    | Some text -> Helpers.decodeUnicodeEscapes text |> Some
+                    | _ -> None
+                Json =
+                    match model.Json with
+                    | Some text -> Helpers.decodeUnicodeEscapes text |> Some
+                    | _ -> None
+            }
         | _ ->
-            ()
+            model
 
+
+type IBindings =
+    interface
+        abstract Tag: Tag with get
+        abstract Key: string with get
+        abstract Text: string option with get
+        abstract Header: string option with get
+        abstract Postfix: string option with get
+        abstract Json: string option with get
+        abstract CopyCommand: ICommand with get
+        abstract PinCommand: ICommand with get
+        abstract DecodeCommand: ICommand with get
+    end
 
 module Bindings =
 
     open Elmish.WPF
 
+    let private __ = Unchecked.defaultof<IBindings>
+
     let bindings () : Binding<TechFieldModel, TechFieldModel.Msg> list =
         [
-            "Tag" |> Binding.oneWay (fun m -> m.Tag)
-            "Key" |> Binding.oneWay (fun m -> m.Key)
-            "Text" |> Binding.oneWayOpt (fun m -> m.Text)
-            "Header" |> Binding.oneWayOpt (fun m -> m.Header)
-            "Postfix" |> Binding.oneWayOpt (fun m -> m.Postfix)
-            "Json" |> Binding.oneWayOpt (fun m -> m.Json)
-            "CopyCommand" |> Binding.cmd Msg.CopyValueRequested
-            "PinCommand" |> Binding.cmd (fun m -> Msg.PinFieldValueInHeader m.Key)
+            nameof __.Tag |> Binding.oneWay (fun m -> m.Tag)
+            nameof __.Key |> Binding.oneWay (fun m -> m.Key)
+            nameof __.Text |> Binding.oneWayOpt (fun m -> m.Text)
+            nameof __.Header |> Binding.oneWayOpt (fun m -> m.Header)
+            nameof __.Postfix |> Binding.oneWayOpt (fun m -> m.Postfix)
+            nameof __.Json |> Binding.oneWayOpt (fun m -> m.Json)
+            nameof __.CopyCommand |> Binding.cmd Msg.CopyValue
+            nameof __.PinCommand |> Binding.cmd (fun m -> Msg.PinFieldValueInHeader m.Key)
+            nameof __.DecodeCommand |> Binding.cmd (fun m -> Msg.DecodeValue)
         ]

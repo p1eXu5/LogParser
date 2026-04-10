@@ -8,12 +8,12 @@
         xmlns:uc="clr-namespace:LogParser.DesktopClient.UserControls"
         xmlns:vm="clr-namespace:LogParser.DesktopClient.ElmishApp.Models;assembly=LogParser.DesktopClient.ElmishApp"
         Title="{Binding DocumentName}"
+        Style="{StaticResource MaterialDesignWindow}"
         Width="1800"
         d:Height="800"
         AllowDrop="True"
         Drop="Window_Drop"
         Icon=".\Resources\gnomelogs_103380.ico"
-        Style="{StaticResource MaterialDesignWindow}"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         >
@@ -35,8 +35,8 @@
                        />
 
             <uc:MainMenu DockPanel.Dock="Left"
-                         Height="45"
                          DataContext="{Binding}"
+                         Height="45"
                          />
 
             <TextBox DockPanel.Dock="Left"
@@ -61,8 +61,8 @@
                 BorderThickness="1"
                 />
 
-        <materialDesign:Snackbar x:Name="SnackbarFour"
-                                 DockPanel.Dock="Bottom"
+        <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                                 x:Name="SnackbarFour"
                                  HorizontalAlignment="Stretch"
                                  MessageQueue="{Binding ErrorMessageQueue}"
                                  />

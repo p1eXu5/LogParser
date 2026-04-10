@@ -4,16 +4,7 @@
                     xmlns:conv="clr-namespace:LogParser.DesktopClient.Converters"
                     xmlns:local="clr-namespace:LogParser.DesktopClient"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:sel="clr-namespace:LogParser.DesktopClient.TemplateSelectors"AI Mode
-All
-Images
-Videos
-News
-More
-
-
-
-Hi Vladimir, 
+                    xmlns:sel="clr-namespace:LogParser.DesktopClient.TemplateSelectors"
                     xmlns:logs="clr-namespace:LogParser.DesktopClient.UserControls.Logs"
                     xmlns:logFields="clr-namespace:LogParser.DesktopClient.UserControls.Logs.Fields"
                     >

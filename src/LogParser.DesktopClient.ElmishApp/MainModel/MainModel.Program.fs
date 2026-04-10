@@ -167,18 +167,41 @@ let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (mod
         | TechFieldModel.Msg.PinFieldValueInHeader key ->
             { model with PinnedFieldName = key |> Some }, Cmd.none
         | _ ->    
-            let log =
+            let logInd =
                 model.Logs
-                |> List.choose (function LogModel.TechLogModel tl -> tl |> Some | _ -> None)
-                |> List.find (fun l -> l.Id = id)
-            
-            let field =
-                log.Fields
-                |> List.find (fun f -> f.Key = key)
+                // |> List.choose (function LogModel.TechLogModel tl -> tl |> Some | _ -> None)
+                |> List.findIndex (fun l ->
+                    match l with
+                    | LogModel.TechLogModel tl -> tl.Id = id
+                    | _ -> false
+                )
 
-            let newField = TechFieldModel.Program.update msg field // TODO: update list when field changing
+            let log = model.Logs[logInd]
 
-            model, Cmd.none
+            let fields =
+                log
+                |> function LogModel.TechLogModel tl -> tl.Fields | _ -> failwith "Unexpected not TechLogModel"
+
+            let fieldInd =
+                fields
+                |> List.findIndex (fun f -> f.Key = key)
+
+            let newField = TechFieldModel.Program.update msg (fields[fieldInd])
+
+            let newFields = fields |> List.removeAt fieldInd |> List.insertAt fieldInd newField
+
+            let newLog =
+                match log with
+                | LogModel.TechLogModel tl -> { tl with Fields = newFields } |> LogModel.TechLogModel
+                | _ -> log
+
+
+            { model with
+                Logs =
+                    model.Logs
+                    |> List.removeAt logInd
+                    |> List.insertAt logInd newLog
+            } , Cmd.none
 
     | TechLogMsg (id, Msg.CopyLogCommand) ->
         let log =

@@ -77,7 +77,15 @@
                                        Text="{Binding Log}"
                                        TextAlignment="Left"
                                        TextTrimming="CharacterEllipsis"
-                                       />
+                                       >
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Command="{Binding DecodeCommand}"
+                                                  Header="Decode"
+                                                  />
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
                         </Grid>
 
                         <!--  Pinned Field  -->

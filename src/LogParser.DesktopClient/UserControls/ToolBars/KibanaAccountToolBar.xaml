@@ -5,31 +5,31 @@
          xmlns:local="clr-namespace:LogParser.DesktopClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         Style="{DynamicResource MaterialDesignToolBar}"
          d:Background="#1E1E1E"
          d:DesignHeight="50"
          d:DesignWidth="400"
          d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
-         Style="{DynamicResource MaterialDesignToolBar}"
          mc:Ignorable="d"
          >
-    <ComboBox Width="250"
+    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+              Width="250"
               Margin="10,0,10,10"
               materialDesign:HintAssist.Hint="Kibana Account"
               IsEditable="False"
               IsTextSearchEnabled="False"
               ItemsSource="{Binding KibanaAccounts}"
               SelectedIndex="{Binding SelectedKibanaAccountIndex}"
-              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
               Text="{Binding SelectedKibanaBaseUri,
                              UpdateSourceTrigger=PropertyChanged,
                              Mode=OneWay}"
               />
 
-    <TextBox MinWidth="200"
+    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+             MinWidth="200"
              Margin="10,0,0,10"
              VerticalAlignment="Center"
              materialDesign:HintAssist.Hint="Login"
-             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
              Text="{Binding SelectedKibanaLogin,
                             UpdateSourceTrigger=PropertyChanged}"
              />

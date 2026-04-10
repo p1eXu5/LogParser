@@ -11,20 +11,20 @@
              mc:Ignorable="d"
              >
     <ToolBarTray VerticalAlignment="Top">
-        <local:KibanaSearchToolBar Width="1400"
+        <local:KibanaSearchToolBar DataContext="{Binding KibanaSearchModel}"
+                                   Width="1400"
                                    Band="0"
                                    BandIndex="0"
-                                   DataContext="{Binding KibanaSearchModel}"
                                    />
-        <local:KibanaAccountToolBar Band="0"
+        <local:KibanaAccountToolBar DataContext="{Binding KibanaSearchModel}"
+                                    Band="0"
                                     BandIndex="1"
-                                    DataContext="{Binding KibanaSearchModel}"
                                     />
-        <local:StandardToolBar Band="1"
-                               DataContext="{Binding}"
+        <local:StandardToolBar DataContext="{Binding}"
+                               Band="1"
                                />
-        <local:FiltersToolBar Band="1"
-                              DataContext="{Binding FiltersModel}"
+        <local:FiltersToolBar DataContext="{Binding FiltersModel}"
+                              Band="1"
                               />
     </ToolBarTray>
 </UserControl>
