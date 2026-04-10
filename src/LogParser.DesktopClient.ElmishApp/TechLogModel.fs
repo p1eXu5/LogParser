@@ -50,7 +50,15 @@ module TechLogModel=
         let (mainFields, otherFields) =
             log.Fields
             |> List.sortBy TechField.orderOrKey
-            |> List.map TechFieldModel.init
+            |> List.map (fun technoField ->
+                match technoField with
+                | TechField.Json (name, fields) when name.Equals("logContext", StringComparison.InvariantCultureIgnoreCase) ->
+                    fields
+                    |> List.map TechFieldModel.init
+                | _ ->
+                    [ technoField |> TechFieldModel.init ]
+            )
+            |> List.concat
             |> List.partition (fun f -> 
                 match f.TechField with
                 | TechField.Timespan _
