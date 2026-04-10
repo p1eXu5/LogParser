@@ -300,6 +300,13 @@ Target.create "GitHubRelease" (fun _ ->
 Target.create "All" ignore
 Target.create "Local" ignore
 
+(* Actions:
+ * ========
+ *
+ * 1. GetVersion - reads LogParser.DesktopClient.csproj to obtain Version tag value, checks that RELEASE_NOTES.md
+ *                 contains release notes (if not there will be an error).
+ *)
+
 "GetVersion" ==> "Clean"
 
 if isGitHubActions then
