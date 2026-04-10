@@ -32,6 +32,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TimePicker.xaml" />
 
                 <ResourceDictionary Source="pack://application:,,,/LogParser.DesktopClient;component/Resources/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LogParser.DesktopClient;component/Resources/Converters.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LogParser.DesktopClient;component/Resources/LogDataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
