@@ -18,14 +18,14 @@
 
   <ItemGroup>
     <PackageReference Include="FParsec" Version="2.0.0-beta2" />
-    <PackageReference Include="FSharp.Data" Version="6.6.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
-    <PackageReference Include="NEST" Version="7.17.4" />
+    <PackageReference Include="FSharp.Data" Version="8.1.8" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.6" />
+    <PackageReference Include="NEST" Version="7.17.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.100" />
+    <PackageReference Update="FSharp.Core" Version="10.1.202" />
   </ItemGroup>
 
   <ItemGroup>
