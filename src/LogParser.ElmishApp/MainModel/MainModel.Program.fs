@@ -88,7 +88,7 @@ let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (mod
 
     | SaveFile ->
         match model.LogFile with
-        | LogFile.New _ -> ()
+        | LogFile.New -> ()
         | LogFile.Existing path ->
             if File.Exists(path) then
                 let content = model.Input |> Option.defaultValue ""
@@ -237,7 +237,7 @@ let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (mod
             { model with ShowMode = ShowMode.OnlyParsedLogs }, Cmd.none
 
     | Msg.OnError ex ->
-        model.ErrorMessageQueue.EnqueuError(ex.Message)
+        model.ErrorMessageQueue.EnqueueError(ex.Message)
         {model with Loading = false}, Cmd.none
 
     | SetTempTitle v ->

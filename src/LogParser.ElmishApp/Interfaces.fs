@@ -9,5 +9,5 @@ type ISettingsManager =
 
 type IErrorMessageQueue =
     interface
-        abstract EnqueuError : string -> unit
+        abstract EnqueueError : string -> unit
     end

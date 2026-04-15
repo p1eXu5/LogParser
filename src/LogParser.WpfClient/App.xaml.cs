@@ -1,12 +1,12 @@
-﻿using LogParser.ElmishApp.Interfaces;
-using NspkXsdGenerator.DesktopClient;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using LogParser.ElmishApp.Interfaces;
+using NspkXsdGenerator.DesktopClient;
 
 namespace LogParser.WpfClient;
 /// <summary>
@@ -36,7 +36,7 @@ public partial class App : Application
         this.Activated += StartElmish;
     }
 
-    private void StartElmish( object? sender, EventArgs e )
+    private void StartElmish(object? sender, EventArgs e)
     {
         this.Activated -= StartElmish;
         ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance, _logFile);
@@ -44,20 +44,20 @@ public partial class App : Application
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
-        _errorMessageQueue.EnqueuError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+        _errorMessageQueue.EnqueueError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
         e.Handled = false;
     }
 
     private void OnDispatcherUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         string errorMessage = e.ExceptionObject.ToString() + Environment.NewLine;
-        _errorMessageQueue.EnqueuError(errorMessage);
+        _errorMessageQueue.EnqueueError(errorMessage);
     }
 
     private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         string errorMessage = e.Exception.InnerExceptions.First().Message + Environment.NewLine + e.Exception.GetType();
-        _errorMessageQueue.EnqueuError(errorMessage);
+        _errorMessageQueue.EnqueueError(errorMessage);
     }
 
     private void Application_Startup(object sender, StartupEventArgs e)
