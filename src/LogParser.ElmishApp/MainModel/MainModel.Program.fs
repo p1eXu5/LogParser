@@ -255,11 +255,8 @@ let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (mod
         let filtersModel = FiltersModel.Program.update fmsg model.FiltersModel
         model |> withFiltersModel filtersModel, Cmd.none
 
-    | ToggleShowAll v ->
-        if v then
-            { model with ShowMode = ShowMode.All }, Cmd.none
-        else
-            { model with ShowMode = ShowMode.OnlyParsedLogs }, Cmd.none
+    | ToggleShowAll _ ->
+        model |> toggleShowMode, Cmd.none
 
     | Msg.OnError ex ->
         model.ErrorMessageQueue.EnqueueError(ex.Message)

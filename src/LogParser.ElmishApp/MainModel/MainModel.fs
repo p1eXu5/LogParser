@@ -188,6 +188,11 @@ module MainModel =
         | ShowMode.OnlyParsedLogs -> true
         | _ -> false
 
+    let toggleShowMode model =
+        match model.ShowMode with
+        | ShowMode.OnlyParsedLogs -> { model with ShowMode = ShowMode.All }
+        | ShowMode.All -> { model with ShowMode = ShowMode.OnlyParsedLogs }
+
     let filtersModel (m: MainModel) =
         m.FiltersModel
 
