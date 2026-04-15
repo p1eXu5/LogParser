@@ -78,13 +78,17 @@
                                        TextAlignment="Left"
                                        TextTrimming="CharacterEllipsis"
                                        >
-                                <TextBlock.ContextMenu>
+                                <!--  TODO: fix bindings  -->
+                                <!--<TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Command="{Binding DecodeCommand}"
                                                   Header="Decode"
                                                   />
+                                        <MenuItem Command="{Binding InsertLineBreaksCommand}"
+                                                  Header="Insert Line Breaks"
+                                                  />
                                     </ContextMenu>
-                                </TextBlock.ContextMenu>
+                                </TextBlock.ContextMenu>-->
                             </TextBlock>
                         </Grid>
 

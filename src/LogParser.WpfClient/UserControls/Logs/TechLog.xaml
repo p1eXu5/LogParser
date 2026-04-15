@@ -154,6 +154,9 @@
                                             <MenuItem Command="{Binding DecodeCommand}"
                                                       Header="Decode"
                                                       />
+                                            <MenuItem Command="{Binding InsertLineBreaksCommand}"
+                                                      Header="Insert Line Breaks"
+                                                      />
                                         </ContextMenu>
                                     </TextBlock.ContextMenu>
                                 </TextBlock>
