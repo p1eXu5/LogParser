@@ -13,8 +13,8 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/LogParser.Core/LogParser.Core.fsproj" />
-    <Project Path="src/LogParser.DesktopClient.ElmishApp/LogParser.DesktopClient.ElmishApp.fsproj" />
-    <Project Path="src/LogParser.DesktopClient/LogParser.DesktopClient.csproj" />
+    <Project Path="src/LogParser.ElmishApp/LogParser.ElmishApp.fsproj" />
+    <Project Path="src/LogParser.WpfClient/LogParser.WpfClient.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/LogParser.Core.Tests/LogParser.Core.Tests.fsproj" />

@@ -37,7 +37,7 @@ Fake.Core.Context.setExecutionContextFromCommandLineArgs __SOURCE_FILE__
 // ------------------
 //    Properties
 // ------------------
-let [<Literal>] project = "./src/LogParser.DesktopClient/LogParser.DesktopClient.csproj"
+let [<Literal>] project = "./src/LogParser.WpfClient/LogParser.WpfClient.csproj"
 
 let [<Literal>] framework = "net10.0-windows"
 let [<Literal>] runtime = "win-x64"
@@ -303,7 +303,7 @@ Target.create "Local" ignore
 (* Actions:
  * ========
  *
- * 1. GetVersion - reads LogParser.DesktopClient.csproj to obtain Version tag value, checks that RELEASE_NOTES.md
+ * 1. GetVersion - reads LogParser.WpfClient.csproj to obtain Version tag value, checks that RELEASE_NOTES.md
  *                 contains release notes (if not there will be an error).
  *)
 

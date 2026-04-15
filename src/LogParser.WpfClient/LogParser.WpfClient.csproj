@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+
+    <Title>Log Parser</Title>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+      
+    <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
+    <PackageIcon>gnomelogs_103380.ico</PackageIcon>
+
+    <Version>1.15.0</Version>
+    <AssemblyVersion>1.15.0</AssemblyVersion>
+    <FileVersion>1.15.0.0</FileVersion>
+
+    <Copyright>2023 Vladimir Likhatskiy</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/p1eXu5/LogParser</RepositoryUrl>
+    <PackageTags>logger;log;parser;windows;wpf</PackageTags>
+    <Configurations>Debug;Release;</Configurations>
+    <StartupObject>LogParser.WpfClient.App</StartupObject>
+    <UserSecretsId></UserSecretsId>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Resource Include="Resources\gnomelogs_103380.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.1-ci1190" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LogParser.ElmishApp\LogParser.ElmishApp.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Resources\gnomelogs_103380.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <!--<Target Name="Rename" AfterTargets="AfterBuild" Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
+    <Move SourceFiles="$(OUTDIR)\$(MSBuildProjectName).exe" DestinationFiles="$(OUTDIR)\LogParser.exe" />
+    <Message Text="Renamed executable file." Importance="high" />
+  </Target>-->
+
+</Project>

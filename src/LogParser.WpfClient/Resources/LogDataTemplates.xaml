@@ -1,0 +1,54 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:conv="clr-namespace:LogParser.WpfClient.Converters"
+                    xmlns:local="clr-namespace:LogParser.WpfClient"
+                    xmlns:logFields="clr-namespace:LogParser.WpfClient.UserControls.Logs.Fields"
+                    xmlns:logs="clr-namespace:LogParser.WpfClient.UserControls.Logs"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:sel="clr-namespace:LogParser.WpfClient.TemplateSelectors"
+                    >
+    <!--
+        ***********************
+        Logs
+        ***********************
+    -->
+
+    <!--  dt_TextLog  -->
+    <DataTemplate x:Key="dt_TextLog">
+        <logs:TextLog />
+    </DataTemplate>
+
+    <!--  dt_TechLog  -->
+    <DataTemplate x:Key="dt_TechLog">
+        <logs:TechLog />
+    </DataTemplate>
+
+    <!--
+        ***********************
+        Fields
+        ***********************
+    -->
+    <sel:LogFieldDataTemplateSelector x:Key="ts_FieldTemplateSelector" />
+
+    <!--  dt_SimpleField  -->
+    <DataTemplate x:Key="dt_SimpleField">
+        <logFields:SimpleField />
+    </DataTemplate>
+
+    <!--  dt_Json  -->
+    <DataTemplate x:Key="dt_Json">
+        <logFields:JsonField />
+    </DataTemplate>
+
+    <!--  dt_AnnotatedJson  -->
+    <DataTemplate x:Key="dt_AnnotatedJson">
+        <logFields:AnnotatedJsonField />
+    </DataTemplate>
+
+    <!--  dt_WithPostfixAnnotatedJson  -->
+    <DataTemplate x:Key="dt_WithPostfixAnnotatedJson">
+        <logFields:WithPostfixAnnotatedJsonField />
+    </DataTemplate>
+
+</ResourceDictionary>
