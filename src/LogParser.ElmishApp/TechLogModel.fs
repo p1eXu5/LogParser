@@ -59,6 +59,7 @@ module TechLogModel=
                     [ technoField |> TechFieldModel.init ]
             )
             |> List.concat
+            |> List.distinct
             |> List.partition (fun f -> 
                 match f.TechField with
                 | TechField.Timespan _
