@@ -21,6 +21,7 @@
             <TextBox MinWidth="280"
                      VerticalAlignment="Stretch"
                      materialDesign:HintAssist.Hint="Log text"
+                     materialDesign:HintAssist.HintHorizontalAlignment="Center"
                      AcceptsReturn="True"
                      AllowDrop="true"
                      Background="#1E1E1E"
