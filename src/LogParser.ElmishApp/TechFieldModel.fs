@@ -54,6 +54,7 @@ module TechFieldModel =
                 Text = jta.Annotation |> Some
                 Postfix = None
             }
+
         | TechField.Body fields ->
             { 
                 TechField = techField 
@@ -84,6 +85,17 @@ module TechFieldModel =
                 Json = fields |> TechField.toString 1 |> Some; 
                 Text = text |> Some
                 Postfix = postfix |> Some
+            }
+
+        | TechField.MessageArrayJson _ ->
+            { 
+                TechField = techField 
+                Tag = Tag.JsonField;
+                Key = techField |> TechField.key; 
+                Header = "json object" |> Some; 
+                Json = techField |> TechField.value |> Some; 
+                Text = None
+                Postfix = None
             }
 
         | _ ->
