@@ -6,5 +6,5 @@
     <conv:TechFieldHeaderToBrushConverter x:Key="conv_HeaderToBrush" />
     <conv:LogLevelToBrushConverter x:Key="conv_LogLevelToBrush" />
     <conv:HierarchyLevelToThicknessConverter x:Key="conv_HierarchyLevel" />
-    
+
 </ResourceDictionary>

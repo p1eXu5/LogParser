@@ -12,9 +12,9 @@
     <ApplicationIcon>Resources\gnomelogs_103380.ico</ApplicationIcon>
     <PackageIcon>gnomelogs_103380.ico</PackageIcon>
 
-    <Version>1.15.0</Version>
-    <AssemblyVersion>1.15.0</AssemblyVersion>
-    <FileVersion>1.15.0.0</FileVersion>
+    <Version>1.16.0</Version>
+    <AssemblyVersion>1.16.0</AssemblyVersion>
+    <FileVersion>1.16.0.0</FileVersion>
 
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
