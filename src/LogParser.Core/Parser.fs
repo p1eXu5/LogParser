@@ -83,6 +83,7 @@ let internal p_fieldStringValueChoice (q: string) =
 // predefined fields
 // =================
 
+/// Skips names and p_fieldDelimiterSpaceWrapped
 let private p_predefinedFieldIdentifierDelimiter q names =
     names
     |> List.map (fun n -> skipStringCI $"{q}{n}{q}")
@@ -228,26 +229,50 @@ let internal p_boolField q value =
     .>>? skipStringCI $"{value}"
     |>> (fun n -> TechField.Bool (n, value))
 
-
-let internal p_arrayString q =
-    p_fieldIdentifier q
-    .>>? p_fieldDelimiterSpaceWrapped
+/// Wrapped q[
+let inline internal p_squareBraketOpenW q =
+    skipString q
+    .>> ws
     .>>? skipChar '['
     .>> ws
-    .>>.? sepEndBy (p_fieldStringValue q) (attempt(ws >>. skipChar ',' >>. ws))
+
+/// Wrapped ]q
+let inline internal p_squareBraketCloseW q =
+    ws
+    .>>? skipChar ']'
     .>> ws
-    .>> skipChar ']'
+    .>>? skipString q
+
+let internal p_squareBraketOpen : Parser<unit, unit> =
+    skipChar '['
+    .>> ws
+
+let internal p_squareBraketClose : Parser<unit, unit> =
+    ws
+    .>>? skipChar ']'
+
+
+let internal p_arrayString q =
+    let p = sepEndBy (p_fieldStringValue q) (attempt(ws >>. skipChar ',' >>. ws))
+
+    p_fieldIdentifier q
+    .>>? p_fieldDelimiterSpaceWrapped
+    .>>.? choice [
+        (p_squareBraketOpenW q >>. p .>> p_squareBraketCloseW q) |> attempt
+        (p_squareBraketOpen >>. p .>> p_squareBraketClose) |> attempt
+    ]
     |>> TechField.Array
 
 
 let internal p_arrayInt q =
+    let p = sepEndBy (pint32) (attempt(ws >>. skipChar ',' >>. ws))
+
     p_fieldIdentifier q
     .>>? p_fieldDelimiterSpaceWrapped
-    .>>? skipChar '['
-    .>> ws
-    .>>.? sepEndBy (pint32) (attempt(ws >>. skipChar ',' >>. ws))
-    .>> ws
-    .>> skipChar ']'
+    .>>.? choice [
+        (p_squareBraketOpenW q >>. p .>> p_squareBraketCloseW q) |> attempt
+        (p_squareBraketOpen >>. p .>> p_squareBraketClose) |> attempt
+    ]
     |>> TechField.ArrayInt
 
 
@@ -366,21 +391,16 @@ let p_body q =
 
 
 let p_arrayJsonAnnonimous q =
+    let p = sepEndBy (p_jsonChoice q) (attempt(ws >>. skipChar ',' >>. ws))
     ws
-    >>? skipChar '['
-    >>. ws
-    >>? sepEndBy (p_jsonChoice q) (attempt(ws >>. skipChar ',' >>. ws))
-    .>> ws
-    .>> skipChar ']'
+    >>? choice [
+        (p_squareBraketOpenW q >>. p .>> p_squareBraketCloseW q) |> attempt
+        (p_squareBraketOpen >>. p .>> p_squareBraketClose) |> attempt
+    ]
     |>> TechField.ArrayJsonAnnonimous
 
-/// Array of json ojects or array of annonimous json objects
-let p_arrayJson q =
-    p_fieldIdentifier q
-    .>>? p_fieldDelimiterSpaceWrapped
-    .>>? skipChar '['
-    .>> ws
-    .>>.? sepEndBy (
+let internal p_arrayJsonItems q =
+    sepEndBy (
         choice [
             (nextCharSatisfiesNot ((=) '[') >>. skipStringCI "null" |>> (fun _ -> TechField.NullAnnonimous |> List.singleton)) |> attempt
             (nextCharSatisfiesNot ((=) '[') >>. p_fieldStringValue q |>> (TechField.StringAnnonimous >> List.singleton)) |> attempt
@@ -389,10 +409,17 @@ let p_arrayJson q =
             p_arrayJsonAnnonimous q |>> List.singleton |> attempt
         ]
     ) (attempt(ws >>. skipChar ',' >>. ws))
-    .>> ws
-    .>> skipChar ']'
-     |>> TechField.ArrayJson
 
+
+/// Array of json ojects or array of annonimous json objects
+let p_arrayJson q =
+    p_fieldIdentifier q
+    .>>? p_fieldDelimiterSpaceWrapped
+    .>>.? choice [
+        (p_squareBraketOpenW q >>. p_arrayJsonItems q .>> p_squareBraketCloseW q) |> attempt
+        (p_squareBraketOpen >>. p_arrayJsonItems q .>> p_squareBraketClose) |> attempt
+    ]
+     |>> TechField.ArrayJson
 
 
 
@@ -428,9 +455,17 @@ let messageFieldNames = ["message"; "@m"; "@mt"; "msg"]
 let p_messageString q =
     p_predefinedStringField q messageFieldNames TechField.Message
 
+/// Array of json ojects or array of annonimous json objects
+let p_messageArrayJson q =
+    p_predefinedFieldIdentifierDelimiter q messageFieldNames
+    >>. choice [
+        (p_squareBraketOpenW q >>. p_arrayJsonItems q .>> p_squareBraketCloseW q) |> attempt
+        (p_squareBraketOpen >>. p_arrayJsonItems q .>> p_squareBraketClose) |> attempt
+    ]
+    |>> TechField.MessageArrayJson
 
 /// (<typeJson>)
-let p_messageJson q =
+let p_jsonSpecialPrimitiveInBraces q =
     ws
     >>? between (pchar '(' >>. ws) (ws .>> pchar ')') 
         (
@@ -449,11 +484,11 @@ let p_messageJson q =
 /// [ (<typeJson>)* ]
 let p_messageJsonList q =
     between (skipChar '[' >>. ws) (ws .>> skipChar ']') 
-        (sepEndBy (p_messageJson q) (skipChar ','))
+        (sepEndBy (p_jsonSpecialPrimitiveInBraces q) (skipChar ','))
 
 
 let p_messageBoddiedNotClosed q =
-    p_predefinedFieldIdentifierDelimiter q ["message"; "@m"; "@mt"]
+    p_predefinedFieldIdentifierDelimiter q messageFieldNames
     >>? skipChar '\"'
     >>? p_annotation q
     .>>.? choice [
@@ -484,6 +519,7 @@ let p_message q =
     choice [
         attempt (p_messageBuddied q)
         attempt (p_messageBuddiedWithPostfix q)
+        attempt (p_messageArrayJson q)
         attempt (p_messageString q)
     ]
 

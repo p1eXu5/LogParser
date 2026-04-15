@@ -3,6 +3,7 @@
 open LogParser.Core
 open NUnit.Framework
 open FsUnit
+open LogParser.Core.Dsl
 
 [<Category("LogParsingTests")>]
 module LogParsingTests =
@@ -67,6 +68,50 @@ module LogParsingTests =
             | TextLog _ ->
                 return! Result.Error "wrong log type. Log type is TextLog"
 
+        } |> Result.runTest
+
+    [<Test>]
+    let ``5_ - logContext with message test`` () =
+        result {
+            let input = "{\"logContext\":\"{\\\"Message\\\": \\\"asd\\\"}\"}"
+            let expected =
+                jsonLog {
+                    Field "logContext" (jsonLog { message "asd" })
+                }
+                |> List.head
+
+            let! res = LogParser.Core.Parser.parse input
+
+            res |> should haveLength 1
+            match res |> List.head with
+            | TechLog tl ->
+                tl.Fields |> should haveLength 1
+                tl.Fields.[0] |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (tl.Fields.[0]) expected)
+                return! Result.Ok ()
+            | TextLog _ ->
+                return! Result.Error "wrong log type. Log type is TextLog"
+        } |> Result.runTest
+
+    [<Test>]
+    let ``5_ - logContext with message with wrapped array test`` () =
+        result {
+            let input = "{\"logContext\":\"{\\\"Message\\\": \\\"[{\\\"code\\\": \\\"asd\\\"}]\\\"}\"}"
+            let expected =
+                jsonLog {
+                    Field "logContext" (jsonLog { message ([jsonLog { Field "code" "asd" }]) })
+                }
+                |> List.head
+
+            let! res = LogParser.Core.Parser.parse input
+
+            res |> should haveLength 1
+            match res |> List.head with
+            | TechLog tl ->
+                tl.Fields |> should haveLength 1
+                tl.Fields.[0] |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (tl.Fields.[0]) expected)
+                return! Result.Ok ()
+            | TextLog _ ->
+                return! Result.Error "wrong log type. Log type is TextLog"
         } |> Result.runTest
 
 

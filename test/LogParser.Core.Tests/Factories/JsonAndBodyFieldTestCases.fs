@@ -19,6 +19,13 @@ type JsonAndBodyFieldTestCases() =
             ).SetName("10 - Json. with simple int field")
 
             TestCaseData(
+                "\"foo\": \"{
+                        \\\"rabbitmq_node\\\":\\\"5672\\\"
+                    }\"",
+                TechField.Json ("foo", (jsonLog { Field "rabbitmq_node" "5672" }))
+            ).SetName("10 - Json. with simple string field")
+
+            TestCaseData(
                 "\"requestBody\": \"{ \\\"bankId\\\": \\\"1234\\\"}\"",
                 TechField.Json ("requestBody", (jsonLog { Field "bankId" "1234" }))
             ).SetName("10 - Json. with escaped double quotes body")
@@ -160,6 +167,17 @@ type JsonAndBodyFieldTestCases() =
                     ]
                 )
             ).SetName("11 - ArrayJson. with escaped quotes single line")
+
+            TestCaseData(
+                """\"certificates\":\"[ { \"usage\":\"CA\" } ]\"
+                """,
+                TechField.ArrayJson (
+                    "certificates",
+                    [
+                        jsonLog { Field "usage" "CA" }
+                    ]
+                )
+            ).SetName("11 - ArrayJson. with escaped quotes single line wrapped with quotes")
 
 
             TestCaseData(

@@ -54,6 +54,10 @@ type JsonLogBuilder () =
     member _.Message(log: TechLog, header: string, body: TechJson, postfix: string) =
         { log with Fields = log.Fields @ [((header, body, postfix) |> TechField.MessageBoddiedWithPostfix)] }
 
+    /// TechField.ArrayJson
+    [<CustomOperation("message")>]
+    member _.Message(log: TechLog, value: TechJson list) = { log with Fields = log.Fields @ [(value |> TechField.MessageArrayJson)] }
+
     [<CustomOperation("level")>]
     member _.Level(log: TechLog, value: string) = { log with Fields = log.Fields @ [(Enum.Parse(typeof<LogLevel>, value) |> unbox |> TechField.Level)] }
 

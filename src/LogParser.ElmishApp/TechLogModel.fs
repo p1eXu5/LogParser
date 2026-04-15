@@ -68,6 +68,7 @@ module TechLogModel=
                 | TechField.TraceId _ // TODO: remove after make log model hierarchy
                 | TechField.Message _
                 | TechField.MessageBoddied _
+                | TechField.MessageArrayJson _
                 | TechField.MessageBoddiedWithPostfix _ -> true
                 | _ -> false
             )

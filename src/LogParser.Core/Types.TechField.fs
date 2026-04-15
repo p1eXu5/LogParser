@@ -12,6 +12,7 @@ type TechField =
     | Message of string
     | MessageBoddied of header: string * body: TechJson
     | MessageBoddiedWithPostfix of header: string * body: TechJson * postfix: string
+    | MessageArrayJson of value: TechJson list
 
     | Level of LogLevel
     | Method of string
@@ -80,14 +81,23 @@ type TechField =
             | Array (k, v) -> 
                 let values = String.Join(",\n    ",v |> List.map (fun s -> $"\"{s}\""))
                 $"\"{k}\": [\n    {values}\n]"
+
             | ArrayJson (k, v) ->
                 let values = 
                     let xs =
                         v
                         |> List.map (TechField.toString 1)
                     String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
-
                 $"\"{k}\": [\n    {values}\n]"
+
+            | MessageArrayJson v ->
+                let values = 
+                    let xs =
+                        v
+                        |> List.map (TechField.toString 1)
+                    String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
+                $"\"message\": [\n    {values}\n]"
+
             | ArrayJsonAnnonimous v ->
                 let values = 
                     let xs =
@@ -315,6 +325,14 @@ module TechField =
 
         | MessageBoddied (v, fl) -> $"{v}\n{fl |> toString 1}"
         | MessageBoddiedWithPostfix (v, fl, p) -> $"{v}\n{fl |> toString 1}{p}"
+        | MessageArrayJson fls ->
+            let values = 
+                let xs =
+                    fls
+                    |> List.map (TechField.toString 2)
+                String.Join(",\n    ",xs |> List.map (fun s -> $"{s}"))
+
+            $"[\n{values}\n]"
 
         | Body v
         | Json (_, v) -> v |> toString 1
@@ -361,6 +379,7 @@ module TechField =
 
         | Message _
         | MessageBoddied _
+        | MessageArrayJson _ 
         | MessageBoddiedWithPostfix _ -> "Message"
 
         | JsonAnnotated v -> capitalize v.Key
@@ -376,6 +395,7 @@ module TechField =
         | Level _ -> "1"
         | MessageBoddied _
         | MessageBoddiedWithPostfix _
+        | MessageArrayJson _
         | Message _ -> "2"
         | Json (k, _) when k.Equals("message", StringComparison.InvariantCultureIgnoreCase) -> "2"
         | Method _ -> nameof(Method)

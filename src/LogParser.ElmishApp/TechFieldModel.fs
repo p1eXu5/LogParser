@@ -19,10 +19,10 @@ type TechFieldModel =
 module TechFieldModel =
 
     type Tag =
-            | SimpleField = 0
-            | JsonField = 1
-            | AnnotatedJsonField = 2
-            | WithPostfixAnnotatedJsonField = 3
+        | SimpleField = 0
+        | JsonField = 1
+        | AnnotatedJsonField = 2
+        | WithPostfixAnnotatedJsonField = 3
 
     // Intensions. Currently processed in MainModel Program.
     type Msg =

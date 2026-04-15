@@ -14,7 +14,7 @@ module MessageParsingTests =
 
     [<Test>]
     [<Category("TechField Message parsing: p_messageJsonAnnotated")>]
-    let ``p_messageJsonAnnotated test`` () =
+    let ``p_jsonSpecialPrimitiveInBraces test`` () =
         result {
             let input = "(\\\"request\\\": DTO {rabbitmq_node:5672})"
             let expected =
@@ -26,7 +26,7 @@ module MessageParsingTests =
                             Field "rabbitmq_node" 5672
                         }
                 } |> TechField.JsonAnnotated
-            let! res = runResult (p_messageJson ESCAPED_QUOTES) input
+            let! res = runResult (p_jsonSpecialPrimitiveInBraces ESCAPED_QUOTES) input
             res |> should equal expected
         } |> Result.runTest
 
