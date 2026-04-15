@@ -14,6 +14,7 @@ module TextLogModel =
     type Msg =
         | CopyLog
         | DecodeLog
+        | InsertLineBreaks
 
     open Elmish
 
@@ -46,6 +47,8 @@ module Program =
             model
         | Msg.DecodeLog ->
             { model with Log = Helpers.decodeUnicodeEscapes model.Log }
+        | Msg.InsertLineBreaks ->
+            { model with Log = Helpers.insertLineBreaks model.Log }
 
 
 type IBindings =
@@ -53,6 +56,7 @@ type IBindings =
         abstract Log: string with get
         abstract CopyCommand: ICommand with get
         abstract DecodeCommand: ICommand with get
+        abstract InsertLineBreaksCommand: ICommand with get
     end
 
 module Bindings =
@@ -66,4 +70,5 @@ module Bindings =
             nameof __.Log |> Binding.oneWay (fun m -> m.Log)
             nameof __.CopyCommand |> Binding.cmd TextLogModel.Msg.CopyLog
             nameof __.DecodeCommand |> Binding.cmd (fun m -> TextLogModel.Msg.DecodeLog)
+            nameof __.InsertLineBreaksCommand |> Binding.cmd (fun m -> Msg.InsertLineBreaks)
         ]

@@ -28,6 +28,7 @@ module TechFieldModel =
     type Msg =
         | CopyValue
         | DecodeValue
+        | InsertLineBreaks
         | PinFieldValueInHeader of key: string
 
     let init (techField: TechField) =
@@ -128,7 +129,19 @@ module Program =
                     | _ -> None
                 Json =
                     match model.Json with
-                    | Some text -> Helpers.decodeUnicodeEscapes text |> Some
+                    | Some json -> Helpers.decodeUnicodeEscapes json |> Some
+                    | _ -> None
+            }
+
+        | InsertLineBreaks ->
+            { model with
+                Text =
+                    match model.Text with
+                    | Some text -> Helpers.insertLineBreaks text |> Some
+                    | _ -> None
+                Json =
+                    match model.Json with
+                    | Some json -> Helpers.insertLineBreaks json |> Some
                     | _ -> None
             }
         | _ ->
@@ -146,6 +159,7 @@ type IBindings =
         abstract CopyCommand: ICommand with get
         abstract PinCommand: ICommand with get
         abstract DecodeCommand: ICommand with get
+        abstract InsertLineBreaksCommand: ICommand with get
     end
 
 module Bindings =
@@ -165,4 +179,5 @@ module Bindings =
             nameof __.CopyCommand |> Binding.cmd Msg.CopyValue
             nameof __.PinCommand |> Binding.cmd (fun m -> Msg.PinFieldValueInHeader m.Key)
             nameof __.DecodeCommand |> Binding.cmd (fun m -> Msg.DecodeValue)
+            nameof __.InsertLineBreaksCommand |> Binding.cmd (fun m -> Msg.InsertLineBreaks)
         ]

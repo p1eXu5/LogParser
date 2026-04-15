@@ -92,6 +92,7 @@ module MainModel =
         | LogsChanged of (LogModel list * Guid)
         | CleanInputRequested
         | LogParsingRequested of Operation<unit, unit>
+        | TextLogMsg of TextLogModel.Msg
         | TechFieldMsg of key: string * TechFieldModel.Msg
         | TechLogMsg of logKey: Guid * Msg
         | KibanaSearchModelMsg of KibanaSearchModel.Msg

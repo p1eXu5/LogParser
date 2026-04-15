@@ -162,6 +162,31 @@ let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (mod
         }
         , Cmd.none
 
+    | TechLogMsg (id, TextLogMsg msg) ->
+        let logInd =
+            model.Logs
+            |> List.findIndex (fun l ->
+                match l with
+                | LogModel.TechLogModel tl -> tl.Id = id
+                | _ -> false
+            )
+
+        let log = model.Logs[logInd]
+
+        let newLog =
+            match log with
+            | LogModel.TextLogModel sm ->
+                TextLogModel.Program.update msg sm
+                |> LogModel.TextLogModel
+            | _ -> log
+
+        { model with
+            Logs =
+                model.Logs
+                |> List.removeAt logInd
+                |> List.insertAt logInd newLog
+        } , Cmd.none
+
     | TechLogMsg (id, TechFieldMsg (key, msg)) ->
         match msg with
         | TechFieldModel.Msg.PinFieldValueInHeader key ->
