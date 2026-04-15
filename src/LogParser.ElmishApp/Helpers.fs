@@ -22,3 +22,8 @@ let decodeUnicodeEscapes input =
 
     Regex.Replace(input, pattern1, evaluator)
     |> fun res -> Regex.Replace(res, pattern2, evaluator)
+
+let insertLineBreaks (input: string) =
+    input.Replace("\\r\\n", Environment.NewLine).Replace("\\n", Environment.NewLine)
+
+
