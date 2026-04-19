@@ -28,12 +28,12 @@
                 </materialDesign:BundledTheme>
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TimePicker.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
 
                 <ResourceDictionary Source="pack://application:,,,/LogParser.WpfClient;component/Resources/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LogParser.WpfClient;component/Resources/Converters.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LogParser.WpfClient;component/Resources/LogDataTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LogParser.WpfClient;component/Resources/ToolBar.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

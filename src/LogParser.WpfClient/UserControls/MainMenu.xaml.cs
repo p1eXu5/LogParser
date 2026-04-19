@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace LogParser.WpfClient.UserControls
+namespace LogParser.WpfClient.UserControls;
+
+/// <summary>
+/// Interaction logic for MainMenu.xaml
+/// </summary>
+public partial class MainMenu : Menu
 {
-    /// <summary>
-    /// Interaction logic for MainMenu.xaml
-    /// </summary>
-    public partial class MainMenu : UserControl
+    public MainMenu()
     {
-        public MainMenu()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

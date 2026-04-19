@@ -8,12 +8,13 @@
         xmlns:uc="clr-namespace:LogParser.WpfClient.UserControls"
         xmlns:vm="clr-namespace:LogParser.ElmishApp.Models;assembly=LogParser.ElmishApp"
         Title="{Binding DocumentName}"
-        Style="{StaticResource MaterialDesignWindow}"
         Width="1800"
-        d:Height="800"
+        d:Height="300"
         AllowDrop="True"
+        Background="{StaticResource br_WindiwBackground}"
         Drop="Window_Drop"
         Icon=".\Resources\gnomelogs_103380.ico"
+        Style="{StaticResource MaterialDesignWindow}"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         >
@@ -21,92 +22,90 @@
         <sel:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
         <materialDesign:BooleanToVisibilityConverter x:Key="conv_BoolToVis" />
     </Window.Resources>
-    <DockPanel LastChildFill="True">
 
-        <!--  MainMenu  -->
-        <DockPanel DockPanel.Dock="Top"
-                   LastChildFill="True"
-                   >
-            <TextBlock DockPanel.Dock="Right"
-                       Margin="0,0,10,0"
-                       VerticalAlignment="Center"
-                       Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
-                       Text="{Binding AssemblyVersion}"
-                       />
+    <materialDesign:DialogHost x:Name="m_RootDialogHost"
+                               CloseOnClickAway="False"
+                               DialogTheme="Inherit"
+                               Identifier="RootDialog"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
+                                                              Path=MessageQueue}"
+                               >
+        <DockPanel LastChildFill="True">
+            <!--  MainMenu  -->
+            <DockPanel DockPanel.Dock="Top">
+                <!--  Version  -->
+                <TextBlock DockPanel.Dock="Right"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Center"
+                           FontSize="13"
+                           Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+                           Text="{Binding AssemblyVersion}"
+                           />
 
-            <uc:MainMenu DockPanel.Dock="Left"
-                         DataContext="{Binding}"
-                         Height="45"
-                         />
+                <uc:MainMenu DockPanel.Dock="Left"
+                             VerticalAlignment="Center"
+                             DataContext="{Binding}"
+                             />
+            </DockPanel>
 
-            <TextBox DockPanel.Dock="Left"
-                     MinWidth="250"
-                     Margin="50,0,0,0"
-                     HorizontalAlignment="Left"
-                     VerticalAlignment="Center"
-                     materialDesign:HintAssist.Hint="Temp title"
-                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
-                     Text="{Binding TempTitle,
-                                    UpdateSourceTrigger=PropertyChanged}"
-                     />
-        </DockPanel>
+            <!--  ToolBar  -->
+            <uc:LogParserToolBarTray DockPanel.Dock="Top"
+                                     DataContext="{Binding}"
+                                     />
 
-        <!--  ToolBar  -->
-        <uc:LogParserToolBarTray DockPanel.Dock="Top"
-                                 DataContext="{Binding}"
-                                 />
+            <!--  ErrorMessage Snackbar  -->
+            <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
+                                     DockPanel.Dock="Bottom"
+                                     HorizontalAlignment="Stretch"
+                                     MessageQueue="{Binding ErrorMessageQueue}"
+                                     />
 
-        <Border DockPanel.Dock="Top"
-                BorderBrush="#191919"
-                BorderThickness="1"
-                />
+            <!--  Status Bar  -->
+            <Border DockPanel.Dock="Bottom"
+                    Height="32"
+                    Background="{StaticResource br_WindiwBackground}"
+                    >
+                <TextBlock Margin="10,0"
+                           VerticalAlignment="Center"
+                           FontSize="13"
+                           Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                           >
+                    <Run Text="Log count:" />
+                    <Run Text="{Binding LogCount}" />
+                </TextBlock>
+            </Border>
 
-        <materialDesign:Snackbar DockPanel.Dock="Bottom"
-                                 x:Name="SnackbarFour"
-                                 HorizontalAlignment="Stretch"
-                                 MessageQueue="{Binding ErrorMessageQueue}"
-                                 />
+            <!--  Content  -->
+            <Grid>
+                <!--  split view  -->
+                <Grid Visibility="{Binding ShowAll, Converter={StaticResource conv_BoolToVis}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition MinWidth="500" />
+                    </Grid.ColumnDefinitions>
 
-        <Border DockPanel.Dock="Bottom"
-                Background="#191919"
-                >
-            <TextBlock Margin="4,2"
-                       VerticalAlignment="Center"
-                       >
-                <Run Text="Log count:" />
-                <Run Text="{Binding LogCount}" />
-            </TextBlock>
-        </Border>
+                    <uc:LogsInput DataContext="{Binding}" />
 
-        <!--  Content  -->
-        <Grid>
-            <!--  split view  -->
-            <Grid Visibility="{Binding ShowAll, Converter={StaticResource conv_BoolToVis}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition MinWidth="500" />
-                </Grid.ColumnDefinitions>
+                    <GridSplitter Grid.Column="1"
+                                  Width="4"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Stretch"
+                                  Background="{StaticResource br_ToolBarInput}"
+                                  />
 
-                <uc:LogsInput DataContext="{Binding}" />
+                    <!--  Logs  -->
+                    <uc:LogCardList Grid.Column="2"
+                                    DataContext="{Binding}"
+                                    />
+                </Grid>
 
-                <GridSplitter Grid.Column="1"
-                              Width="4"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Stretch"
-                              />
-
-                <!--  Logs  -->
-                <uc:LogCardList Grid.Column="2"
-                                DataContext="{Binding}"
+                <!--  only log cards view  -->
+                <uc:LogCardList DataContext="{Binding}"
+                                Visibility="{Binding ShowOnlyParsedLogs,
+                                                     Converter={StaticResource conv_BoolToVis}}"
                                 />
             </Grid>
-
-            <!--  only log cards view  -->
-            <uc:LogCardList DataContext="{Binding}"
-                            Visibility="{Binding ShowOnlyParsedLogs,
-                                                 Converter={StaticResource conv_BoolToVis}}"
-                            />
-        </Grid>
-    </DockPanel>
+        </DockPanel>
+    </materialDesign:DialogHost>
 </Window>

@@ -6,25 +6,55 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:LogParser.ElmishApp.Models;assembly=LogParser.ElmishApp"
-             d:DesignHeight="100"
+             d:DesignHeight="96"
              d:DesignWidth="1800"
+             Background="{StaticResource br_WindiwBackground}"
              mc:Ignorable="d"
              >
-    <ToolBarTray VerticalAlignment="Top">
-        <local:KibanaSearchToolBar DataContext="{Binding KibanaSearchModel}"
-                                   Width="1400"
-                                   Band="0"
-                                   BandIndex="0"
-                                   />
-        <local:KibanaAccountToolBar DataContext="{Binding KibanaSearchModel}"
-                                    Band="0"
-                                    BandIndex="1"
-                                    />
-        <local:StandardToolBar DataContext="{Binding}"
-                               Band="1"
+    <ToolBarTray x:Name="m_ToolBarTray"
+                 VerticalAlignment="Top"
+                 Background="{StaticResource br_WindiwBackground}"
+                 >
+        <ToolBarTray.ContextMenu>
+            <ContextMenu materialDesign:MenuAssist.MenuItemsPresenterMargin="0">
+                <MenuItem Click="MenuItem_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon x:Name="m_KibanaCheckIcon"
+                                                     Margin="0,0,5,0"
+                                                     IsHitTestVisible="False"
+                                                     Kind="Check"
+                                                     />
+                            <TextBlock VerticalAlignment="Center">Kibana</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+            </ContextMenu>
+        </ToolBarTray.ContextMenu>
+        <local:StandardToolBar Band="0"
+                               BandIndex="0"
+                               DataContext="{Binding}"
+                               Style="{StaticResource st_LogParserToolBar}"
                                />
-        <local:FiltersToolBar DataContext="{Binding FiltersModel}"
-                              Band="1"
+        <local:FiltersToolBar Band="0"
+                              BandIndex="1"
+                              DataContext="{Binding FiltersModel}"
+                              Style="{StaticResource st_LogParserToolBar}"
                               />
+        <local:KibanaSearchToolBar x:Name="m_KibanaSearchToolBar"
+                                   Width="1400"
+                                   Band="1"
+                                   BandIndex="0"
+                                   DataContext="{Binding KibanaSearchModel}"
+                                   Style="{StaticResource st_LogParserToolBar}"
+                                   Visibility="Collapsed"
+                                   />
+        <local:KibanaAccountToolBar x:Name="m_KibanaAccountToolBar"
+                                    Band="1"
+                                    BandIndex="1"
+                                    DataContext="{Binding KibanaSearchModel}"
+                                    Style="{StaticResource st_LogParserToolBar}"
+                                    Visibility="Collapsed"
+                                    />
     </ToolBarTray>
 </UserControl>

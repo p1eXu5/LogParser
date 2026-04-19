@@ -5,108 +5,94 @@
          xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-         Style="{DynamicResource MaterialDesignToolBar}"
          d:Background="#1E1E1E"
-         d:DesignHeight="50"
-         d:DesignWidth="1400"
+         d:DesignWidth="1680"
          d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+         Style="{StaticResource st_LogParserToolBar}"
          mc:Ignorable="d"
          >
     <!--  Trace ID  -->
-    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-             MinWidth="220"
-             Margin="10,0,10,10"
-             VerticalAlignment="Center"
+    <TextBox Width="250"
+             Margin="0,1,0,1"
              materialDesign:HintAssist.Hint="Trace ID or message (when starts with 'm:') "
+             Style="{StaticResource st_ToolBarTextBox}"
              Text="{Binding TraceId,
                             UpdateSourceTrigger=PropertyChanged}"
              />
 
     <!--  Service name  -->
-    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-              Width="250"
-              Margin="10,0,10,10"
-              materialDesign:HintAssist.Hint="Service name"
+    <ComboBox materialDesign:HintAssist.Hint="Service name"
               IsEditable="True"
               IsTextSearchEnabled="True"
               ItemsSource="{Binding ServiceNames}"
+              Style="{StaticResource st_ToolBarComboBox}"
               Text="{Binding SelectedServiceName,
                              UpdateSourceTrigger=PropertyChanged,
                              Mode=OneWayToSource}"
               />
 
-    <Button Command="{Binding PreviousPageCommand}"
+    <Button Padding="15,0,0,0"
+            Command="{Binding PreviousPageCommand}"
             Style="{StaticResource MaterialDesignFlatLightButton}"
-            Padding="8,0,0,0"
             >
         <materialDesign:PackIcon Kind="StepBackward" />
     </Button>
 
     <!--  Log count From  -->
-    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-             Width="40"
-             Margin="10,0,10,10"
+    <TextBox Width="50"
              materialDesign:HintAssist.Hint="From"
+             materialDesign:HintAssist.HintHorizontalAlignment="Center"
+             Style="{StaticResource st_ToolBarTextBox}"
              Text="{Binding LogCountFrom}"
+             TextAlignment="Center"
              />
 
     <!--  Log count To  -->
-    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-             Width="40"
-             Margin="10,0,10,10"
+    <TextBox Width="50"
              materialDesign:HintAssist.Hint="Size"
+             materialDesign:HintAssist.HintHorizontalAlignment="Center"
+             Style="{StaticResource st_ToolBarTextBox}"
              Text="{Binding LogCountTo}"
+             TextAlignment="Center"
              />
 
-    <Button Command="{Binding NextPageCommand}"
+    <Button Padding="15,0,8,0"
+            Command="{Binding NextPageCommand}"
             Style="{StaticResource MaterialDesignFlatLightButton}"
-            Padding="0,0,8,0"
             >
         <materialDesign:PackIcon Kind="StepForward" />
     </Button>
 
-    <!--  Log date  -->
-    <DatePicker Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
-                Width="100"
-                Margin="10,0,10,10"
-                materialDesign:HintAssist.Hint="Pick Date"
-                materialDesign:TextFieldAssist.HasClearButton="True"
-                SelectedDate="{Binding LogsDate,
-                                       UpdateSourceTrigger=PropertyChanged}"
-                />
+    <TextBlock Style="{StaticResource st_ToolBarTextBlock}"
+               Text="From:  "
+               />
 
-    <materialDesign:TimePicker Style="{StaticResource MaterialDesignFloatingHintTimePicker}"
-                               Width="100"
-                               Margin="10,0,10,10"
-                               materialDesign:HintAssist.Hint="Pick Start Time"
-                               materialDesign:TextFieldAssist.HasClearButton="True"
-                               Is24Hours="True"
-                               SelectedTime="{Binding LogsStartTime,
-                                                      UpdateSourceTrigger=PropertyChanged}"
-                               WithSeconds="True"
-                               />
+    <local:ToolBarDateTimePicker DateTime="{Binding LogsStartTime}" />
 
-    <materialDesign:TimePicker Style="{StaticResource MaterialDesignFloatingHintTimePicker}"
-                               Width="100"
-                               Margin="10,0,10,10"
-                               materialDesign:HintAssist.Hint="Pick End Time"
-                               materialDesign:TextFieldAssist.HasClearButton="True"
-                               Is24Hours="True"
-                               SelectedTime="{Binding LogsEndTime,
-                                                      UpdateSourceTrigger=PropertyChanged}"
-                               WithSeconds="True"
-                               />
+    <TextBlock Style="{StaticResource st_ToolBarTextBlock}"
+               Text="To:  "
+               />
 
-    <Button Command="{Binding SearchKibanaLogsCommand}"
-            Content="Request"
-            Style="{StaticResource MaterialDesignPaperSecondaryButton}"
+    <local:ToolBarDateTimePicker VerticalAlignment="Center"
+                                 DateTime="{Binding LogsEndTime}"
+                                 />
+
+    <Button Height="28"
             Margin="10,0"
+            Padding="15,0"
+            Command="{Binding SearchKibanaLogsCommand}"
+            Content="Request"
+            FontSize="13"
+            Style="{StaticResource MaterialDesignPaperSecondaryButton}"
             />
 
-    <Button Command="{Binding CopyKibanaRequestToClipboardCommand}"
+    <Button Height="28"
+            Margin="0,0,0,0"
+            Padding="15,0"
+            Command="{Binding CopyKibanaRequestToClipboardCommand}"
             Content="Copy Search Request"
-            ToolTip="Copy Kibana search request for DevTools"
+            FontSize="13"
             Style="{StaticResource MaterialDesignPaperSecondaryButton}"
-            Margin="10,0,0,0"
+            ToolTip="Copy Kibana search request for DevTools"
             />
 </ToolBar>

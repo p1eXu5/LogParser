@@ -13,16 +13,35 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace LogParser.WpfClient.UserControls
+namespace LogParser.WpfClient.UserControls;
+
+/// <summary>
+/// Interaction logic for ToolBar.xaml
+/// </summary>
+public partial class LogParserToolBarTray : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ToolBar.xaml
-    /// </summary>
-    public partial class LogParserToolBarTray : UserControl
+    public LogParserToolBarTray()
     {
-        public LogParserToolBarTray()
+        InitializeComponent();
+    }
+
+    private void MenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (m_KibanaSearchToolBar.Visibility == Visibility.Visible)
         {
-            InitializeComponent();
+            m_KibanaSearchToolBar.Visibility = Visibility.Collapsed;
+            m_KibanaAccountToolBar.Visibility = Visibility.Collapsed;
+            m_KibanaCheckIcon.Visibility = Visibility.Hidden;
         }
+        else
+        {
+            m_KibanaSearchToolBar.Visibility = Visibility.Visible;
+            m_KibanaAccountToolBar.Visibility = Visibility.Visible;
+            m_KibanaCheckIcon.Visibility = Visibility.Visible;
+        }
+
+        m_ToolBarTray.InvalidateMeasure();
+
+        e.Handled = true;
     }
 }

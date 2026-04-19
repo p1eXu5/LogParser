@@ -44,10 +44,10 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-        <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
-                     Width="100"
+        <ProgressBar Width="100"
                      Height="100"
                      IsIndeterminate="True"
+                     Style="{StaticResource MaterialDesignCircularProgressBar}"
                      Visibility="{Binding Loading,
                                           Converter={StaticResource conv_BoolToVis}}"
                      Value="0"

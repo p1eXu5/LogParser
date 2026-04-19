@@ -5,39 +5,49 @@
          xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-         Style="{DynamicResource MaterialDesignToolBar}"
-         d:Background="#1E1E1E"
-         d:DesignHeight="60"
          d:DesignWidth="400"
          ClipToBounds="True"
+         Style="{StaticResource st_LogParserToolBar}"
          mc:Ignorable="d"
          >
-    <Button Grid.Column="2"
-            Command="{Binding PasteFromClipboardCommand}"
-            Style="{StaticResource MaterialDesignFlatLightButton}"
-            Margin="4,2"
+    <Button Command="{Binding PasteFromClipboardCommand}"
+            Style="{StaticResource st_ToolBarIconButton}"
             >
-        <materialDesign:PackIcon Kind="ContentCopy" />
+        <materialDesign:PackIcon Height="16"
+                                 Kind="ContentCopy"
+                                 />
     </Button>
 
-    <Button Grid.Column="2"
-            Command="{Binding ClearInputCommand}"
-            Style="{StaticResource MaterialDesignFlatLightButton}"
-            Margin="4,2"
+    <Button Command="{Binding ClearInputCommand}"
+            Style="{StaticResource st_ToolBarIconButton}"
             >
-        <materialDesign:PackIcon Kind="DeleteOutline" />
+        <materialDesign:PackIcon Height="20"
+                                 Kind="DeleteOutline"
+                                 />
     </Button>
 
     <ListBox x:Name="c"
-             Margin="4,2"
              VerticalAlignment="Center"
              SelectionMode="Extended"
              >
-        <ListBoxItem Content="{materialDesign:PackIcon Kind=TextBoxOutline}"
-                     Style="{DynamicResource MaterialDesignNavigationPrimaryListBoxItem}"
-                     Width="66"
-                     HorizontalContentAlignment="Center"
-                     IsSelected="{Binding ShowAll}"
-                     />
+        <ListBoxItem IsSelected="{Binding ShowAll}"
+                     Style="{DynamicResource st_ToolBarListBoxItem}"
+                     >
+            <materialDesign:PackIcon Width="18"
+                                     Height="18"
+                                     Kind="TextBoxOutline"
+                                     />
+        </ListBoxItem>
     </ListBox>
+
+    <TextBlock Style="{StaticResource st_ToolBarTextBlock}"
+               Text="Tmp Title:"
+               />
+
+    <TextBox Width="120"
+             materialDesign:HintAssist.Hint="Temp Title"
+             Style="{StaticResource st_ToolBarTextBox}"
+             Text="{Binding TempTitle,
+                            UpdateSourceTrigger=PropertyChanged}"
+             />
 </ToolBar>

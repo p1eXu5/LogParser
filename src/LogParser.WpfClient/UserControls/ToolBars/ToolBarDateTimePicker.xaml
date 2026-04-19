@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="LogParser.WpfClient.UserControls.ToolBars.ToolBarDateTimePicker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="m_ToolBarDateTimePicker"
+             Height="30"
+             VerticalAlignment="Center"
+             TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+             Background="Transparent"
+             mc:Ignorable="d"
+             >
+    <Border Margin="0,2"
+            Background="{StaticResource br_ToolBarInput}"
+            CornerRadius="5"
+            >
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Width="210"
+                       Margin="10,0,0,0"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       Text="{Binding ElementName=m_ToolBarDateTimePicker,
+                                      Path=DateTime,
+                                      StringFormat='{}{0:dd MMMM yyyy, HH:mm:ss.fffff}'}"
+                       TextAlignment="Center"
+                       />
+            <Button Height="26"
+                    Margin="0"
+                    materialDesign:DialogHost.DialogClosingAttached="ClockDialogClosingEventHandler"
+                    materialDesign:DialogHost.DialogOpenedAttached="ClockDialogOpenedEventHandler"
+                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                    Style="{StaticResource st_ToolBarIconButton}"
+                    >
+                <Button.CommandParameter>
+                    <Grid Margin="-1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0"
+                                    Orientation="Horizontal"
+                                    >
+                            <Calendar x:Name="m_Calendar"
+                                      Margin="-1,-4,-1,0"
+                                      />
+
+                            <materialDesign:Clock x:Name="m_Clock"
+                                                  DisplayAutomation="CycleWithSeconds"
+                                                  Is24Hours="True"
+                                                  />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1"
+                                    Margin="8"
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal"
+                                    >
+                            <Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                    CommandParameter="0"
+                                    Content="CANCEL"
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    />
+
+                            <Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                    CommandParameter="1"
+                                    Content="OK"
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    />
+                        </StackPanel>
+                    </Grid>
+                </Button.CommandParameter>
+
+                <materialDesign:PackIcon Height="18"
+                                         Margin="0"
+                                         Padding="0"
+                                         Kind="ClockOutline"
+                                         />
+            </Button>
+        </StackPanel>
+    </Border>
+</UserControl>

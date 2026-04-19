@@ -1,0 +1,106 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    >
+    <Style x:Key="st_LogParserToolBar"
+           BasedOn="{StaticResource MaterialDesignToolBar}"
+           TargetType="ToolBar"
+           >
+        <Setter Property="Height" Value="30" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Light" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <!--<Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="Black" />-->
+        <Style.Triggers>
+            <Trigger Property="Band" Value="0">
+                <Setter Property="Margin" Value="4,0,4,4" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="st_ToolBarIconButton"
+           BasedOn="{StaticResource MaterialDesignFlatLightButton}"
+           TargetType="Button"
+           >
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <Style x:Key="st_ToolBarIconToggleButton"
+           BasedOn="{StaticResource MaterialDesignFlatLightButton}"
+           TargetType="ToggleButton"
+           >
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <Style x:Key="st_ToolBarListBoxItem"
+           BasedOn="{StaticResource MaterialDesignNavigationPrimaryListBoxItem}"
+           TargetType="ListBoxItem"
+           >
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Margin" Value="1,0" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="st_ToolBarComboBox"
+           BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
+           TargetType="ComboBox"
+           >
+        <Setter Property="Width" Value="250" />
+        <Setter Property="Margin" Value="15,1,0,1" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{StaticResource br_ToolBarInput}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
+        <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="False" />
+    </Style>
+
+    <Style x:Key="st_ToolBarTextBox"
+           BasedOn="{StaticResource MaterialDesignOutlinedTextBox}"
+           TargetType="TextBox"
+           >
+        <Setter Property="Margin" Value="15,1,0,1" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{StaticResource br_ToolBarInput}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
+        <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="False" />
+    </Style>
+
+    <Style x:Key="st_ToolBarPasswordBox"
+           BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}"
+           TargetType="PasswordBox"
+           >
+        <Setter Property="Margin" Value="15,1,0,1" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{StaticResource br_ToolBarInput}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
+        <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="False" />
+    </Style>
+
+    <Style x:Key="st_ToolBarTextBlock"
+           TargetType="TextBlock"
+           >
+        <Setter Property="Foreground" Value="{DynamicResource ResourceKey=MaterialDesign.Brush.Primary.Light}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="15,0,0,0" />
+    </Style>
+</ResourceDictionary>

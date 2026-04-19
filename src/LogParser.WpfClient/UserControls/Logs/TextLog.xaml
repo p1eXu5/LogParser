@@ -1,10 +1,10 @@
 ﻿<UserControl x:Class="LogParser.WpfClient.UserControls.Logs.TextLog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:root="clr-namespace:LogParser.WpfClient"
              d:DesignHeight="60"
              d:DesignWidth="800"
@@ -93,8 +93,8 @@
                         </Grid>
 
                         <!--  Pinned Field  -->
-                        <TextBlock DockPanel.Dock="Right"
-                                   Grid.Column="1"
+                        <TextBlock Grid.Column="1"
+                                   DockPanel.Dock="Right"
                                    Margin="10,0"
                                    VerticalAlignment="Center"
                                    Foreground="{StaticResource br_ForegroundLight}"
@@ -105,18 +105,18 @@
 
                         <!--  Copy Button  -->
                         <Button Grid.Column="2"
-                                Command="{Binding CopyCommand}"
-                                Style="{StaticResource MaterialDesignFlatLightButton}"
                                 Margin="10,0"
+                                Command="{Binding CopyCommand}"
                                 IsHitTestVisible="True"
+                                Style="{StaticResource MaterialDesignFlatLightButton}"
                                 >
                             <materialDesign:PackIcon Kind="ContentCopy" />
                         </Button>
 
                         <!--  Exclamation Toggle Button  -->
                         <ToggleButton Grid.Column="3"
-                                      ToolTip="MaterialDesignFlatToggleButton"
                                       Style="{StaticResource MaterialDesignFlatToggleButton}"
+                                      ToolTip="MaterialDesignFlatToggleButton"
                                       >
                             <materialDesign:PackIcon Width="21"
                                                      Height="21"
