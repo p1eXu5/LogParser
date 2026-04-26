@@ -14,7 +14,7 @@ module Log =
 
 [<RequireQualifiedAccess>]
 module JsonLog =
-    let emptyJson key = TechField.Json (key, [])
+    let emptyJson key = TechJsonField.Json (key, [])
 
 
 type JsonLogBuilder () =
@@ -27,13 +27,13 @@ type JsonLogBuilder () =
     member _.Run(log) = log |> Log.fieldList
 
     [<CustomOperation("timestamp")>]
-    member _.Timestamp(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> (Timespan.Value >> TechField.Timespan))] }
+    member _.Timestamp(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> (Timespan.Value >> TechJsonField.Timespan))] }
 
     /// <summary>
     /// "message" : "some text"
     /// </summary>
     [<CustomOperation("message")>]
-    member _.Message(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.Message)] }
+    member _.Message(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.Message)] }
 
     /// <summary>
     /// Buddied message field:
@@ -42,7 +42,7 @@ type JsonLogBuilder () =
     /// </code>
     /// </summary>
     [<CustomOperation("message")>]
-    member _.Message(log: TechLog, header: string, json: TechJson) = { log with Fields = log.Fields @ [((header, json) |> TechField.MessageBoddied)] }
+    member _.Message(log: TechLog, header: string, json: TechJson) = { log with Fields = log.Fields @ [((header, json) |> TechJsonField.MessageBoddied)] }
 
     /// <summary>
     /// Buddied message field with postfix:
@@ -52,107 +52,107 @@ type JsonLogBuilder () =
     /// </summary>
     [<CustomOperation("message")>]
     member _.Message(log: TechLog, header: string, body: TechJson, postfix: string) =
-        { log with Fields = log.Fields @ [((header, body, postfix) |> TechField.MessageBoddiedWithPostfix)] }
+        { log with Fields = log.Fields @ [((header, body, postfix) |> TechJsonField.MessageBoddiedWithPostfix)] }
 
     /// TechField.ArrayJson
     [<CustomOperation("message")>]
-    member _.Message(log: TechLog, value: TechJson list) = { log with Fields = log.Fields @ [(value |> TechField.MessageArrayJson)] }
+    member _.Message(log: TechLog, value: TechJson list) = { log with Fields = log.Fields @ [(value |> TechJsonField.MessageArrayJson)] }
 
     [<CustomOperation("level")>]
-    member _.Level(log: TechLog, value: string) = { log with Fields = log.Fields @ [(Enum.Parse(typeof<LogLevel>, value) |> unbox |> TechField.Level)] }
+    member _.Level(log: TechLog, value: string) = { log with Fields = log.Fields @ [(Enum.Parse(typeof<LogLevel>, value) |> unbox |> TechJsonField.Level)] }
 
     [<CustomOperation("level")>]
-    member _.Level(log: TechLog, value: LogLevel) = { log with Fields = log.Fields @ [value |> TechField.Level] }
+    member _.Level(log: TechLog, value: LogLevel) = { log with Fields = log.Fields @ [value |> TechJsonField.Level] }
 
     [<CustomOperation("host")>]
-    member _.Host(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.Host)] }
+    member _.Host(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.Host)] }
 
     [<CustomOperation("port")>]
-    member _.Port(log: TechLog, value: int) = { log with Fields = log.Fields @ [(value |> TechField.Port)] }
+    member _.Port(log: TechLog, value: int) = { log with Fields = log.Fields @ [(value |> TechJsonField.Port)] }
 
     [<CustomOperation("sourceContext")>]
-    member _.SourceContext(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.SourceContext)] }
+    member _.SourceContext(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.SourceContext)] }
 
     [<CustomOperation("method")>]
-    member _.Method(log: TechLog, value: string) = { log with Fields = log.Fields @ [value |> TechField.Method] }
+    member _.Method(log: TechLog, value: string) = { log with Fields = log.Fields @ [value |> TechJsonField.Method] }
 
     [<CustomOperation("path")>]
-    member _.Path(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.Path)] }
+    member _.Path(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.Path)] }
 
     [<CustomOperation("statusCode")>]
-    member _.StatusCode(log: TechLog, value: string) = { log with Fields = log.Fields @ [(Enum.Parse(typeof<HttpStatusCode>, value) |> unbox |> TechField.StatusCode)] }
+    member _.StatusCode(log: TechLog, value: string) = { log with Fields = log.Fields @ [(Enum.Parse(typeof<HttpStatusCode>, value) |> unbox |> TechJsonField.StatusCode)] }
 
     [<CustomOperation("statusCode")>]
-    member _.StatusCode(log: TechLog, value: HttpStatusCode) = { log with Fields = log.Fields @ [value |> TechField.StatusCode] }
+    member _.StatusCode(log: TechLog, value: HttpStatusCode) = { log with Fields = log.Fields @ [value |> TechJsonField.StatusCode] }
 
     [<CustomOperation("body")>]
-    member _.Body(log: TechLog, json: TechJson) = { log with Fields = log.Fields @ [json |> TechField.Body] }
+    member _.Body(log: TechLog, json: TechJson) = { log with Fields = log.Fields @ [json |> TechJsonField.Body] }
 
     [<CustomOperation("requestId")>]
-    member _.RequestId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.RequestId)] }
+    member _.RequestId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.RequestId)] }
 
     [<CustomOperation("requestPath")>]
-    member _.RequestPath(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.RequestPath)] }
+    member _.RequestPath(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.RequestPath)] }
 
     [<CustomOperation("spanId")>]
-    member _.SpanId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.SpanId)] }
+    member _.SpanId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.SpanId)] }
 
     [<CustomOperation("traceId")>]
-    member _.TraceId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.TraceId)] }
+    member _.TraceId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.TraceId)] }
 
     [<CustomOperation("parentId")>]
-    member _.ParentId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.ParentId)] }
+    member _.ParentId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.ParentId)] }
 
     [<CustomOperation("connectionId")>]
-    member _.ConnectionId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.ConnectionId)] }
+    member _.ConnectionId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.ConnectionId)] }
 
     [<CustomOperation("hierarchicalTraceId")>]
-    member _.HierarchicalTraceId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.HierarchicalTraceId)] }
+    member _.HierarchicalTraceId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.HierarchicalTraceId)] }
 
     [<CustomOperation("eventId")>]
-    member _.EventId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechField.EventId)] }
+    member _.EventId(log: TechLog, value: string) = { log with Fields = log.Fields @ [(value |> TechJsonField.EventId)] }
 
     /// TechField.String
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: string) = { log with Fields = log.Fields @ [((key, value) |> TechField.String)] }
+    member _.Field(log: TechLog, key: string, value: string) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.String)] }
 
     /// TechField.Int
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: int) = { log with Fields = log.Fields @ [((key, value) |> TechField.Int)] }
+    member _.Field(log: TechLog, key: string, value: int) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.Int)] }
 
     /// TechField.Bool
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: bool) = { log with Fields = log.Fields @ [((key, value) |> TechField.Bool)] }
+    member _.Field(log: TechLog, key: string, value: bool) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.Bool)] }
 
     /// TechField.Json
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, json: TechJson) = { log with Fields = log.Fields @ [((key, json) |> TechField.Json)] }
+    member _.Field(log: TechLog, key: string, json: TechJson) = { log with Fields = log.Fields @ [((key, json) |> TechJsonField.Json)] }
 
     /// TechField.Array
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: string list) = { log with Fields = log.Fields @ [((key, value) |> TechField.Array)] }
+    member _.Field(log: TechLog, key: string, value: string list) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.Array)] }
 
     /// TechField.ArrayInt
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: int list) = { log with Fields = log.Fields @ [((key, value) |> TechField.ArrayInt)] }
+    member _.Field(log: TechLog, key: string, value: int list) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.ArrayInt)] }
 
     /// TechField.JsonAnnotated
     [<CustomOperation("Field")>]
     member _.Field(log: TechLog, key: string, typeName: string, json: TechJson) = 
-        { log with Fields = log.Fields @ [({Key = key; Annotation = typeName; Body = json} |> TechField.JsonAnnotated)] }
+        { log with Fields = log.Fields @ [({Key = key; Annotation = typeName; Body = json} |> TechJsonField.JsonAnnotated)] }
 
     /// TechField.ArrayJson
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: TechJson list) = { log with Fields = log.Fields @ [((key, value) |> TechField.ArrayJson)] }
+    member _.Field(log: TechLog, key: string, value: TechJson list) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.ArrayJson)] }
 
     /// TechField.ArrayJsonAnnotated
     [<CustomOperation("Field")>]
-    member _.Field(log: TechLog, key: string, value: JsonAnnotated list) = { log with Fields = log.Fields @ [((key, value) |> TechField.ArrayJsonAnnotated)] }
+    member _.Field(log: TechLog, key: string, value: JsonAnnotated list) = { log with Fields = log.Fields @ [((key, value) |> TechJsonField.ArrayJsonAnnotated)] }
 
     /// TechField.Null
     [<CustomOperation("Null")>]
     member _.NullField(log: TechLog, key: string) = 
-        { log with Fields = log.Fields @ [(key |> TechField.Null)] }
+        { log with Fields = log.Fields @ [(key |> TechJsonField.Null)] }
 
 
 let jsonLog = JsonLogBuilder()

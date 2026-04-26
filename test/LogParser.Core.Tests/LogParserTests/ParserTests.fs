@@ -72,7 +72,7 @@ module ParserTests =
         result {
             let! res = runResult (Parser.p_stringField quotes) input
             match res with
-            | TechField.String (k, v) ->
+            | TechJsonField.String (k, v) ->
                 k |> should equal key
                 v |> should equal value
                 return ()
@@ -101,7 +101,7 @@ module ParserTests =
         result {
             let! res = runResult (Parser.p_logLevelField quotes) input
             match res with
-            | TechField.Level l ->
+            | TechJsonField.Level l ->
                 l |> shouldL equal logLevel "Not expected LogLevel "
                 return ()
             | _ ->
@@ -114,7 +114,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<PrimitiveFieldCases>, nameof PrimitiveFieldCases.PrimitiveFields)>]
-    let ``p_primitiveField tests`` (input: string, expected: TechField) =
+    let ``p_primitiveField tests`` (input: string, expected: TechJsonField) =
         result {
             let! res =
                 runResult (Parser.p_primitiveField Parser.QUOTES) input
@@ -130,7 +130,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<ArrayPrimitiveFieldCases>, nameof ArrayPrimitiveFieldCases.ArrayFields)>]
-    let ``p_arrayPrimitiveField tests`` (input: string, expected: TechField) =
+    let ``p_arrayPrimitiveField tests`` (input: string, expected: TechJsonField) =
         result {
             let! res = runResult (Parser.p_arrayPrimitiveField Parser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -141,7 +141,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<SpecialFieldCases>, nameof SpecialFieldCases.SpecialFields)>]
-    let ``p_specialField tests`` (input: string, expected: TechField) =
+    let ``p_specialField tests`` (input: string, expected: TechJsonField) =
         result {
             let! res = runResult (Parser.p_specialField Parser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -152,7 +152,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<JsonFieldCases>, nameof JsonFieldCases.JsonFields)>]
-    let ``p_jsonField tests`` (input: string, expected: TechField) =
+    let ``p_jsonField tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_jsonField' q = runResult (Parser.p_jsonField q) input
@@ -169,7 +169,7 @@ module ParserTests =
 
 
     [<TestCaseSource(typeof<JsonFieldCases>, nameof JsonFieldCases.FullMessage)>]
-    let ``p_jsonField fullMessage field tests`` (input: string, expected: TechField) =
+    let ``p_jsonField fullMessage field tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_jsonField' q = runResult (Parser.p_jsonField q) input
@@ -189,7 +189,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<ArrayJsonAnnonimousCases>, nameof ArrayJsonAnnonimousCases.ArrayJsonAnnonimous)>]
-    let ``p_arrayJsonAnnonimous tests`` (input: string, expected: TechField) =
+    let ``p_arrayJsonAnnonimous tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_arrayJsonAnnonimous' q = runResult (Parser.p_arrayJsonAnnonimous q) input
@@ -209,7 +209,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<ArrayJsonCases>, nameof ArrayJsonCases.ArrayJson)>]
-    let ``p_arrayJson tests`` (input: string, expected: TechField) =
+    let ``p_arrayJson tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_arrayJson' q = runResult (Parser.p_arrayJson q) input
@@ -231,7 +231,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<ArrayJsonAnnotatedCases>, nameof ArrayJsonAnnotatedCases.ArrayJsonAnnotated)>]
-    let ``p_arrayJsonAnnotated tests`` (input: string, expected: TechField) =
+    let ``p_arrayJsonAnnotated tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_arrayJsonAnnotated' q = runResult (Parser.p_arrayJsonAnnotated q) input
@@ -294,7 +294,7 @@ module ParserTests =
 
 
     [<TestCaseSource(typeof<JsonAnnotatedCases>, nameof JsonAnnotatedCases.JsonAnnotated)>]
-    let ``p_jsonAnnotated tests`` (input: string, expected: TechField) =
+    let ``p_jsonAnnotated tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_jsonAnnotated' q = runResult (Parser.p_jsonAnnotated q) input
@@ -315,7 +315,7 @@ module ParserTests =
     // ------------------------------------
 
     [<TestCaseSource(typeof<BodyCases>, nameof BodyCases.BodyFields)>]
-    let ``p_body tests`` (input: string, expected: TechField) =
+    let ``p_body tests`` (input: string, expected: TechJsonField) =
         result {
             let! res = runResult (Parser.p_body Parser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -338,7 +338,7 @@ module ParserTests =
                         jsonLog {
                             Field "rabbitmq_node" 5672
                         }
-                } |> TechField.JsonAnnotated
+                } |> TechJsonField.JsonAnnotated
             let! res = runResult (Parser.p_jsonSpecialPrimitiveInBraces Parser.ESCAPED_QUOTES) input
             res |> should equal expected
         } |> Result.runTest
@@ -349,7 +349,7 @@ module ParserTests =
 
     [<Category("TechField Message parsing: p_messageJsonAnnotatedList")>]
     [<TestCaseSource(typeof<MessageJsonListCases>, nameof MessageJsonListCases.MessageJsonList)>]
-    let ``p_messageJsonList test`` (input: string, expected: TechField list) =
+    let ``p_messageJsonList test`` (input: string, expected: TechJsonField list) =
         result {
             // arrange
             let p_messageJsonAnnotatedList' q = runResult (Parser.p_messageJsonList q) input
@@ -371,7 +371,7 @@ module ParserTests =
 
     [<TestCaseSource(typeof<MessageStringCases>, nameof MessageStringCases.MessageString)>]
     [<Category("TechField Message parsing: p_messageString")>]
-    let ``p_messageString tests`` (input: string, expected: TechField) =
+    let ``p_messageString tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_messageString' q = runResult (Parser.p_messageString q) input
@@ -392,7 +392,7 @@ module ParserTests =
 
     [<TestCaseSource(typeof<MessageCases>, nameof MessageCases.Message)>]
     [<Category("TechField Message parsing: p_message on simple message")>]
-    let ``p_message tests`` (input: string, expected: TechField) =
+    let ``p_message tests`` (input: string, expected: TechJsonField) =
         result {
             // arrange
             let p_message' q = runResult (Parser.p_message q) input
@@ -413,7 +413,7 @@ module ParserTests =
 
     [<Category("TechField Message parsing: p_messageBuddied")>]
     [<TestCaseSource(typeof<MessageBodiedCases>, nameof MessageBodiedCases.MessageBodied)>]
-    let ``p_messageBuddied tests`` (input: string, expected: TechField) =
+    let ``p_messageBuddied tests`` (input: string, expected: TechJsonField) =
         result {
             let! res = runResult (Parser.p_messageBuddied Parser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -425,7 +425,7 @@ module ParserTests =
 
     [<TestCaseSource(typeof<MessageBodiedWithPostfixCases>, nameof MessageBodiedWithPostfixCases.MessageBodiedWithPostfix)>]
     [<Category("TechField Message parsing: p_messageBuddiedWithPostfix")>]
-    let ``p_messageBuddiedWithPostfix tests`` (input: string, expected: TechField) =
+    let ``p_messageBuddiedWithPostfix tests`` (input: string, expected: TechJsonField) =
         result {
             let! res = runResult (Parser.p_messageBuddiedWithPostfix Parser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -471,7 +471,7 @@ module ParserTests =
             res |> should haveLength 1
             match res |> List.head with
             | TechLog tl ->
-                tl.Source |> should equal (TechField.String ("logSource", "test source") |> Some)
+                tl.Source |> should equal (TechJsonField.String ("logSource", "test source") |> Some)
                 return! Result.Ok ()
             | TextLog _ ->
                 return! Result.Error "wrong log type. Log type is TextLog"

@@ -14,16 +14,16 @@ type ArrayPrimitiveFieldCases() =
         seq {
             TestCaseData(
                 "\"scope\":[\"HTTP POST http://gate_app:5000/d/push\"]",
-                TechField.Array ("scope", ["HTTP POST http://gate_app:5000/d/push"])
+                TechJsonField.Array ("scope", ["HTTP POST http://gate_app:5000/d/push"])
             ).SetName("03 - privitive field. Array")
 
             TestCaseData(
                 "\"scope\":\"[\"HTTP POST http://gate_app:5000/d/push\"]\"",
-                TechField.Array ("scope", ["HTTP POST http://gate_app:5000/d/push"])
+                TechJsonField.Array ("scope", ["HTTP POST http://gate_app:5000/d/push"])
             ).SetName("03 - privitive field. Array wrapped in quotes")
 
             TestCaseData(
                 "\"scope\":[3]",
-                TechField.ArrayInt ("scope", [3])
+                TechJsonField.ArrayInt ("scope", [3])
             ).SetName("03 - privitive field. ArrayInt")
         }

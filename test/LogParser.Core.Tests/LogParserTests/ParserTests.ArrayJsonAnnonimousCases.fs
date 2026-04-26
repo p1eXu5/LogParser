@@ -22,7 +22,7 @@ type ArrayJsonAnnonimousCases() =
                         }
                     ]
                 """,
-                TechField.ArrayJsonAnnonimous [
+                TechJsonField.ArrayJsonAnnonimous [
                     jsonLog {
                         Field "rabbitmq_node" 
                             (jsonLog { Field "bar" "5672" })

@@ -52,7 +52,7 @@ module TechLogModel=
             |> List.sortBy TechField.orderOrKey
             |> List.map (fun technoField ->
                 match technoField with
-                | TechField.Json (name, fields) when name.Equals("logContext", StringComparison.InvariantCultureIgnoreCase) ->
+                | TechJsonField.Json (name, fields) when name.Equals("logContext", StringComparison.InvariantCultureIgnoreCase) ->
                     fields
                     |> List.map TechFieldModel.init
                 | _ ->
@@ -62,14 +62,14 @@ module TechLogModel=
             |> List.distinct
             |> List.partition (fun f -> 
                 match f.TechField with
-                | TechField.Timespan _
-                | TechField.Level _
-                | TechField.HierarchicalTraceId _ // TODO: remove after make log model hierarchy
-                | TechField.TraceId _ // TODO: remove after make log model hierarchy
-                | TechField.Message _
-                | TechField.MessageBoddied _
-                | TechField.MessageArrayJson _
-                | TechField.MessageBoddiedWithPostfix _ -> true
+                | TechJsonField.Timespan _
+                | TechJsonField.Level _
+                | TechJsonField.HierarchicalTraceId _ // TODO: remove after make log model hierarchy
+                | TechJsonField.TraceId _ // TODO: remove after make log model hierarchy
+                | TechJsonField.Message _
+                | TechJsonField.MessageBoddied _
+                | TechJsonField.MessageArrayJson _
+                | TechJsonField.MessageBoddiedWithPostfix _ -> true
                 | _ -> false
             )
 

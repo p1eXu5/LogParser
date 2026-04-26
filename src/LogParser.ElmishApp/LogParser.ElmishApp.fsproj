@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Elmish.Extensions.fs" />
     <Compile Include="Interfaces.fs" />
     <Compile Include="Helpers.fs" />
     <Compile Include="TextLogModel.fs" />
@@ -28,14 +27,16 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    <PackageReference Include="p1eXu5.FSharp.ElmishExtensions" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FSharp.Control.Reactive\FSharp.Control.Reactive.fsproj" />
     <ProjectReference Include="..\LogParser.Core\LogParser.Core.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.1.202" />
+    <PackageReference Update="FSharp.Core" Version="10.1.203" />
   </ItemGroup>
 
 </Project>

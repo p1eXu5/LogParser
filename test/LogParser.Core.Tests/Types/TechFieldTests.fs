@@ -30,7 +30,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - json array to string test`` () =
         let json =
-            TechField.ArrayJson (
+            TechJsonField.ArrayJson (
                 "certificates",
                 [
                     jsonLog { Field "usage" "CA" }
@@ -54,7 +54,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - multi json array to string test`` () =
         let json =
-            TechField.ArrayJson (
+            TechJsonField.ArrayJson (
                 "certificates",
                 [
                     jsonLog { Field "usage" "CA" }
@@ -83,7 +83,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - annonimous json array to string test`` () =
         let json =
-            TechField.ArrayJsonAnnonimous [
+            TechJsonField.ArrayJsonAnnonimous [
                 jsonLog {
                     Field "rabbitmq_node" 
                         (jsonLog { Field "bar" "5672" })
@@ -110,7 +110,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - multi annonimous json array to string test`` () =
         let json =
-            TechField.ArrayJsonAnnonimous [
+            TechJsonField.ArrayJsonAnnonimous [
                 jsonLog {
                     Field "rabbitmq_node" 
                         (jsonLog { Field "bar" "5672" })
@@ -146,10 +146,10 @@ module TechFieldTests =
     [<Test>]
     let ``toString - two dim json array to string test`` () =
         let json =
-            TechField.ArrayJson (
+            TechJsonField.ArrayJson (
                 "foo",
                 [
-                    [TechField.ArrayJsonAnnonimous [
+                    [TechJsonField.ArrayJsonAnnonimous [
                         jsonLog {
                             Field "rabbitmq_node" 
                                 (jsonLog { Field "bar" "5672" })
@@ -180,10 +180,10 @@ module TechFieldTests =
     [<Test>]
     let ``toString - multi two dim json array to string test`` () =
         let json =
-            TechField.ArrayJson (
+            TechJsonField.ArrayJson (
                 "foo",
                 [
-                    [TechField.ArrayJsonAnnonimous [
+                    [TechJsonField.ArrayJsonAnnonimous [
                         jsonLog {
                             Field "rabbitmq_node" 
                                 (jsonLog { Field "bar" "5672" })

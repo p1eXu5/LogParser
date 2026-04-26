@@ -3,7 +3,7 @@
 open System
 
 open Elmish
-open Elmish.Extensions
+open p1eXu5.FSharp.ElmishExtensions
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Interfaces
 open MainModel
@@ -113,7 +113,9 @@ module MainModel =
     let init (errorMessageQueue: Interfaces.IErrorMessageQueue) (settingsManager: ISettingsManager) (logFile: string option) =
         fun () ->
             let cmd =
-                logFile |> Option.map (fun fileName -> Cmd.ofMsg (Msg.OpenSpecifiedFile fileName)) |> Option.defaultValue Cmd.none
+                logFile
+                |> Option.map (fun fileName -> Cmd.ofMsg (Msg.OpenSpecifiedFile fileName))
+                |> Option.defaultValue Cmd.none
 
             let assemblyVer = "Version " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 

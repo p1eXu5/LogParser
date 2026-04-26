@@ -5,7 +5,7 @@ open System.Net
 open Microsoft.Extensions.Logging
 open Microsoft.FSharp.Reflection
 
-type TechField =
+type TechJsonField =
     | Timespan of Timespan
 
     // TODO: wrap in separate DU
@@ -121,7 +121,7 @@ type TechField =
             | Json (k, v) -> $"\"{k}\": {v |> TechField.toString 1}"
             | JsonAnnotated (tj) -> $"%O{tj}"
 and
-    TechJson = TechField list
+    TechJson = TechJsonField list
 and
     /// Used within message field as `parameter:`
     ///
@@ -130,7 +130,7 @@ and
         {
             Key: string
             Annotation: string
-            Body: TechField list
+            Body: TechJsonField list
         }
         with
             override this.ToString() =
@@ -144,7 +144,7 @@ module TechField =
 
     open System.Text
 
-    let toString (initTabLevel: int) (fields: TechField list) =
+    let toString (initTabLevel: int) (fields: TechJsonField list) =
         let fold folder fields state =
             fields
             |> List.fold folder state
@@ -431,4 +431,4 @@ module TechField =
         | NullAnnonimous -> Int32.MaxValue.ToString()
 
     let arrayTypeJson key jsonList =
-        (key, jsonList) |> TechField.ArrayJsonAnnotated
+        (key, jsonList) |> TechJsonField.ArrayJsonAnnotated

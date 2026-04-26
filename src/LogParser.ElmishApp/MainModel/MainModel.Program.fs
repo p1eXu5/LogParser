@@ -2,20 +2,20 @@
 
 open System
 open System.IO
+open System.Windows
 open Microsoft.Extensions.Logging
 open Microsoft.Win32
 
 open Elmish
-open Elmish.Extensions
+open p1eXu5.FSharp.ElmishExtensions
 open FsToolkit.ErrorHandling
 
 open LogParser.Core
+open LogParser.Core.Types
 
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.Models.MainModel
-open System.Windows
-open LogParser.Core.Types
 open LogParser.ElmishApp.Interfaces
 open LogParser.ElmishApp.Models.LogFile
 
@@ -34,7 +34,7 @@ let private toLogModels logs =
 
 
 
-let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (model: MainModel) =
+let update (settingsManager: ISettingsManager) (observer: IObserver<LogPosition>) (logger: ILogger) (msg: Msg) (model: MainModel) =
     match msg with
     | NewFile -> MainModel.init model.ErrorMessageQueue settingsManager None ()
 
@@ -116,7 +116,7 @@ let update (settingsManager: ISettingsManager) (logger: ILogger) (msg: Msg) (mod
                 let v =
                     if isCsv then Csv.parse v
                     else v
-                match Parser.parse (v) with
+                match Parser.parse observer (v) with
                 | Ok xlog ->
                     return (toLogModels xlog), processId
                 | Error err ->

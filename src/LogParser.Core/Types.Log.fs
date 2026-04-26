@@ -1,11 +1,12 @@
 ﻿namespace LogParser.Core.Types
 
 open System
+open FParsec
 
 type TechLog =
         {
-            Source: TechField option
-            Fields: TechField list
+            Source: TechJsonField option
+            Fields: TechJsonField list
         }
         with
             override this.ToString() =
@@ -23,6 +24,13 @@ type Log =
             | TextLog s -> s
             | TechLog tl -> tl.ToString()
 
+
+type LogPosition =
+    {
+        Start: Position
+        End: Position
+        Log: Log
+    }
 
 // ----------------------- modules
 
@@ -52,26 +60,26 @@ module Log =
             techLog.Fields
             |> List.tryPick (fun field -> 
                 match fieldType, field with
-                | TechFieldType.Timespan, TechField.Timespan (Timespan.Value v)
-                | TechFieldType.Message, TechField.Message v 
-                | TechFieldType.Method, TechField.Method v
-                | TechFieldType.Path, TechField.Path v
-                | TechFieldType.Host, TechField.Host v
-                | TechFieldType.SourceContext, TechField.SourceContext v
-                | TechFieldType.RequestId, TechField.RequestId v
-                | TechFieldType.RequestPath, TechField.RequestPath v
-                | TechFieldType.SpanId, TechField.SpanId v
-                | TechFieldType.TraceId, TechField.TraceId v
-                | TechFieldType.EventId, TechField.EventId v
-                | TechFieldType.ParentId, TechField.ParentId v
-                | TechFieldType.ConnectionId, TechField.ConnectionId v
-                | TechFieldType.HierarchicalTraceId, TechField.HierarchicalTraceId v 
+                | TechFieldType.Timespan, TechJsonField.Timespan (Timespan.Value v)
+                | TechFieldType.Message, TechJsonField.Message v 
+                | TechFieldType.Method, TechJsonField.Method v
+                | TechFieldType.Path, TechJsonField.Path v
+                | TechFieldType.Host, TechJsonField.Host v
+                | TechFieldType.SourceContext, TechJsonField.SourceContext v
+                | TechFieldType.RequestId, TechJsonField.RequestId v
+                | TechFieldType.RequestPath, TechJsonField.RequestPath v
+                | TechFieldType.SpanId, TechJsonField.SpanId v
+                | TechFieldType.TraceId, TechJsonField.TraceId v
+                | TechFieldType.EventId, TechJsonField.EventId v
+                | TechFieldType.ParentId, TechJsonField.ParentId v
+                | TechFieldType.ConnectionId, TechJsonField.ConnectionId v
+                | TechFieldType.HierarchicalTraceId, TechJsonField.HierarchicalTraceId v 
                     -> 
                         Some v
 
-                | TechFieldType.StatusCode, TechField.StatusCode v -> Some (v.ToString())
-                | TechFieldType.Level, TechField.Level v -> Some (v.ToString())
-                | TechFieldType.Port, TechField.Port v -> Some (v.ToString())
+                | TechFieldType.StatusCode, TechJsonField.StatusCode v -> Some (v.ToString())
+                | TechFieldType.Level, TechJsonField.Level v -> Some (v.ToString())
+                | TechFieldType.Port, TechJsonField.Port v -> Some (v.ToString())
                 | _ -> None
             )
 

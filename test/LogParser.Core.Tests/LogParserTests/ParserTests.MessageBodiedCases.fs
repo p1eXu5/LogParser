@@ -20,7 +20,7 @@ type MessageBodiedCases() =
                                 \"rabbitmq_node\":5672
                             }"
                 """,
-                TechField.MessageBoddied ("Returning next host:", jsonLog { Field "rabbitmq_node" 5672 })
+                TechJsonField.MessageBoddied ("Returning next host:", jsonLog { Field "rabbitmq_node" 5672 })
             ).SetName("MessageBodied with simple json")
 
 
@@ -30,7 +30,7 @@ type MessageBodiedCases() =
                                 rabbitmq_node: 5672
                             }"
                 """,
-                TechField.MessageBoddied ("Returning next EndPoint=IPEndPoint", jsonLog { Field "rabbitmq_node" 5672 })
+                TechJsonField.MessageBoddied ("Returning next EndPoint=IPEndPoint", jsonLog { Field "rabbitmq_node" 5672 })
             ).SetName("MessageBodied with equal sign in header and simple json")
 
 
@@ -44,7 +44,7 @@ type MessageBodiedCases() =
                         }
                     }"
                 """,
-                TechField.MessageBoddied (
+                TechJsonField.MessageBoddied (
                     "foo",
                     (jsonLog {
                         Field
@@ -77,7 +77,7 @@ type MessageBodiedCases() =
                             \"designId\":\"DF09987BC2F\"
                         }"
                 """,
-                TechField.MessageBoddied (
+                TechJsonField.MessageBoddied (
                         "Response to POST /v8/rock/and/roll 200",
                         (jsonLog {
                             Field "bin" "123456"
@@ -98,7 +98,7 @@ type MessageBodiedCases() =
 
             TestCaseData(
                 "\"message\": \"Error during removing token: ApiUnexpectedErrorResult { Message: \\\"Bad status code 404: \\\" }\"",
-                TechField.MessageBoddied (
+                TechJsonField.MessageBoddied (
                     "Error during removing token: ApiUnexpectedErrorResult",
                     (jsonLog {
                         message "Bad status code 404: "
@@ -109,7 +109,7 @@ type MessageBodiedCases() =
             TestCaseData(
                 """"message": "Returning next host, parameters: [ ( \"request\": \"123-123-123\" ) ]"
                 """,
-                TechField.MessageBoddied (
+                TechJsonField.MessageBoddied (
                     "Returning next host, parameters:", 
                     jsonLog {
                         Field "request" "123-123-123"

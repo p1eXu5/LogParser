@@ -6,7 +6,7 @@ open LogParser.Core.Types
 
 type TechFieldModel =
     {
-        TechField: TechField
+        TechField: TechJsonField
         Key: string
         Header: string option
         Text: string option
@@ -31,10 +31,10 @@ module TechFieldModel =
         | InsertLineBreaks
         | PinFieldValueInHeader of key: string
 
-    let init (techField: TechField) =
+    let init (techField: TechJsonField) =
 
         match techField with
-        | TechField.Json (_, fields) ->
+        | TechJsonField.Json (_, fields) ->
             { 
                 TechField = techField 
                 Tag = Tag.JsonField; 
@@ -44,7 +44,7 @@ module TechFieldModel =
                 Text = None
                 Postfix = None
             }
-        | TechField.JsonAnnotated jta ->
+        | TechJsonField.JsonAnnotated jta ->
             { 
                 TechField = techField 
                 Tag = Tag.AnnotatedJsonField; 
@@ -55,7 +55,7 @@ module TechFieldModel =
                 Postfix = None
             }
 
-        | TechField.Body fields ->
+        | TechJsonField.Body fields ->
             { 
                 TechField = techField 
                 Tag = Tag.JsonField; 
@@ -65,7 +65,7 @@ module TechFieldModel =
                 Text = None
                 Postfix = None
             }
-        | TechField.MessageBoddied (text, fields) ->
+        | TechJsonField.MessageBoddied (text, fields) ->
             { 
                 TechField = techField 
                 Tag = Tag.AnnotatedJsonField; 
@@ -76,7 +76,7 @@ module TechFieldModel =
                 Postfix = None
             }
 
-        | TechField.MessageBoddiedWithPostfix (text, fields, postfix) ->
+        | TechJsonField.MessageBoddiedWithPostfix (text, fields, postfix) ->
             { 
                 TechField = techField 
                 Tag = Tag.WithPostfixAnnotatedJsonField;
@@ -87,7 +87,7 @@ module TechFieldModel =
                 Postfix = postfix |> Some
             }
 
-        | TechField.MessageArrayJson _ ->
+        | TechJsonField.MessageArrayJson _ ->
             { 
                 TechField = techField 
                 Tag = Tag.JsonField;

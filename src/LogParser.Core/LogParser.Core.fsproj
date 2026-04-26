@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Helpers.fs" />
-    <Compile Include="Types.fs" />
+    <Compile Include="Types.Fields.fs" />
     <Compile Include="Types.TechField.fs" />
     <Compile Include="Types.Log.fs" />
     <Compile Include="Dsl.fs" />
@@ -31,4 +31,5 @@
   <ItemGroup>
     <InternalsVisibleTo Include="LogParser.Core.Tests" />
   </ItemGroup>
+
 </Project>

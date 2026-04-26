@@ -19,19 +19,19 @@ type JsonAnnotatedCases() =
                         \"rabbitmq_node\":5672
                     }"
                 """,
-                TechField.JsonAnnotated { Key = "foo"; Annotation = "Error:"; Body = (jsonLog { Field "rabbitmq_node" 5672 }) }
+                TechJsonField.JsonAnnotated { Key = "foo"; Annotation = "Error:"; Body = (jsonLog { Field "rabbitmq_node" 5672 }) }
             ).SetName("12 - JsonAnnotated. simple int value")
 
 
             TestCaseData(
                 "\\\"request\\\": DTO {rabbitmq_node:5672}",
-                TechField.JsonAnnotated { Key = "request"; Annotation = "DTO"; Body = (jsonLog { Field "rabbitmq_node" 5672 }) }
+                TechJsonField.JsonAnnotated { Key = "request"; Annotation = "DTO"; Body = (jsonLog { Field "rabbitmq_node" 5672 }) }
             ).SetName("12 - JsonAnnotated. simple quoteless int value")
 
 
             TestCaseData(
                 "\\\"request\\\": DTO {rabbitmq_node: ABC}",
-                TechField.JsonAnnotated { Key = "request"; Annotation = "DTO"; Body = (jsonLog { Field "rabbitmq_node" "ABC" }) }
+                TechJsonField.JsonAnnotated { Key = "request"; Annotation = "DTO"; Body = (jsonLog { Field "rabbitmq_node" "ABC" }) }
             ).SetName("12 - JsonAnnotated. typeJson with string field without quotes test")
             
             
@@ -40,7 +40,7 @@ type JsonAnnotatedCases() =
                        DeviceCountry: \"BR\"
                    }
                 """,
-                TechField.JsonAnnotated
+                TechJsonField.JsonAnnotated
                     {
                         Key = "Scoring"
                         Annotation = "DeviceMetadataScoring"

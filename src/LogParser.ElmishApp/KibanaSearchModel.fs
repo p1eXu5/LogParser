@@ -1,7 +1,7 @@
 ﻿namespace LogParser.ElmishApp.Models
 
 open System
-open Elmish.Extensions
+open p1eXu5.FSharp.ElmishExtensions
 open LogParser.Core.Kibana
 open LogParser.ElmishApp.Helpers
 open LogParser.ElmishApp.KibanaSearchModel.Services
@@ -322,7 +322,7 @@ module Program =
     open System.Windows
     open Microsoft.Extensions.Logging
     open Elmish
-    open Elmish.Extensions
+    open p1eXu5.FSharp.ElmishExtensions
     open LogParser.Core
     open LogParser.ElmishApp.Models
     open LogParser.ElmishApp.Models.KibanaSearchModel
@@ -353,7 +353,7 @@ module Program =
         | SetLogsStartTime logsStartTime -> { model with LogsStartTime = logsStartTime } |> setKibanaParams, Cmd.none, Intent.FilterOff
         | SetLogsEndTime logsEndTime -> { model with LogsEndTime = logsEndTime } |> setKibanaParams, Cmd.none, Intent.FilterOff
 
-        | SearchKibanaLogs (Start ()) ->
+        | SearchKibanaLogs (Operation.Start ()) ->
             model
             , Cmd.OfTask.either 
                 (Kibana.searchLogs logger) 
@@ -362,11 +362,11 @@ module Program =
                 Msg.OnError
             , Intent.LoadingOn
 
-        | SearchKibanaLogs (Finish logs) when logs |> (not << Seq.isEmpty) ->
+        | SearchKibanaLogs (Operation.Finish logs) when logs |> (not << Seq.isEmpty) ->
             let logMessage = String.Join(Environment.NewLine, logs) |> Some
             model, Cmd.none, Intent.ProcessLoadedLogs logMessage
 
-        | SearchKibanaLogs (Finish logs) when logs |> Seq.isEmpty ->
+        | SearchKibanaLogs (Operation.Finish logs) when logs |> Seq.isEmpty ->
             let logMessage = "No Logs" |> Some
             model, Cmd.none, Intent.ProcessLoadedLogs logMessage
 
@@ -408,7 +408,7 @@ module Program =
 module Bindings =
 
     open Elmish.WPF
-    open Elmish.Extensions
+    open p1eXu5.FSharp.ElmishExtensions
     open LogParser.ElmishApp.Models
     open LogParser.ElmishApp.Models.KibanaSearchModel
 

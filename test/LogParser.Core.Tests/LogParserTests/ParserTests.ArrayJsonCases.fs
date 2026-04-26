@@ -23,7 +23,7 @@ type ArrayJsonCases() =
                         }
                     ]
                 """,
-                TechField.ArrayJson (
+                TechJsonField.ArrayJson (
                     "foo",
                     [
                         jsonLog {
@@ -38,7 +38,7 @@ type ArrayJsonCases() =
             TestCaseData(
                 """\"certificates\":[ { \"usage\":\"CA\" } ]
                 """,
-                TechField.ArrayJson (
+                TechJsonField.ArrayJson (
                     "certificates",
                     [
                         jsonLog { Field "usage" "CA" }
@@ -49,7 +49,7 @@ type ArrayJsonCases() =
             TestCaseData(
                 """\"certificates\":\"[ { \"usage\":\"CA\" } ]\"
                 """,
-                TechField.ArrayJson (
+                TechJsonField.ArrayJson (
                     "certificates",
                     [
                         jsonLog { Field "usage" "CA" }
@@ -63,7 +63,7 @@ type ArrayJsonCases() =
                         { \"usage\":\"CA\" } 
                     ]
                 """,
-                TechField.ArrayJson (
+                TechJsonField.ArrayJson (
                     "certificates",
                     [
                         jsonLog { Field "usage" "CA" }
@@ -81,10 +81,10 @@ type ArrayJsonCases() =
                         }
                     ]]
                 """,
-                TechField.ArrayJson (
+                TechJsonField.ArrayJson (
                     "foo",
                     [
-                        [TechField.ArrayJsonAnnonimous [
+                        [TechJsonField.ArrayJsonAnnonimous [
                             jsonLog {
                                 Field "rabbitmq_node" 
                                     (jsonLog { Field "bar" "5672" })
@@ -107,12 +107,12 @@ type ArrayJsonCases() =
                         null
                     ]
                 """,
-                TechField.ArrayJson (
+                TechJsonField.ArrayJson (
                     "vals",
                     [
-                        [TechField.StringAnnonimous "some message";]
-                        [TechField.IntAnnonimous 0;]
-                        [TechField.StringAnnonimous "0ca140ed-2608-42a5-a0da-6c2665f88a65";]
+                        [TechJsonField.StringAnnonimous "some message";]
+                        [TechJsonField.IntAnnonimous 0;]
+                        [TechJsonField.StringAnnonimous "0ca140ed-2608-42a5-a0da-6c2665f88a65";]
                         
                         jsonLog {
                             Field "HTTPHeader_content-type" "application/json"
@@ -120,7 +120,7 @@ type ArrayJsonCases() =
                             Field "HTTPPath" "/debitint"
                         }
                         
-                        [TechField.NullAnnonimous]
+                        [TechJsonField.NullAnnonimous]
                     ]
                 )
             ).SetName("11 - ArrayJson. mix of nested json, string, int and null")

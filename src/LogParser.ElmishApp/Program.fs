@@ -9,6 +9,8 @@ open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.MainModel
 
 open Microsoft.Extensions.Logging
+open FSharp.Control.Reactive
+open FSharp.Control.Reactive.Observables
 
 
 let [<Literal>] debugLogLevel = Events.LogEventLevel.Debug
@@ -45,6 +47,16 @@ let main (window, errorQueue, settingsManager, logFile) =
         | null -> None
         | _ -> Some logFile
 
-    WpfProgram.mkProgram (MainModel.init errorQueue settingsManager logFileOpt) (Program.update settingsManager mainModelLogger) MainModel.Bindings.bindings
+    let subject = Subject.broadcast
+
+    //let subscribe m =
+    //    let logStream dispatch =
+    //        subject
+    //        |> Observable.subscribe (dispatch (MainModel.Msg.))
+    //    []
+        
+
+    WpfProgram.mkProgram (MainModel.init errorQueue settingsManager logFileOpt) (Program.update settingsManager subject mainModelLogger) MainModel.Bindings.bindings
+    // |> WpfProgram.withSubscription subscribe
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.startElmishLoop window
