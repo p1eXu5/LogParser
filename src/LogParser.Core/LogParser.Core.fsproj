@@ -8,7 +8,7 @@
   <ItemGroup>
     <Compile Include="Helpers.fs" />
     <Compile Include="Types.TechJsonLogField.fs" />
-    <Compile Include="Types.Log.fs" />
+    <Compile Include="Types.TechLog.fs" />
     <Compile Include="Dsl.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="Kibana.fs" />

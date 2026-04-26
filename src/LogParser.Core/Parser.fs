@@ -603,7 +603,7 @@ let logList (observer: IObserver<LogPosition>) =
                         else
                             ("logSource", source.Trim()) |> TechJsonLogField.String |> Some; 
                     Fields = mergeFullMessage fieldList
-                } |> Log.TechLog
+                } |> TechLog.TechJsonLog
 
             observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
             log
@@ -613,7 +613,7 @@ let logList (observer: IObserver<LogPosition>) =
     let p_TechLog =
         getPosition .>>. p_TechLogWithQuotes .>>. getPosition
         |>> (fun ((startPosition, techFieldList), endPosition) ->
-            let log = {Source = None; Fields = techFieldList} |> Log.TechLog
+            let log = {Source = None; Fields = techFieldList} |> TechLog.TechJsonLog
             observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
             log
         )
@@ -621,7 +621,7 @@ let logList (observer: IObserver<LogPosition>) =
     let p_TextLog =
         getPosition .>>. many1Satisfy ((<>) '\n') .>>. getPosition
         |>> (fun ((startPosition, text), endPosition) ->
-            let log = Log.TextLog text
+            let log = TechLog.TextLog text
             observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
             log
         )

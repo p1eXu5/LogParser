@@ -13,7 +13,7 @@ type TechLogModel =
         HierarchicalTraceId: string // TODO: remove after make log model hierarchy
         ServiceName: string
         TraceId: string // TODO: remove after make log model hierarchy
-        Log: TechLog
+        Log: TechJsonLog
         Fields: TechFieldModel list
         Children: TechLogModel list
         IsNestedLog: bool // TODO: remove after make log model hierarchy
@@ -46,7 +46,7 @@ module TechLogModel=
             |> Option.defaultValue level
         )
 
-    let init (log: TechLog) =
+    let init (log: TechJsonLog) =
         let (mainFields, otherFields) =
             log.Fields
             |> List.sortBy TechJsonLogField.orderOrKey
@@ -133,4 +133,4 @@ module TechLogModel=
 
     let tryFindField fieldName (techLogModel: TechLogModel) =
         techLogModel.Log
-        |> TechLog.tryFindField fieldName
+        |> TechJsonLog.tryFindField fieldName

@@ -26,10 +26,10 @@ type TechJsonSpecialFieldType =
     | ConnectionId
     | HierarchicalTraceId
 
-type TechLog =
+type TechJsonLog =
         {
             Source: TechJsonLogField option
-            Fields: TechJsonLogField list
+            Fields: TechJsonLogContent
         }
         with
             override this.ToString() =
@@ -38,26 +38,26 @@ type TechLog =
                 |> (fun l -> String.Join("\n", l))
 
 
-type Log =
+type TechLog =
     | TextLog of string
-    | TechLog of TechLog
+    | TechJsonLog of TechJsonLog
     with
         override this.ToString() =
             match this with
             | TextLog s -> s
-            | TechLog tl -> tl.ToString()
+            | TechJsonLog tl -> tl.ToString()
 
 
 type LogPosition =
     {
         Start: Position
         End: Position
-        Log: Log
+        Log: TechLog
     }
 
 // ----------------------- modules
 
-module TechLog =
+module TechJsonLog =
 
     let tryFindField fieldName techLog =
         techLog.Fields
@@ -66,20 +66,20 @@ module TechLog =
         )
 
 
-module Log =
+module TechLog =
 
     let fromTechJson (techJson: TechJsonLogContent) =
         {
             Source = None
             Fields = techJson
         }
-        |> Log.TechLog
+        |> TechLog.TechJsonLog
 
 
     let tryFind fieldType log =
         match log with
-        | Log.TextLog _ -> None
-        | Log.TechLog techLog ->
+        | TechLog.TextLog _ -> None
+        | TechLog.TechJsonLog techLog ->
             techLog.Fields
             |> List.tryPick (fun field -> 
                 match fieldType, field with

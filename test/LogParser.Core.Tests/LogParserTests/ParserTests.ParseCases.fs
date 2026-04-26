@@ -19,7 +19,7 @@ type ParseCases () =
                 jsonLog {
                     Field "requestBody" (jsonLog { Field "bankId" "1234" })
                 }
-                |> Log.fromTechJson
+                |> TechLog.fromTechJson
             ).SetName("50 - log parsing. {\"requestBody\": \"{ \\\"bankId\\\": \\\"1234\\\"}\"}")
 
             TestCaseData(
@@ -33,7 +33,7 @@ type ParseCases () =
                     port 5672
                     sourceContext "MassTransit"
                 } 
-                |> Log.fromTechJson
+                |> TechLog.fromTechJson
                 
             ).SetName("50 - log parsing. short simple log tech message")
 
@@ -48,7 +48,7 @@ type ParseCases () =
                     port 5672
                     sourceContext "MassTransit"
                 } 
-                |> Log.fromTechJson
+                |> TechLog.fromTechJson
                 
             ).SetName("50 - log parsing. short simple log tech message with trailing spaces")
 
@@ -91,7 +91,7 @@ type ParseCases () =
                         })
                         "(status=Error)"
                 } 
-                |> Log.fromTechJson
+                |> TechLog.fromTechJson
             ).SetName("50 - log parsing. with buddied message with postfix")
 
             TestCaseData(
@@ -131,7 +131,7 @@ type ParseCases () =
                             Field "issuerId" "482386d9-3507-4bef-a227-7bcdb01f1e70"
                             Field "designId" "DF09987BC2F"
                         }) 
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
             ).SetName("50 - log parsing. with buddied message")
 
             TestCaseData(
@@ -228,7 +228,7 @@ type ParseCases () =
                         parentId "e3c9175453cf5040" 
                         connectionId "0HMGU1JHPH9FR" 
                         hierarchicalTraceId "|87ac8ea8142e664f998a1d858052e1eb.555.08b4e925_"
-                    } |> Log.fromTechJson
+                    } |> TechLog.fromTechJson
                 )
             ).SetName("50 - log parsing. complex log tech message")
 
@@ -279,7 +279,7 @@ type ParseCases () =
                     traceId "f1907304a203694c81345dfa93303aaf"
                     parentId "aa0c97c70c85ab43"
                     connectionId "0HMGU1JEEI1D7"
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
             ).SetName("50 - log parsing. complex log tech message 2")
 
             TestCaseData(
@@ -328,7 +328,7 @@ type ParseCases () =
                     timestamp "2022-04-15T04:33:54.621Z"
                     statusCode HttpStatusCode.NotFound
                     Field "actionName" "Metal.Pay.ABC.Gateway.Narnia.Controllers.Pmp.AbcDeployController.tokenAsync (Metal.Pay.ABC.Gateway.Narnia)"
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
             ).SetName("50 - log parsing. complex log with array")
 
             TestCaseData(
@@ -389,7 +389,7 @@ type ParseCases () =
                                         })
                                 })
                         })
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
             ).SetName("50 - log parsing. log with message parameterized")
 
             TestCaseData(
@@ -421,7 +421,7 @@ type ParseCases () =
                                     Field "RegDateTime" "04/28/2021 11:24:57"
                                 })
                         })
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
             ).SetName("50 - log parsing. log with message parameterized with json")
 
             TestCaseData(
@@ -437,7 +437,7 @@ type ParseCases () =
                             Field "recipient" "sdf"
                         }
                     )
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
                 
             ).SetName("50 - log parsing. body with simple json field")
 
@@ -470,7 +470,7 @@ type ParseCases () =
                             )
                         }
                     )
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
                 
             ).SetName("50 - log parsing. body with nested json")
 
@@ -483,7 +483,7 @@ type ParseCases () =
 
                 jsonLog {
                     hierarchicalTraceId "|835674ebb32a89144396ba52f55405ef.457.c49360ab_"
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
                 
             ).SetName("50 - log parsing. single hierarchicalTraceId")
 
@@ -502,7 +502,7 @@ type ParseCases () =
                             timestamp "2022-07-15T04:02:47.002Z"
                         })
                     timestamp "2022-07-15T04:02:47.002Z"
-                } |> Log.fromTechJson
+                } |> TechLog.fromTechJson
                 
             ).SetName("50 - log parsing. kibana full message with timestamp")
         }

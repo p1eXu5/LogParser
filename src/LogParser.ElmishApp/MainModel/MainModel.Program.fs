@@ -24,10 +24,10 @@ let private toLogModels logs =
     logs
     |> List.map (fun l -> 
         match l with
-        | Log.TechLog l ->
+        | TechLog.TechJsonLog l ->
             let techLogModel = TechLogModel.init (l)
             LogModel.TechLogModel techLogModel
-        | Log.TextLog l ->
+        | TechLog.TextLog l ->
             let (textLogModel, _) = TextLogModel.init (l)
             LogModel.TextLogModel textLogModel
     )

@@ -453,7 +453,7 @@ module ParserTests =
             res
             |> List.map (function
                 | TextLog _ -> true
-                | TechLog _ -> false
+                | TechJsonLog _ -> false
             )
             |> should not' (contain false)
         } |> Result.runTest
@@ -470,7 +470,7 @@ module ParserTests =
             // Assert:
             res |> should haveLength 1
             match res |> List.head with
-            | TechLog tl ->
+            | TechJsonLog tl ->
                 tl.Source |> should equal (TechJsonLogField.String ("logSource", "test source") |> Some)
                 return! Result.Ok ()
             | TextLog _ ->
@@ -490,7 +490,7 @@ module ParserTests =
             // Assert:
             res |> should haveLength 1
             match res |> List.head with
-            | TechLog tl ->
+            | TechJsonLog tl ->
                 tl.Source |> should be (ofCase <@ None @>)
                 return! Result.Ok ()
             | TextLog _ ->
@@ -515,7 +515,7 @@ module ParserTests =
             // Assert:
             res |> should haveLength 1
             match res |> List.head with
-            | TechLog tl ->
+            | TechJsonLog tl ->
                 tl.Fields |> should haveLength 1
                 tl.Fields.[0] |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (tl.Fields.[0]) expected)
                 return! Result.Ok ()
@@ -540,7 +540,7 @@ module ParserTests =
             // Assert:
             res |> should haveLength 1
             match res |> List.head with
-            | TechLog tl ->
+            | TechJsonLog tl ->
                 tl.Fields |> should haveLength 1
                 tl.Fields.[0] |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (tl.Fields.[0]) expected)
                 return! Result.Ok ()
@@ -550,7 +550,7 @@ module ParserTests =
 
 
     [<TestCaseSource(typeof<ParseCases>, nameof ParseCases.Parse)>]
-    let ``tech log parsing tests`` (input: string, expected: Log) =
+    let ``tech log parsing tests`` (input: string, expected: TechLog) =
         result {
             let! res = LogParser.Core.Parser.parse testObserver input
             res |> List.head |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (res |> List.head) expected)
