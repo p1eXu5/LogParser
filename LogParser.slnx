@@ -12,11 +12,13 @@
     <File Path="RELEASE_NOTES.md" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/FSharp.Control.Reactive/FSharp.Control.Reactive.fsproj" />
     <Project Path="src/LogParser.Core/LogParser.Core.fsproj" />
     <Project Path="src/LogParser.ElmishApp/LogParser.ElmishApp.fsproj" />
     <Project Path="src/LogParser.WpfClient/LogParser.WpfClient.csproj" />
   </Folder>
   <Folder Name="/test/">
+    <Project Path="test/FSharp.Control.Reactive.Testing/FSharp.Control.Reactive.Testing.fsproj" />
     <Project Path="test/LogParser.Core.Tests/LogParser.Core.Tests.fsproj" />
   </Folder>
 </Solution>
