@@ -3,6 +3,29 @@
 open System
 open FParsec
 
+/// Used in Log.tryFind
+[<Struct>]
+[<RequireQualifiedAccess>]
+type TechJsonSpecialFieldType =
+    | Timespan
+    | Message
+    | Level
+    | Method
+    | StatusCode
+    | Path
+    | Host
+    | Port
+    | Body
+    | SourceContext
+    | RequestId
+    | RequestPath
+    | SpanId
+    | TraceId
+    | EventId
+    | ParentId
+    | ConnectionId
+    | HierarchicalTraceId
+
 type TechLog =
         {
             Source: TechJsonField option
@@ -60,27 +83,27 @@ module Log =
             techLog.Fields
             |> List.tryPick (fun field -> 
                 match fieldType, field with
-                | TechFieldType.Timespan, TechJsonField.Timespan (Timespan.Value v)
-                | TechFieldType.Message, TechJsonField.Message v 
-                | TechFieldType.Method, TechJsonField.Method v
-                | TechFieldType.Path, TechJsonField.Path v
-                | TechFieldType.Host, TechJsonField.Host v
-                | TechFieldType.SourceContext, TechJsonField.SourceContext v
-                | TechFieldType.RequestId, TechJsonField.RequestId v
-                | TechFieldType.RequestPath, TechJsonField.RequestPath v
-                | TechFieldType.SpanId, TechJsonField.SpanId v
-                | TechFieldType.TraceId, TechJsonField.TraceId v
-                | TechFieldType.EventId, TechJsonField.EventId v
-                | TechFieldType.ParentId, TechJsonField.ParentId v
-                | TechFieldType.ConnectionId, TechJsonField.ConnectionId v
-                | TechFieldType.HierarchicalTraceId, TechJsonField.HierarchicalTraceId v 
+                | TechJsonSpecialFieldType.Timespan, TechJsonField.Timespan (Timespan.Value v)
+                | TechJsonSpecialFieldType.Message, TechJsonField.Message v 
+                | TechJsonSpecialFieldType.Method, TechJsonField.Method v
+                | TechJsonSpecialFieldType.Path, TechJsonField.Path v
+                | TechJsonSpecialFieldType.Host, TechJsonField.Host v
+                | TechJsonSpecialFieldType.SourceContext, TechJsonField.SourceContext v
+                | TechJsonSpecialFieldType.RequestId, TechJsonField.RequestId v
+                | TechJsonSpecialFieldType.RequestPath, TechJsonField.RequestPath v
+                | TechJsonSpecialFieldType.SpanId, TechJsonField.SpanId v
+                | TechJsonSpecialFieldType.TraceId, TechJsonField.TraceId v
+                | TechJsonSpecialFieldType.EventId, TechJsonField.EventId v
+                | TechJsonSpecialFieldType.ParentId, TechJsonField.ParentId v
+                | TechJsonSpecialFieldType.ConnectionId, TechJsonField.ConnectionId v
+                | TechJsonSpecialFieldType.HierarchicalTraceId, TechJsonField.HierarchicalTraceId v 
                     -> 
                         Some v
 
-                | TechFieldType.StatusCode, TechJsonField.StatusCode v -> Some (v.ToString())
-                | TechFieldType.Level, TechJsonField.Level v -> Some (v.ToString())
-                | TechFieldType.Port, TechJsonField.Port v -> Some (v.ToString())
+                | TechJsonSpecialFieldType.StatusCode, TechJsonField.StatusCode v -> Some (v.ToString())
+                | TechJsonSpecialFieldType.Level, TechJsonField.Level v -> Some (v.ToString())
+                | TechJsonSpecialFieldType.Port, TechJsonField.Port v -> Some (v.ToString())
                 | _ -> None
             )
 
-    let hierarchicalTraceId = tryFind TechFieldType.HierarchicalTraceId
+    let hierarchicalTraceId = tryFind TechJsonSpecialFieldType.HierarchicalTraceId

@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Compile Include="Helpers.fs" />
-    <Compile Include="Types.Fields.fs" />
     <Compile Include="Types.TechField.fs" />
     <Compile Include="Types.Log.fs" />
     <Compile Include="Dsl.fs" />

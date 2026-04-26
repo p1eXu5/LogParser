@@ -5,6 +5,10 @@ open System.Net
 open Microsoft.Extensions.Logging
 open Microsoft.FSharp.Reflection
 
+type Timespan =
+    | Value of string
+    | Null
+
 type TechJsonField =
     | Timespan of Timespan
 
