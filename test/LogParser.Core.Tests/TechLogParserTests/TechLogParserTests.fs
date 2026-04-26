@@ -1,8 +1,8 @@
-﻿namespace LogParser.Core.Tests.ParserTests
+﻿namespace LogParser.Core.Tests.TechLogParserTests
 
 open NUnit.Framework
 
-module ParserTests =
+module TechLogParserTests =
 
     open FsUnit
     open LogParser.Core.Tests.ShouldExtensions
@@ -25,17 +25,17 @@ module ParserTests =
 
     let ``p_fieldIdentifier cases`` : IEnumerable =
         seq {
-            [| "\"asd\""; Parser.QUOTES; "asd" |]
-            [| "asd"; Parser.NO_QUOTES; "asd" |]
-            [| "cvv\\/cvr"; Parser.NO_QUOTES; "cvv\\/cvr" |]
-            [| "\"cvv\\/cvr\""; Parser.QUOTES; "cvv\\/cvr" |]
-            [| "\"/cvr\""; Parser.QUOTES; "/cvr" |]
+            [| "\"asd\""; TechLogParser.QUOTES; "asd" |]
+            [| "asd"; TechLogParser.NO_QUOTES; "asd" |]
+            [| "cvv\\/cvr"; TechLogParser.NO_QUOTES; "cvv\\/cvr" |]
+            [| "\"cvv\\/cvr\""; TechLogParser.QUOTES; "cvv\\/cvr" |]
+            [| "\"/cvr\""; TechLogParser.QUOTES; "/cvr" |]
         }
 
     [<TestCaseSource(nameof ``p_fieldIdentifier cases``)>]
     let ``p_fieldIdentifier success with `` (input: string, quotes: string, output: string) =
         result {
-            let! res = runResult (Parser.p_fieldIdentifier quotes) input
+            let! res = runResult (TechLogParser.p_fieldIdentifier quotes) input
             res |> should equal output
         }
         |> Result.runTest
@@ -49,7 +49,7 @@ module ParserTests =
     [<TestCase(@""" \""bar\"", \""baz\"" """)>]
     let ``p_fieldStringValue test`` (input: string) =
         result {
-            let! res = runResult (Parser.p_fieldStringValue Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_fieldStringValue TechLogParser.QUOTES) input
             res |> should equal (input.Trim('\"'))
         } |> Result.runTest
 
@@ -59,18 +59,18 @@ module ParserTests =
 
     let ``p_stringField cases`` : IEnumerable =
         seq {
-            [| "\"asd\":\"asd\""; Parser.QUOTES; "asd"; "asd" |]
+            [| "\"asd\":\"asd\""; TechLogParser.QUOTES; "asd"; "asd" |]
             // TODO: FIX-1.0: fix no quoted
             // [| "asd: asd"; NO_QUOTES; "asd"; "asd" |]
             // [| "cvv\\/cvr: cvv\\/cvr"; NO_QUOTES; "cvv\\/cvr"; "cvv\\/cvr" |]
-            [| "\"cvv\\/cvr\": \"cvv\\/cvr\""; Parser.QUOTES; "cvv\\/cvr"; "cvv\\/cvr" |]
-            [| "\"/cvr\":\"/cvr\""; Parser.QUOTES; "/cvr"; "/cvr" |]
+            [| "\"cvv\\/cvr\": \"cvv\\/cvr\""; TechLogParser.QUOTES; "cvv\\/cvr"; "cvv\\/cvr" |]
+            [| "\"/cvr\":\"/cvr\""; TechLogParser.QUOTES; "/cvr"; "/cvr" |]
         }
 
     [<TestCaseSource(nameof ``p_stringField cases``)>]
     let ``p_stringField success with `` (input: string, quotes: string, key: string, value: string) =
         result {
-            let! res = runResult (Parser.p_stringField quotes) input
+            let! res = runResult (TechLogParser.p_stringField quotes) input
             match res with
             | TechJsonLogField.String (k, v) ->
                 k |> should equal key
@@ -87,9 +87,9 @@ module ParserTests =
 
     let ``p_logLevelField cases`` : IEnumerable =
         seq {
-            [| box "\"logLevel\":\"Debug\""; Parser.QUOTES; LogLevel.Debug |]
-            [| box "\"level\":\"info\""; Parser.QUOTES; LogLevel.Information |]
-            [| box "\"@l\":\"VRB\""; Parser.QUOTES; LogLevel.Trace |]
+            [| box "\"logLevel\":\"Debug\""; TechLogParser.QUOTES; LogLevel.Debug |]
+            [| box "\"level\":\"info\""; TechLogParser.QUOTES; LogLevel.Information |]
+            [| box "\"@l\":\"VRB\""; TechLogParser.QUOTES; LogLevel.Trace |]
             // TODO: FIX-1.0: fix no quoted
             //[| box "logLevel:Debug"; NO_QUOTES; LogLevel.Debug |]
             //[| box "level: info "; NO_QUOTES; LogLevel.Info |]
@@ -99,7 +99,7 @@ module ParserTests =
     [<TestCaseSource(nameof ``p_logLevelField cases``)>]
     let ``p_logLevelField success with `` (input: string, quotes: string, logLevel: LogLevel) =
         result {
-            let! res = runResult (Parser.p_logLevelField quotes) input
+            let! res = runResult (TechLogParser.p_logLevelField quotes) input
             match res with
             | TechJsonLogField.Level l ->
                 l |> shouldL equal logLevel "Not expected LogLevel "
@@ -117,10 +117,10 @@ module ParserTests =
     let ``p_primitiveField tests`` (input: string, expected: TechJsonLogField) =
         result {
             let! res =
-                runResult (Parser.p_primitiveField Parser.QUOTES) input
+                runResult (TechLogParser.p_primitiveField TechLogParser.QUOTES) input
                 |> Result.orElseWith (fun err ->
                     TestContext.WriteLine(err)
-                    runResult (Parser.p_primitiveField Parser.NO_QUOTES) input
+                    runResult (TechLogParser.p_primitiveField TechLogParser.NO_QUOTES) input
                 )
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
@@ -132,7 +132,7 @@ module ParserTests =
     [<TestCaseSource(typeof<ArrayPrimitiveFieldCases>, nameof ArrayPrimitiveFieldCases.ArrayFields)>]
     let ``p_arrayPrimitiveField tests`` (input: string, expected: TechJsonLogField) =
         result {
-            let! res = runResult (Parser.p_arrayPrimitiveField Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_arrayPrimitiveField TechLogParser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
@@ -143,7 +143,7 @@ module ParserTests =
     [<TestCaseSource(typeof<SpecialFieldCases>, nameof SpecialFieldCases.SpecialFields)>]
     let ``p_specialField tests`` (input: string, expected: TechJsonLogField) =
         result {
-            let! res = runResult (Parser.p_specialField Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_specialField TechLogParser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
@@ -155,12 +155,12 @@ module ParserTests =
     let ``p_jsonField tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_jsonField' q = runResult (Parser.p_jsonField q) input
+            let p_jsonField' q = runResult (TechLogParser.p_jsonField q) input
 
             // act
             let! res =
-                p_jsonField' Parser.QUOTES
-                |> Result.orElse (p_jsonField' Parser.NO_QUOTES)
+                p_jsonField' TechLogParser.QUOTES
+                |> Result.orElse (p_jsonField' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -172,12 +172,12 @@ module ParserTests =
     let ``p_jsonField fullMessage field tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_jsonField' q = runResult (Parser.p_jsonField q) input
+            let p_jsonField' q = runResult (TechLogParser.p_jsonField q) input
 
             // act
             let! res =
-                p_jsonField' Parser.QUOTES
-                |> Result.orElse (p_jsonField' Parser.NO_QUOTES)
+                p_jsonField' TechLogParser.QUOTES
+                |> Result.orElse (p_jsonField' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -192,12 +192,12 @@ module ParserTests =
     let ``p_arrayJsonAnnonimous tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_arrayJsonAnnonimous' q = runResult (Parser.p_arrayJsonAnnonimous q) input
+            let p_arrayJsonAnnonimous' q = runResult (TechLogParser.p_arrayJsonAnnonimous q) input
 
             // act
             let! res =
-                p_arrayJsonAnnonimous' Parser.QUOTES
-                |> Result.orElse (p_arrayJsonAnnonimous' Parser.ESCAPED_QUOTES)
+                p_arrayJsonAnnonimous' TechLogParser.QUOTES
+                |> Result.orElse (p_arrayJsonAnnonimous' TechLogParser.ESCAPED_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -212,14 +212,14 @@ module ParserTests =
     let ``p_arrayJson tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_arrayJson' q = runResult (Parser.p_arrayJson q) input
+            let p_arrayJson' q = runResult (TechLogParser.p_arrayJson q) input
 
             // act
             let! res =
-                p_arrayJson' Parser.QUOTES
+                p_arrayJson' TechLogParser.QUOTES
                 |> Result.orElseWith (fun err ->
                     TestContext.WriteLine(err |> sprintf "%A")
-                    p_arrayJson' Parser.ESCAPED_QUOTES)
+                    p_arrayJson' TechLogParser.ESCAPED_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -234,12 +234,12 @@ module ParserTests =
     let ``p_arrayJsonAnnotated tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_arrayJsonAnnotated' q = runResult (Parser.p_arrayJsonAnnotated q) input
+            let p_arrayJsonAnnotated' q = runResult (TechLogParser.p_arrayJsonAnnotated q) input
 
             // act
             let! res =
-                p_arrayJsonAnnotated' Parser.QUOTES
-                |> Result.orElse (p_arrayJsonAnnotated' Parser.NO_QUOTES)
+                p_arrayJsonAnnotated' TechLogParser.QUOTES
+                |> Result.orElse (p_arrayJsonAnnotated' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -256,7 +256,7 @@ module ParserTests =
         let input = "\"{"
 
         // act
-        let res = runResult (Parser.p_annotation Parser.NO_QUOTES) input
+        let res = runResult (TechLogParser.p_annotation TechLogParser.NO_QUOTES) input
 
         // assert
         match res with
@@ -270,7 +270,7 @@ module ParserTests =
     [<TestCaseSource(typeof<JsonAnnotatedValueCases>, nameof JsonAnnotatedValueCases.JsonAnnotatedValue)>]
     let ``p_jsonAnnotatedValue tests`` (input: string, expected: JsonAnnotated) =
         result {
-            let! res = runResult (Parser.p_jsonAnnotatedValue Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_jsonAnnotatedValue TechLogParser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
@@ -285,7 +285,7 @@ module ParserTests =
         // arrange
 
         // act
-        let res = runResult (Parser.p_jsonAnnotated Parser.QUOTES) input
+        let res = runResult (TechLogParser.p_jsonAnnotated TechLogParser.QUOTES) input
 
         // assert
         match res with
@@ -297,13 +297,13 @@ module ParserTests =
     let ``p_jsonAnnotated tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_jsonAnnotated' q = runResult (Parser.p_jsonAnnotated q) input
+            let p_jsonAnnotated' q = runResult (TechLogParser.p_jsonAnnotated q) input
 
             // act
             let! res = // p_jsonAnnotated' DOUBLE_QUOTES
-                p_jsonAnnotated' Parser.ESCAPED_QUOTES
-                |> Result.orElse (p_jsonAnnotated' Parser.QUOTES)
-                |> Result.orElse (p_jsonAnnotated' Parser.NO_QUOTES)
+                p_jsonAnnotated' TechLogParser.ESCAPED_QUOTES
+                |> Result.orElse (p_jsonAnnotated' TechLogParser.QUOTES)
+                |> Result.orElse (p_jsonAnnotated' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -317,7 +317,7 @@ module ParserTests =
     [<TestCaseSource(typeof<BodyCases>, nameof BodyCases.BodyFields)>]
     let ``p_body tests`` (input: string, expected: TechJsonLogField) =
         result {
-            let! res = runResult (Parser.p_body Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_body TechLogParser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
@@ -339,7 +339,7 @@ module ParserTests =
                             Field "rabbitmq_node" 5672
                         }
                 } |> TechJsonLogField.JsonAnnotated
-            let! res = runResult (Parser.p_jsonSpecialPrimitiveInBraces Parser.ESCAPED_QUOTES) input
+            let! res = runResult (TechLogParser.p_jsonSpecialPrimitiveInBraces TechLogParser.ESCAPED_QUOTES) input
             res |> should equal expected
         } |> Result.runTest
 
@@ -352,13 +352,13 @@ module ParserTests =
     let ``p_messageJsonList test`` (input: string, expected: TechJsonLogField list) =
         result {
             // arrange
-            let p_messageJsonAnnotatedList' q = runResult (Parser.p_messageJsonList q) input
+            let p_messageJsonAnnotatedList' q = runResult (TechLogParser.p_messageJsonList q) input
 
             // act
             let! res = // p_messageString' NO_QUOTES
-                p_messageJsonAnnotatedList' Parser.ESCAPED_QUOTES
-                |> Result.orElse (p_messageJsonAnnotatedList' Parser.QUOTES)
-                |> Result.orElse (p_messageJsonAnnotatedList' Parser.NO_QUOTES)
+                p_messageJsonAnnotatedList' TechLogParser.ESCAPED_QUOTES
+                |> Result.orElse (p_messageJsonAnnotatedList' TechLogParser.QUOTES)
+                |> Result.orElse (p_messageJsonAnnotatedList' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equivalent expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -374,12 +374,12 @@ module ParserTests =
     let ``p_messageString tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_messageString' q = runResult (Parser.p_messageString q) input
+            let p_messageString' q = runResult (TechLogParser.p_messageString q) input
 
             // act
             let! res = // p_messageString' NO_QUOTES
-                p_messageString' Parser.QUOTES
-                |> Result.orElse (p_messageString' Parser.NO_QUOTES)
+                p_messageString' TechLogParser.QUOTES
+                |> Result.orElse (p_messageString' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -395,12 +395,12 @@ module ParserTests =
     let ``p_message tests`` (input: string, expected: TechJsonLogField) =
         result {
             // arrange
-            let p_message' q = runResult (Parser.p_message q) input
+            let p_message' q = runResult (TechLogParser.p_message q) input
 
             // act
             let! res = // p_messageString' NO_QUOTES
-                p_message' Parser.QUOTES
-                |> Result.orElse (p_message' Parser.NO_QUOTES)
+                p_message' TechLogParser.QUOTES
+                |> Result.orElse (p_message' TechLogParser.NO_QUOTES)
 
             // assert
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
@@ -415,7 +415,7 @@ module ParserTests =
     [<TestCaseSource(typeof<MessageBodiedCases>, nameof MessageBodiedCases.MessageBodied)>]
     let ``p_messageBuddied tests`` (input: string, expected: TechJsonLogField) =
         result {
-            let! res = runResult (Parser.p_messageBuddied Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_messageBuddied TechLogParser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
@@ -427,7 +427,7 @@ module ParserTests =
     [<Category("TechField Message parsing: p_messageBuddiedWithPostfix")>]
     let ``p_messageBuddiedWithPostfix tests`` (input: string, expected: TechJsonLogField) =
         result {
-            let! res = runResult (Parser.p_messageBuddiedWithPostfix Parser.QUOTES) input
+            let! res = runResult (TechLogParser.p_messageBuddiedWithPostfix TechLogParser.QUOTES) input
             res |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" res expected)
         } |> Result.runTest
 
@@ -446,7 +446,7 @@ module ParserTests =
                 """
 
             // Act:
-            let! res = LogParser.Core.Parser.parse testObserver input
+            let! res = LogParser.Core.TechLogParser.parse testObserver input
 
             // Assert:
             res |> should haveLength 3
@@ -465,7 +465,7 @@ module ParserTests =
             let input = "test source { \"message\": \"foo\" }"
 
             // Act:
-            let! res = LogParser.Core.Parser.parse testObserver input
+            let! res = LogParser.Core.TechLogParser.parse testObserver input
 
             // Assert:
             res |> should haveLength 1
@@ -485,7 +485,7 @@ module ParserTests =
             let input = "     { \"message\": \"foo\" }"
 
             // Act:
-            let! res = LogParser.Core.Parser.parse testObserver input
+            let! res = LogParser.Core.TechLogParser.parse testObserver input
 
             // Assert:
             res |> should haveLength 1
@@ -510,7 +510,7 @@ module ParserTests =
                 |> List.head
 
             // Act:
-            let! res = LogParser.Core.Parser.parse testObserver input
+            let! res = LogParser.Core.TechLogParser.parse testObserver input
 
             // Assert:
             res |> should haveLength 1
@@ -535,7 +535,7 @@ module ParserTests =
                 |> List.head
 
             // Act:
-            let! res = LogParser.Core.Parser.parse testObserver input
+            let! res = LogParser.Core.TechLogParser.parse testObserver input
 
             // Assert:
             res |> should haveLength 1
@@ -552,6 +552,6 @@ module ParserTests =
     [<TestCaseSource(typeof<ParseCases>, nameof ParseCases.Parse)>]
     let ``tech log parsing tests`` (input: string, expected: TechLog) =
         result {
-            let! res = LogParser.Core.Parser.parse testObserver input
+            let! res = LogParser.Core.TechLogParser.parse testObserver input
             res |> List.head |> shouldL equal expected (sprintf "Actual: %A\nExpected: %A" (res |> List.head) expected)
         } |> Result.runTest

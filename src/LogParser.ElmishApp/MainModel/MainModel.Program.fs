@@ -116,7 +116,7 @@ let update (settingsManager: ISettingsManager) (observer: IObserver<LogPosition>
                 let v =
                     if isCsv then Csv.parse v
                     else v
-                match Parser.parse observer (v) with
+                match TechLogParser.parse observer (v) with
                 | Ok xlog ->
                     return (toLogModels xlog), processId
                 | Error err ->

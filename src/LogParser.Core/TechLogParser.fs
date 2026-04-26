@@ -1,5 +1,5 @@
 ﻿// [<RequireQualifiedAccess>]
-module LogParser.Core.Parser
+module LogParser.Core.TechLogParser
 
 open System
 open FParsec

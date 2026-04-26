@@ -1,4 +1,4 @@
-﻿namespace LogParser.Core.Tests.ParserTests
+﻿namespace LogParser.Core.Tests.TechLogParserTests
 
 open System.Collections
 open System.Net

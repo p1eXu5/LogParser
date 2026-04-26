@@ -10,7 +10,7 @@
     <Compile Include="Types.TechJsonLogField.fs" />
     <Compile Include="Types.TechLog.fs" />
     <Compile Include="Dsl.fs" />
-    <Compile Include="Parser.fs" />
+    <Compile Include="TechLogParser.fs" />
     <Compile Include="Kibana.fs" />
     <Compile Include="Csv.fs" />
   </ItemGroup>

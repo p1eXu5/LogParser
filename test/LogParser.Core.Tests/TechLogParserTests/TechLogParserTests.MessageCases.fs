@@ -1,4 +1,4 @@
-﻿namespace LogParser.Core.Tests.ParserTests
+﻿namespace LogParser.Core.Tests.TechLogParserTests
 
 open System.Collections
 open System.Net
@@ -9,7 +9,7 @@ open NUnit.Framework
 open LogParser.Core.Types
 open LogParser.Core.Dsl
 
-type MessageStringCases() =
+type MessageCases() =
 
     /// 42. To split on two cases, Message, Message2 (fix Test Explorer Category splitting.)
     static member MessageFactory(n: int) : IEnumerable =
@@ -34,5 +34,4 @@ type MessageStringCases() =
                 "Request:\nMethod: GET\nPathBase: \nPath: /api/v1/internal/groups\nQueryString: ?userId=84062c29-2e0c-42f0-9d0c-5a11c7c6baf0"
         }
 
-    static member MessageString : IEnumerable = MessageStringCases.MessageFactory(1)
     static member Message : IEnumerable = MessageStringCases.MessageFactory(2)
