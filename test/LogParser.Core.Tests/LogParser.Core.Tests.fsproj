@@ -8,31 +8,39 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Factories\MockLoggerFactories.fs" />
-    <Compile Include="Factories\SimpleFieldTestCases.fs" />
-    <Compile Include="Factories\JsonAndBodyFieldTestCases.fs" />
-    <Compile Include="Factories\MessageTestCases.fs" />
-    <Compile Include="Factories\TechLogTestCases.fs" />
-    <Compile Include="ShouldExtensions.fs" />
-    <Compile Include="ParserTests\FieldIdentifierParserTests.fs" />
-    <Compile Include="ParserTests\StringFieldParserTests.fs" />
-    <Compile Include="ParserTests\LogLevelFieldParserTests.fs" />
-    <Compile Include="SimpleFieldParsingTests.fs" />
-    <Compile Include="JsonAndBodyParsingTests.fs" />
-    <Compile Include="MessageParsingTests.fs" />
-    <Compile Include="LogParsingTests.fs" />
-    <Compile Include="ToStringTests.fs" />
+    <Compile Include="Utilities\ShouldExtensions.fs" />
+    <Compile Include="Utilities\MockLoggerFactory.fs" />
+    <Compile Include="Types\TechFieldTests.fs" />
+    <Compile Include="LogParserTests\ParserTests.PrimitiveFieldCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.SpecialFieldCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.ArrayFieldCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.ArrayJsonAnnonimousCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.ArrayJsonCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.ArrayJsonAnnotatedCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.JsonFieldCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.JsonAnnotatedValueCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.JsonAnnotatedCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.BodyCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.MessageJsonListCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.MessageStringCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.MessageCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.MessageBodiedCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.MessageBodiedWithPostfixCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.ParseCases.fs" />
+    <Compile Include="LogParserTests\ParserTests.fs" />
+    <Compile Include="KibanaTests.fs" />
     <Compile Include="CsvTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Faqt" Version="5.1.0" />
     <PackageReference Include="FsUnit" Version="7.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NUnit" Version="4.5.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
-    <PackageReference Include="coverlet.collector" Version="8.0.1">
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -40,10 +48,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\LogParser.Core\LogParser.Core.fsproj" />
+    <ProjectReference Include="..\FSharp.Control.Reactive.Testing\FSharp.Control.Reactive.Testing.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.1.202" />
+    <PackageReference Update="FSharp.Core" Version="10.1.203" />
   </ItemGroup>
 
 </Project>

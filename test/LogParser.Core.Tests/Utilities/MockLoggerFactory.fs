@@ -5,9 +5,8 @@ open Moq
 open Microsoft.Extensions.Logging;
 open NUnit.Framework
 
-
 type MockLoggerFactory () =
-    static member GetMockLogger<'T>(writeLine) =
+    static member GetMockLogger<'T>(writeLinef: (string -> unit)) =
         let (mockLogger: Mock< ILogger<'T>>) = new Mock< ILogger<'T> >();
         
         mockLogger
@@ -36,13 +35,13 @@ type MockLoggerFactory () =
                         $"{logLevel.ToString().ToLowerInvariant()}: {typeof<'T>.FullName}" + Environment.NewLine
                         + $"{invokeMethod.Invoke(formatter, [| state; exception' |]).ToString()}"
 
-                writeLine message
+                writeLinef message
             )
             |> ignore
 
         mockLogger
 
-    static member GetMockLogger(context, writeLine) =
+    static member GetMockLogger(context, writeLinef: (string -> unit)) =
         let (mockLogger: Mock< ILogger>) = Mock< ILogger >();
         
         mockLogger
@@ -71,18 +70,18 @@ type MockLoggerFactory () =
                         $"{logLevel.ToString().ToLowerInvariant()}: %s{context}:" + Environment.NewLine
                         + $"\t%s{invokeMethod.Invoke(formatter, [| state; exception' |]).ToString()}"
 
-                writeLine message
+                writeLinef message
             )
             |> ignore
 
         mockLogger
 
-    static member GetMockLoggerFactory(writeLine) =
+    static member GetMockLoggerFactory(writeLinef: (string -> unit)) =
         let mockFactory = Mock<ILoggerFactory>()
 
         mockFactory
             .Setup(fun f -> f.CreateLogger(It.IsAny<string>()))
-            .Returns<string>(fun category -> MockLoggerFactory.GetMockLogger(category, writeLine).Object)
+            .Returns<string>(fun category -> MockLoggerFactory.GetMockLogger(category, writeLinef).Object)
             |> ignore
 
         mockFactory

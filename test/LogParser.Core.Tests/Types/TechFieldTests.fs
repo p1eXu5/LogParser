@@ -4,14 +4,13 @@ open LogParser.Core.Types
 open NUnit.Framework
 open LogParser.Core.Tests.ShouldExtensions
 
-[<Category("ToStringTests")>]
-module ToStringTests =
+module TechFieldTests =
 
     open FsUnit
     open LogParser.Core.Dsl
 
     [<Test>]
-    let ``json to string test`` () =
+    let ``toString - json to string test`` () =
         let json =
             jsonLog {
                 Field "foo" "foo"
@@ -29,7 +28,7 @@ module ToStringTests =
 
 
     [<Test>]
-    let ``json array to string test`` () =
+    let ``toString - json array to string test`` () =
         let json =
             TechField.ArrayJson (
                 "certificates",
@@ -53,7 +52,7 @@ module ToStringTests =
         s |> should equal expected
 
     [<Test>]
-    let ``multi json array to string test`` () =
+    let ``toString - multi json array to string test`` () =
         let json =
             TechField.ArrayJson (
                 "certificates",
@@ -82,7 +81,7 @@ module ToStringTests =
 
 
     [<Test>]
-    let ``annonimous json array to string test`` () =
+    let ``toString - annonimous json array to string test`` () =
         let json =
             TechField.ArrayJsonAnnonimous [
                 jsonLog {
@@ -109,7 +108,7 @@ module ToStringTests =
 
 
     [<Test>]
-    let ``multi annonimous json array to string test`` () =
+    let ``toString - multi annonimous json array to string test`` () =
         let json =
             TechField.ArrayJsonAnnonimous [
                 jsonLog {
@@ -145,7 +144,7 @@ module ToStringTests =
 
 
     [<Test>]
-    let ``two dim json array to string test`` () =
+    let ``toString - two dim json array to string test`` () =
         let json =
             TechField.ArrayJson (
                 "foo",
@@ -179,7 +178,7 @@ module ToStringTests =
 
 
     [<Test>]
-    let ``multi two dim json array to string test`` () =
+    let ``toString - multi two dim json array to string test`` () =
         let json =
             TechField.ArrayJson (
                 "foo",

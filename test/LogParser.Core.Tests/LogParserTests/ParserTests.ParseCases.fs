@@ -1,4 +1,4 @@
-﻿namespace LogParser.Core.Tests.Factories
+﻿namespace LogParser.Core.Tests.ParserTests
 
 open System.Collections
 open System.Net
@@ -9,9 +9,9 @@ open NUnit.Framework
 open LogParser.Core.Types
 open LogParser.Core.Dsl
 
-type TechLogTestCases () =
+type ParseCases () =
 
-    static member TechLogs : IEnumerable =
+    static member Parse : IEnumerable =
         seq {
 
             TestCaseData(
