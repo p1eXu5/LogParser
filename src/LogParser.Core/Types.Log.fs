@@ -28,8 +28,8 @@ type TechJsonSpecialFieldType =
 
 type TechLog =
         {
-            Source: TechJsonField option
-            Fields: TechJsonField list
+            Source: TechJsonLogField option
+            Fields: TechJsonLogField list
         }
         with
             override this.ToString() =
@@ -62,13 +62,13 @@ module TechLog =
     let tryFindField fieldName techLog =
         techLog.Fields
         |> List.tryFind (fun f ->
-            f |> TechField.key |> fun k -> k.Equals(fieldName, StringComparison.OrdinalIgnoreCase)
+            f |> TechJsonLogField.key |> fun k -> k.Equals(fieldName, StringComparison.OrdinalIgnoreCase)
         )
 
 
 module Log =
 
-    let fromTechJson (techJson: TechJson) =
+    let fromTechJson (techJson: TechJsonLogContent) =
         {
             Source = None
             Fields = techJson
@@ -83,26 +83,26 @@ module Log =
             techLog.Fields
             |> List.tryPick (fun field -> 
                 match fieldType, field with
-                | TechJsonSpecialFieldType.Timespan, TechJsonField.Timespan (Timespan.Value v)
-                | TechJsonSpecialFieldType.Message, TechJsonField.Message v 
-                | TechJsonSpecialFieldType.Method, TechJsonField.Method v
-                | TechJsonSpecialFieldType.Path, TechJsonField.Path v
-                | TechJsonSpecialFieldType.Host, TechJsonField.Host v
-                | TechJsonSpecialFieldType.SourceContext, TechJsonField.SourceContext v
-                | TechJsonSpecialFieldType.RequestId, TechJsonField.RequestId v
-                | TechJsonSpecialFieldType.RequestPath, TechJsonField.RequestPath v
-                | TechJsonSpecialFieldType.SpanId, TechJsonField.SpanId v
-                | TechJsonSpecialFieldType.TraceId, TechJsonField.TraceId v
-                | TechJsonSpecialFieldType.EventId, TechJsonField.EventId v
-                | TechJsonSpecialFieldType.ParentId, TechJsonField.ParentId v
-                | TechJsonSpecialFieldType.ConnectionId, TechJsonField.ConnectionId v
-                | TechJsonSpecialFieldType.HierarchicalTraceId, TechJsonField.HierarchicalTraceId v 
+                | TechJsonSpecialFieldType.Timespan, TechJsonLogField.Timespan (Timespan.Value v)
+                | TechJsonSpecialFieldType.Message, TechJsonLogField.Message v 
+                | TechJsonSpecialFieldType.Method, TechJsonLogField.Method v
+                | TechJsonSpecialFieldType.Path, TechJsonLogField.Path v
+                | TechJsonSpecialFieldType.Host, TechJsonLogField.Host v
+                | TechJsonSpecialFieldType.SourceContext, TechJsonLogField.SourceContext v
+                | TechJsonSpecialFieldType.RequestId, TechJsonLogField.RequestId v
+                | TechJsonSpecialFieldType.RequestPath, TechJsonLogField.RequestPath v
+                | TechJsonSpecialFieldType.SpanId, TechJsonLogField.SpanId v
+                | TechJsonSpecialFieldType.TraceId, TechJsonLogField.TraceId v
+                | TechJsonSpecialFieldType.EventId, TechJsonLogField.EventId v
+                | TechJsonSpecialFieldType.ParentId, TechJsonLogField.ParentId v
+                | TechJsonSpecialFieldType.ConnectionId, TechJsonLogField.ConnectionId v
+                | TechJsonSpecialFieldType.HierarchicalTraceId, TechJsonLogField.HierarchicalTraceId v 
                     -> 
                         Some v
 
-                | TechJsonSpecialFieldType.StatusCode, TechJsonField.StatusCode v -> Some (v.ToString())
-                | TechJsonSpecialFieldType.Level, TechJsonField.Level v -> Some (v.ToString())
-                | TechJsonSpecialFieldType.Port, TechJsonField.Port v -> Some (v.ToString())
+                | TechJsonSpecialFieldType.StatusCode, TechJsonLogField.StatusCode v -> Some (v.ToString())
+                | TechJsonSpecialFieldType.Level, TechJsonLogField.Level v -> Some (v.ToString())
+                | TechJsonSpecialFieldType.Port, TechJsonLogField.Port v -> Some (v.ToString())
                 | _ -> None
             )
 

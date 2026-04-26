@@ -16,7 +16,7 @@ type BodyCases() =
         seq {
             TestCaseData(
                 "\"body\": \"{ \\\"TrId\\\": \\\"16700010001\\\" } \"",
-                TechJsonField.Body (jsonLog { Field "TrId" "16700010001" })
+                TechJsonLogField.Body (jsonLog { Field "TrId" "16700010001" })
             ).SetName("20 - Body. simple")
 
             TestCaseData(
@@ -25,7 +25,7 @@ type BodyCases() =
                             \"rabbitmq_node\": \"5672\"
                         }"
                 """,
-                TechJsonField.Body (jsonLog { Field "rabbitmq_node" "5672" })
+                TechJsonLogField.Body (jsonLog { Field "rabbitmq_node" "5672" })
             ).SetName("20 - Body. simple multi lined")
 
             TestCaseData(
@@ -34,7 +34,7 @@ type BodyCases() =
                             \"rabbitmq_node\": \"5672\"
                         }"
                 """,
-                TechJsonField.Body (jsonLog { Field "rabbitmq_node" "5672" })
+                TechJsonLogField.Body (jsonLog { Field "rabbitmq_node" "5672" })
             ).SetName("20 - Body. simple multi lined 2")
 
             TestCaseData(
@@ -48,7 +48,7 @@ type BodyCases() =
                            }
                        }"
                 """,
-                TechJsonField.Body (
+                TechJsonLogField.Body (
                     jsonLog { 
                         Field "enrollment"
                             (
@@ -71,7 +71,7 @@ type BodyCases() =
             TestCaseData(
                 """"body": "{ \"rabbitmq_node\": { } }"
                 """,
-                TechJsonField.Body [ JsonLog.emptyJson "rabbitmq_node" ]
+                TechJsonLogField.Body [ JsonLog.emptyJson "rabbitmq_node" ]
             ).SetName("20 - Body. empty object json field")
 
 
@@ -82,7 +82,7 @@ type BodyCases() =
                         ]
                     }"
                 """,
-                TechJsonField.Body (
+                TechJsonLogField.Body (
                     jsonLog {
                         Field "certificates" [
                             (jsonLog { Field "usage" "CA" })

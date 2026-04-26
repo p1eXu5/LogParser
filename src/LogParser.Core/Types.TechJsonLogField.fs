@@ -9,14 +9,14 @@ type Timespan =
     | Value of string
     | Null
 
-type TechJsonField =
+type TechJsonLogField =
     | Timespan of Timespan
 
     // TODO: wrap in separate DU
     | Message of string
-    | MessageBoddied of header: string * body: TechJson
-    | MessageBoddiedWithPostfix of header: string * body: TechJson * postfix: string
-    | MessageArrayJson of value: TechJson list
+    | MessageBoddied of header: string * body: TechJsonLogContent
+    | MessageBoddiedWithPostfix of header: string * body: TechJsonLogContent * postfix: string
+    | MessageArrayJson of value: TechJsonLogContent list
 
     | Level of LogLevel
     | Method of string
@@ -24,7 +24,7 @@ type TechJsonField =
     | Path of string
     | Host of string
     | Port of int
-    | Body of TechJson
+    | Body of TechJsonLogContent
     | SourceContext of string
     | RequestId of string
     | RequestPath of string
@@ -41,11 +41,11 @@ type TechJsonField =
     | Bool of key: string * value: bool
     | Array of key: string * value: string list
     | ArrayInt of key: string * value: int list
-    | ArrayJson of key: string * value: TechJson list
-    | ArrayJsonAnnonimous of value: TechJson list
+    | ArrayJson of key: string * value: TechJsonLogContent list
+    | ArrayJsonAnnonimous of value: TechJsonLogContent list
     | Null of key: string
     | NullAnnonimous
-    | Json of key: string * value: TechJson
+    | Json of key: string * value: TechJsonLogContent
     | JsonAnnotated of JsonAnnotated
     | ArrayJsonAnnotated of key: string * JsonAnnotated list
     with
@@ -55,8 +55,8 @@ type TechJsonField =
             | Timespan (Timespan.Null) -> $"\"timespan\": null"
 
             | Message v -> $"\"message\": \"{v}\""
-            | MessageBoddied (k, v) -> $"\"message\": \"{k},\n {v |> TechField.toString 1}\""
-            | MessageBoddiedWithPostfix (k, v, p) -> $"\"message\": \"{k},\n {v |> TechField.toString 1}{p}\""
+            | MessageBoddied (k, v) -> $"\"message\": \"{k},\n {v |> TechJsonLogField.toString 1}\""
+            | MessageBoddiedWithPostfix (k, v, p) -> $"\"message\": \"{k},\n {v |> TechJsonLogField.toString 1}{p}\""
 
             | Level v -> $"\"level\": \"{v}\""
             | Method v -> $"\"method\": \"{v}\""
@@ -64,7 +64,7 @@ type TechJsonField =
             | Path v -> $"\"path\": \"{v}\""
             | Host v -> $"\"host\": \"{v}\""
             | Port v -> $"\"port\": {v}"
-            | Body v -> $"\"body\": \"{v |> TechField.toString 1}\""
+            | Body v -> $"\"body\": \"{v |> TechJsonLogField.toString 1}\""
             | SourceContext v -> $"\"sourceContext\": \"{v}\"" 
             | RequestId v -> $"\"requestId\": \"{v}\""
             | RequestPath v -> $"\"requestPath\": \"{v}\""
@@ -90,7 +90,7 @@ type TechJsonField =
                 let values = 
                     let xs =
                         v
-                        |> List.map (TechField.toString 1)
+                        |> List.map (TechJsonLogField.toString 1)
                     String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
                 $"\"{k}\": [\n    {values}\n]"
 
@@ -98,7 +98,7 @@ type TechJsonField =
                 let values = 
                     let xs =
                         v
-                        |> List.map (TechField.toString 1)
+                        |> List.map (TechJsonLogField.toString 1)
                     String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
                 $"\"message\": [\n    {values}\n]"
 
@@ -106,7 +106,7 @@ type TechJsonField =
                 let values = 
                     let xs =
                         v
-                        |> List.map (TechField.toString 1)
+                        |> List.map (TechJsonLogField.toString 1)
                     String.Join(",\n    ",xs |> List.map (fun s -> $"{{ {s} }}"))
 
                 $"[\n    {values}\n]"
@@ -115,17 +115,17 @@ type TechJsonField =
                 let values =
                     fields
                     |> List.map (fun f ->
-                        $"{f.Annotation} {f.Body |> TechField.toString 1}"
+                        $"{f.Annotation} {f.Body |> TechJsonLogField.toString 1}"
                     )
                 
                 $"\"{key}\": [\n {values}\n]"
 
             | Null k -> $"\"{k}\": null"
             | NullAnnonimous -> "null"
-            | Json (k, v) -> $"\"{k}\": {v |> TechField.toString 1}"
+            | Json (k, v) -> $"\"{k}\": {v |> TechJsonLogField.toString 1}"
             | JsonAnnotated (tj) -> $"%O{tj}"
 and
-    TechJson = TechJsonField list
+    TechJsonLogContent = TechJsonLogField list
 and
     /// Used within message field as `parameter:`
     ///
@@ -134,21 +134,21 @@ and
         {
             Key: string
             Annotation: string
-            Body: TechJsonField list
+            Body: TechJsonLogField list
         }
         with
             override this.ToString() =
-                let fields = this.Body |> TechField.toString 1
+                let fields = this.Body |> TechJsonLogField.toString 1
                 $"\"{this.Key}\": {this.Annotation} {fields}"
 
 
 // ----------------------------- modules
 
-module TechField =
+module TechJsonLogField =
 
     open System.Text
 
-    let toString (initTabLevel: int) (fields: TechJsonField list) =
+    let toString (initTabLevel: int) (fields: TechJsonLogField list) =
         let fold folder fields state =
             fields
             |> List.fold folder state
@@ -309,7 +309,7 @@ module TechField =
             let values = 
                 let xs =
                     v
-                    |> List.map (TechField.toString 2)
+                    |> List.map (TechJsonLogField.toString 2)
                 String.Join(",\n    ",xs |> List.map (fun s -> $"{s}"))
 
             $"[\n{values}\n]"
@@ -318,7 +318,7 @@ module TechField =
             let values = 
                 let xs =
                     v
-                    |> List.map (fun taj -> sprintf "%s %s" taj.Annotation (TechField.toString 2 taj.Body))
+                    |> List.map (fun taj -> sprintf "%s %s" taj.Annotation (TechJsonLogField.toString 2 taj.Body))
                 String.Join(",\n    ",xs |> List.map (fun s -> $"{s}"))
 
             $"[\n{values}\n]"
@@ -333,7 +333,7 @@ module TechField =
             let values = 
                 let xs =
                     fls
-                    |> List.map (TechField.toString 2)
+                    |> List.map (TechJsonLogField.toString 2)
                 String.Join(",\n    ",xs |> List.map (fun s -> $"{s}"))
 
             $"[\n{values}\n]"
@@ -435,4 +435,4 @@ module TechField =
         | NullAnnonimous -> Int32.MaxValue.ToString()
 
     let arrayTypeJson key jsonList =
-        (key, jsonList) |> TechJsonField.ArrayJsonAnnotated
+        (key, jsonList) |> TechJsonLogField.ArrayJsonAnnotated

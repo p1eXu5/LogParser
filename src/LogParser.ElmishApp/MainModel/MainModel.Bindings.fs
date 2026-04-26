@@ -12,7 +12,7 @@ let logBindings () =
     [
         "Log" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
             match l.LogModel with
-            | LogModel.TechLogModel tl -> tl.Fields |> List.map (fun f -> f.TechField) |> LogParser.Core.Types.TechField.toString 1 |> Some
+            | LogModel.TechLogModel tl -> tl.Fields |> List.map (fun f -> f.TechField) |> LogParser.Core.Types.TechJsonLogField.toString 1 |> Some
             | LogModel.TextLogModel t -> t.Log |> Some
         )
 

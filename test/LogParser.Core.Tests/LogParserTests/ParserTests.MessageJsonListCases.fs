@@ -16,7 +16,7 @@ type MessageJsonListCases() =
         seq {
             TestCaseData(
                 "[ ( \\\"request\\\": DTO { rabbitmq_node:5672 } ) ] ",
-                TechJsonField.JsonAnnotated {
+                TechJsonLogField.JsonAnnotated {
                     Key = "request"
                     Annotation = "DTO"
                     Body =
@@ -31,7 +31,7 @@ type MessageJsonListCases() =
                 "[ ( \"request\": DTO { 
                     rabbitmq_node:5672
                 } ) ] ",
-                TechJsonField.JsonAnnotated {
+                TechJsonLogField.JsonAnnotated {
                     Key = "request"
                     Annotation = "DTO"
                     Body =
@@ -49,7 +49,7 @@ type MessageJsonListCases() =
                         DeviceCountry: \"BR\"
                     }
                 } ) ] ",
-                TechJsonField.JsonAnnotated {
+                TechJsonLogField.JsonAnnotated {
                     Key = "request"
                     Annotation = "DTO"
                     Body =

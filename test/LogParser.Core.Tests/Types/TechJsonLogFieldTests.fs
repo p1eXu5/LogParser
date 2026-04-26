@@ -4,7 +4,7 @@ open LogParser.Core.Types
 open NUnit.Framework
 open LogParser.Core.Tests.ShouldExtensions
 
-module TechFieldTests =
+module TechJsonLogFieldTests =
 
     open FsUnit
     open LogParser.Core.Dsl
@@ -23,14 +23,14 @@ module TechFieldTests =
             "    \"bar\": \"bar\"\n" +
             "}"
 
-        TechField.toString 1 json
+        TechJsonLogField.toString 1 json
         |> should equal expected
 
 
     [<Test>]
     let ``toString - json array to string test`` () =
         let json =
-            TechJsonField.ArrayJson (
+            TechJsonLogField.ArrayJson (
                 "certificates",
                 [
                     jsonLog { Field "usage" "CA" }
@@ -46,7 +46,7 @@ module TechFieldTests =
             "    ]\n" +
             "}"
 
-        let s = TechField.toString 1 [json]
+        let s = TechJsonLogField.toString 1 [json]
         TestContext.WriteLine(s)
 
         s |> should equal expected
@@ -54,7 +54,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - multi json array to string test`` () =
         let json =
-            TechJsonField.ArrayJson (
+            TechJsonLogField.ArrayJson (
                 "certificates",
                 [
                     jsonLog { Field "usage" "CA" }
@@ -74,7 +74,7 @@ module TechFieldTests =
             "    ]\n" +
             "}"
 
-        let s = TechField.toString 1 [json]
+        let s = TechJsonLogField.toString 1 [json]
         TestContext.WriteLine(s)
 
         s |> should equal expected
@@ -83,7 +83,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - annonimous json array to string test`` () =
         let json =
-            TechJsonField.ArrayJsonAnnonimous [
+            TechJsonLogField.ArrayJsonAnnonimous [
                 jsonLog {
                     Field "rabbitmq_node" 
                         (jsonLog { Field "bar" "5672" })
@@ -101,7 +101,7 @@ module TechFieldTests =
             "    ]\n" +
             "}"
 
-        let s = TechField.toString 1 [json]
+        let s = TechJsonLogField.toString 1 [json]
         TestContext.WriteLine(s)
 
         s |> should equal expected
@@ -110,7 +110,7 @@ module TechFieldTests =
     [<Test>]
     let ``toString - multi annonimous json array to string test`` () =
         let json =
-            TechJsonField.ArrayJsonAnnonimous [
+            TechJsonLogField.ArrayJsonAnnonimous [
                 jsonLog {
                     Field "rabbitmq_node" 
                         (jsonLog { Field "bar" "5672" })
@@ -137,7 +137,7 @@ module TechFieldTests =
             "    ]\n" +
             "}"
 
-        let s = TechField.toString 1 [json]
+        let s = TechJsonLogField.toString 1 [json]
         TestContext.WriteLine(s)
 
         s |> should equal expected
@@ -146,10 +146,10 @@ module TechFieldTests =
     [<Test>]
     let ``toString - two dim json array to string test`` () =
         let json =
-            TechJsonField.ArrayJson (
+            TechJsonLogField.ArrayJson (
                 "foo",
                 [
-                    [TechJsonField.ArrayJsonAnnonimous [
+                    [TechJsonLogField.ArrayJsonAnnonimous [
                         jsonLog {
                             Field "rabbitmq_node" 
                                 (jsonLog { Field "bar" "5672" })
@@ -171,7 +171,7 @@ module TechFieldTests =
             "    ]\n" +
             "}"
 
-        let s = TechField.toString 1 [json]
+        let s = TechJsonLogField.toString 1 [json]
         TestContext.WriteLine(s)
 
         s |> should equal expected
@@ -180,10 +180,10 @@ module TechFieldTests =
     [<Test>]
     let ``toString - multi two dim json array to string test`` () =
         let json =
-            TechJsonField.ArrayJson (
+            TechJsonLogField.ArrayJson (
                 "foo",
                 [
-                    [TechJsonField.ArrayJsonAnnonimous [
+                    [TechJsonLogField.ArrayJsonAnnonimous [
                         jsonLog {
                             Field "rabbitmq_node" 
                                 (jsonLog { Field "bar" "5672" })
@@ -214,7 +214,7 @@ module TechFieldTests =
             "    ]\n" +
             "}"
 
-        let s = TechField.toString 1 [json]
+        let s = TechJsonLogField.toString 1 [json]
         TestContext.WriteLine(s)
 
         s |> should equal expected

@@ -10,7 +10,7 @@
   <ItemGroup>
     <Compile Include="Utilities\ShouldExtensions.fs" />
     <Compile Include="Utilities\MockLoggerFactory.fs" />
-    <Compile Include="Types\TechFieldTests.fs" />
+    <Compile Include="Types\TechJsonLogFieldTests.fs" />
     <Compile Include="LogParserTests\ParserTests.PrimitiveFieldCases.fs" />
     <Compile Include="LogParserTests\ParserTests.SpecialFieldCases.fs" />
     <Compile Include="LogParserTests\ParserTests.ArrayFieldCases.fs" />

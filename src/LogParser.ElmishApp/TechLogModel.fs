@@ -49,10 +49,10 @@ module TechLogModel=
     let init (log: TechLog) =
         let (mainFields, otherFields) =
             log.Fields
-            |> List.sortBy TechField.orderOrKey
+            |> List.sortBy TechJsonLogField.orderOrKey
             |> List.map (fun technoField ->
                 match technoField with
-                | TechJsonField.Json (name, fields) when name.Equals("logContext", StringComparison.InvariantCultureIgnoreCase) ->
+                | TechJsonLogField.Json (name, fields) when name.Equals("logContext", StringComparison.InvariantCultureIgnoreCase) ->
                     fields
                     |> List.map TechFieldModel.init
                 | _ ->
@@ -62,14 +62,14 @@ module TechLogModel=
             |> List.distinct
             |> List.partition (fun f -> 
                 match f.TechField with
-                | TechJsonField.Timespan _
-                | TechJsonField.Level _
-                | TechJsonField.HierarchicalTraceId _ // TODO: remove after make log model hierarchy
-                | TechJsonField.TraceId _ // TODO: remove after make log model hierarchy
-                | TechJsonField.Message _
-                | TechJsonField.MessageBoddied _
-                | TechJsonField.MessageArrayJson _
-                | TechJsonField.MessageBoddiedWithPostfix _ -> true
+                | TechJsonLogField.Timespan _
+                | TechJsonLogField.Level _
+                | TechJsonLogField.HierarchicalTraceId _ // TODO: remove after make log model hierarchy
+                | TechJsonLogField.TraceId _ // TODO: remove after make log model hierarchy
+                | TechJsonLogField.Message _
+                | TechJsonLogField.MessageBoddied _
+                | TechJsonLogField.MessageArrayJson _
+                | TechJsonLogField.MessageBoddiedWithPostfix _ -> true
                 | _ -> false
             )
 
@@ -78,7 +78,7 @@ module TechLogModel=
             mainFields
             |> List.tryFind (fun f ->
                 f.TechField
-                |> TechField.orderOrKey
+                |> TechJsonLogField.orderOrKey
                 |> fun fieldKey -> fieldKey.Equals(key, StringComparison.OrdinalIgnoreCase)
             )
             |> Option.bind (fun f -> f.Text)
@@ -88,7 +88,7 @@ module TechLogModel=
             otherFields
             |> List.tryFind (fun f ->
                 f.TechField
-                |> TechField.orderOrKey
+                |> TechJsonLogField.orderOrKey
                 |> fun fieldKey -> fieldKey.Equals(key, StringComparison.OrdinalIgnoreCase)
             )
             |> Option.bind (fun f -> f.Text)

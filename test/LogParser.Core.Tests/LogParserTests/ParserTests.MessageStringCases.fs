@@ -15,7 +15,7 @@ type MessageStringCases() =
     static member MessageFactory(n: int) : IEnumerable =
         let testCaseName = sprintf "%i - %s" n
         let testCase msg expected =
-            TestCaseData(msg, TechJsonField.Message expected).SetName(msg |> testCaseName)
+            TestCaseData(msg, TechJsonLogField.Message expected).SetName(msg |> testCaseName)
         seq {
             testCase
                 "\"message\": \"Returning next host: rabbitmq_node:5672\""

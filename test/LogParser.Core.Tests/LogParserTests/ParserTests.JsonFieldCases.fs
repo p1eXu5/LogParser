@@ -18,24 +18,24 @@ type JsonFieldCases() =
                 "\"foo\": \"{
                         \\\"rabbitmq_node\\\":5672
                     }\"",
-                TechJsonField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 }))
+                TechJsonLogField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 }))
             ).SetName("p_jsonField - Json. with simple int field")
 
             TestCaseData(
                 "\"foo\": \"{
                         \\\"rabbitmq_node\\\":\\\"5672\\\"
                     }\"",
-                TechJsonField.Json ("foo", (jsonLog { Field "rabbitmq_node" "5672" }))
+                TechJsonLogField.Json ("foo", (jsonLog { Field "rabbitmq_node" "5672" }))
             ).SetName("p_jsonField - Json. with simple string field")
 
             TestCaseData(
                 "\"requestBody\": \"{ \\\"bankId\\\": \\\"1234\\\"}\"",
-                TechJsonField.Json ("requestBody", (jsonLog { Field "bankId" "1234" }))
+                TechJsonLogField.Json ("requestBody", (jsonLog { Field "bankId" "1234" }))
             ).SetName("p_jsonField - Json. with escaped double quotes body")
 
             TestCaseData(
                 "\"errorDetails\":\"{\\n  \\\"errorCode\\\": \\\"0005\\\",\\n  \\\"message\\\": \\\"Request rejected\\\"\\n}\"",
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "errorDetails",
                         (jsonLog {
                             Field "errorCode" "0005"
@@ -49,7 +49,7 @@ type JsonFieldCases() =
                         "rabbitmq_node":5672
                     }
                 """,
-                TechJsonField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 }))
+                TechJsonLogField.Json ("foo", (jsonLog { Field "rabbitmq_node" 5672 }))
             ).SetName("p_jsonField - Json. with not escaped quotes")
 
             TestCaseData(
@@ -59,7 +59,7 @@ type JsonFieldCases() =
                         }
                     }
                 """,
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "foo",
                         (jsonLog {
                             Field
@@ -80,7 +80,7 @@ type JsonFieldCases() =
                         }
                     }
                 """,
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "foo",
                         (jsonLog {
                             Field "rabbitmq_node"
@@ -101,7 +101,7 @@ type JsonFieldCases() =
                         }
                     }"
                 """,
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "foo",
                         (jsonLog {
                             Field
@@ -119,7 +119,7 @@ type JsonFieldCases() =
         seq {
             TestCaseData(
                 "\"fullMessage\":\"\"\"{\"traceId\":\"791b789add8cbd88c9bf1ea07d43d3f6\",\"0\":\"srv-mysqldb.metal.com\"}\"\"\"",
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "fullMessage",
                         (jsonLog {
                             traceId "791b789add8cbd88c9bf1ea07d43d3f6"
@@ -133,7 +133,7 @@ type JsonFieldCases() =
                     \"traceId\":\"791b789add8cbd88c9bf1ea07d43d3f6\",
                     \"0\":\"srv-mysqldb.metal.com\"
                 }\"\"\"",
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "fullMessage",
                         (jsonLog {
                             traceId "791b789add8cbd88c9bf1ea07d43d3f6"
@@ -144,7 +144,7 @@ type JsonFieldCases() =
 
             TestCaseData(
                 "\"fullMessage\": \"\"\"{\"timestamp\": \"2022-07-15T04:02:47.002Z\"}\"\"\"",
-                TechJsonField.Json (
+                TechJsonLogField.Json (
                         "fullMessage",
                         (jsonLog {
                             timestamp "2022-07-15T04:02:47.002Z"

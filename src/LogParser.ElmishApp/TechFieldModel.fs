@@ -6,7 +6,7 @@ open LogParser.Core.Types
 
 type TechFieldModel =
     {
-        TechField: TechJsonField
+        TechField: TechJsonLogField
         Key: string
         Header: string option
         Text: string option
@@ -31,69 +31,69 @@ module TechFieldModel =
         | InsertLineBreaks
         | PinFieldValueInHeader of key: string
 
-    let init (techField: TechJsonField) =
+    let init (techField: TechJsonLogField) =
 
         match techField with
-        | TechJsonField.Json (_, fields) ->
+        | TechJsonLogField.Json (_, fields) ->
             { 
                 TechField = techField 
                 Tag = Tag.JsonField; 
-                Key = techField |> TechField.key; 
+                Key = techField |> TechJsonLogField.key; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechField.toString 1 |> Some; 
+                Json = fields |> TechJsonLogField.toString 1 |> Some; 
                 Text = None
                 Postfix = None
             }
-        | TechJsonField.JsonAnnotated jta ->
+        | TechJsonLogField.JsonAnnotated jta ->
             { 
                 TechField = techField 
                 Tag = Tag.AnnotatedJsonField; 
-                Key = techField |> TechField.key; 
+                Key = techField |> TechJsonLogField.key; 
                 Header = "json object" |> Some; 
-                Json = jta.Body |> TechField.toString 1 |> Some; 
+                Json = jta.Body |> TechJsonLogField.toString 1 |> Some; 
                 Text = jta.Annotation |> Some
                 Postfix = None
             }
 
-        | TechJsonField.Body fields ->
+        | TechJsonLogField.Body fields ->
             { 
                 TechField = techField 
                 Tag = Tag.JsonField; 
-                Key = techField |> TechField.key; 
+                Key = techField |> TechJsonLogField.key; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechField.toString 1 |> Some; 
+                Json = fields |> TechJsonLogField.toString 1 |> Some; 
                 Text = None
                 Postfix = None
             }
-        | TechJsonField.MessageBoddied (text, fields) ->
+        | TechJsonLogField.MessageBoddied (text, fields) ->
             { 
                 TechField = techField 
                 Tag = Tag.AnnotatedJsonField; 
-                Key = techField |> TechField.key; 
+                Key = techField |> TechJsonLogField.key; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechField.toString 1 |> Some; 
+                Json = fields |> TechJsonLogField.toString 1 |> Some; 
                 Text = text |> Some
                 Postfix = None
             }
 
-        | TechJsonField.MessageBoddiedWithPostfix (text, fields, postfix) ->
+        | TechJsonLogField.MessageBoddiedWithPostfix (text, fields, postfix) ->
             { 
                 TechField = techField 
                 Tag = Tag.WithPostfixAnnotatedJsonField;
-                Key = techField |> TechField.key; 
+                Key = techField |> TechJsonLogField.key; 
                 Header = "json object" |> Some; 
-                Json = fields |> TechField.toString 1 |> Some; 
+                Json = fields |> TechJsonLogField.toString 1 |> Some; 
                 Text = text |> Some
                 Postfix = postfix |> Some
             }
 
-        | TechJsonField.MessageArrayJson _ ->
+        | TechJsonLogField.MessageArrayJson _ ->
             { 
                 TechField = techField 
                 Tag = Tag.JsonField;
-                Key = techField |> TechField.key; 
+                Key = techField |> TechJsonLogField.key; 
                 Header = "json object" |> Some; 
-                Json = techField |> TechField.value |> Some; 
+                Json = techField |> TechJsonLogField.value |> Some; 
                 Text = None
                 Postfix = None
             }
@@ -103,8 +103,8 @@ module TechFieldModel =
                 TechField = techField 
                 Header = None; 
                 Tag = Tag.SimpleField; 
-                Key = techField |> TechField.key; 
-                Text = techField |> TechField.value |> Some;
+                Key = techField |> TechJsonLogField.key; 
+                Text = techField |> TechJsonLogField.value |> Some;
                 Json = None
                 Postfix = None
             }

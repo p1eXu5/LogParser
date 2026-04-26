@@ -234,7 +234,7 @@ let update (settingsManager: ISettingsManager) (observer: IObserver<LogPosition>
             |> List.choose (function LogModel.TechLogModel tl -> tl |> Some | _ -> None)
             |> List.find (fun l -> l.Id = id)
 
-        Clipboard.SetText(log.Log.Fields |> TechField.toString 1)
+        Clipboard.SetText(log.Log.Fields |> TechJsonLogField.toString 1)
         model, Cmd.none
 
     | KibanaSearchModelMsg kaMsg ->

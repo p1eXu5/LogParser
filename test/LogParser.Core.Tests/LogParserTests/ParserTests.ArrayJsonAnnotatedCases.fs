@@ -16,6 +16,6 @@ type ArrayJsonAnnotatedCases() =
         seq {
             TestCaseData(
                 "request: [DTO {rabbitmq_node:5672}]",
-                TechJsonField.ArrayJsonAnnotated ("request", [ { Key = ""; Annotation = "DTO"; Body = (jsonLog { Field "rabbitmq_node" 5672 }) } ])
+                TechJsonLogField.ArrayJsonAnnotated ("request", [ { Key = ""; Annotation = "DTO"; Body = (jsonLog { Field "rabbitmq_node" 5672 }) } ])
             ).SetName("14 - ArrayJsonAnnotated. simple int value")
         }

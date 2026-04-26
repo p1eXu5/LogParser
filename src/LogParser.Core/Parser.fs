@@ -123,13 +123,13 @@ let private criticalLevels = [ "Critical"; "Fatal"; "FTL"; "CRT"; "crit" ]
 
 let internal p_logLevelField q =
     p_predefinedStringField q ["logLevel"; "level"; "@l"] (fun s ->
-        if traceLevels |> List.exists (equalOrdinalCI s) then LogLevel.Trace |> TechJsonField.Level
-        elif debugLevels |> List.exists (equalOrdinalCI s) then LogLevel.Debug |> TechJsonField.Level
-        elif informationLevels |> List.exists (equalOrdinalCI s) then LogLevel.Information |> TechJsonField.Level
-        elif warningLevels |> List.exists (equalOrdinalCI s) then LogLevel.Warning |> TechJsonField.Level
-        elif errorLevels |> List.exists (equalOrdinalCI s) then LogLevel.Error |> TechJsonField.Level
-        elif criticalLevels |> List.exists (equalOrdinalCI s) then LogLevel.Critical |> TechJsonField.Level
-        else LogLevel.None |> TechJsonField.Level
+        if traceLevels |> List.exists (equalOrdinalCI s) then LogLevel.Trace |> TechJsonLogField.Level
+        elif debugLevels |> List.exists (equalOrdinalCI s) then LogLevel.Debug |> TechJsonLogField.Level
+        elif informationLevels |> List.exists (equalOrdinalCI s) then LogLevel.Information |> TechJsonLogField.Level
+        elif warningLevels |> List.exists (equalOrdinalCI s) then LogLevel.Warning |> TechJsonLogField.Level
+        elif errorLevels |> List.exists (equalOrdinalCI s) then LogLevel.Error |> TechJsonLogField.Level
+        elif criticalLevels |> List.exists (equalOrdinalCI s) then LogLevel.Critical |> TechJsonLogField.Level
+        else LogLevel.None |> TechJsonLogField.Level
     )
 
 
@@ -141,31 +141,31 @@ let internal p_statusCodeField q =
     ]
     |>> (fun s ->
         match Enum.TryParse(typeof<HttpStatusCode>, s, true) with
-        | true, l -> unbox l |> TechJsonField.StatusCode
-        | false, _ -> (LanguagePrimitives.EnumOfValue 0) |> TechJsonField.StatusCode
+        | true, l -> unbox l |> TechJsonLogField.StatusCode
+        | false, _ -> (LanguagePrimitives.EnumOfValue 0) |> TechJsonLogField.StatusCode
     )
 
 let internal p_port q =
-    p_predefinedIntField q ["port"] TechJsonField.Port
+    p_predefinedIntField q ["port"] TechJsonLogField.Port
 
 let internal p_timestamp q =
     choice [
-        p_predefinedStringField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (Timespan.Value >> TechJsonField.Timespan)
-        p_predefinedNullField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (TechJsonField.Timespan Timespan.Null)
+        p_predefinedStringField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (Timespan.Value >> TechJsonLogField.Timespan)
+        p_predefinedNullField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (TechJsonLogField.Timespan Timespan.Null)
     ]
 
-let internal p_host q = p_predefinedStringField q ["host"] TechJsonField.Host
-let internal p_sourceContext q = p_predefinedStringField q ["sourceContext"] TechJsonField.SourceContext
-let internal p_path q = p_predefinedStringField q ["path"] TechJsonField.Path
-let internal p_method q = p_predefinedStringField q ["method"] TechJsonField.Method
-let internal p_hierarchicalTraceId q = p_predefinedStringField q ["hierarchicalTraceId"] TechJsonField.HierarchicalTraceId
-let internal p_connectionId q = p_predefinedStringField q ["connectionId"] TechJsonField.ConnectionId
-let internal p_parentId q = p_predefinedStringField q ["parentId"] TechJsonField.ParentId
-let internal p_traceId q = p_predefinedStringField q ["traceId"] TechJsonField.TraceId
-let internal p_spanId q = p_predefinedStringField q ["spanId"] TechJsonField.SpanId
-let internal p_requestPath q = p_predefinedStringField q ["requestPath"] TechJsonField.RequestPath
-let internal p_requestId q = p_predefinedStringField q ["requestId"] TechJsonField.RequestId
-let internal p_eventId q = p_predefinedStringField q ["eventId"] TechJsonField.EventId
+let internal p_host q = p_predefinedStringField q ["host"] TechJsonLogField.Host
+let internal p_sourceContext q = p_predefinedStringField q ["sourceContext"] TechJsonLogField.SourceContext
+let internal p_path q = p_predefinedStringField q ["path"] TechJsonLogField.Path
+let internal p_method q = p_predefinedStringField q ["method"] TechJsonLogField.Method
+let internal p_hierarchicalTraceId q = p_predefinedStringField q ["hierarchicalTraceId"] TechJsonLogField.HierarchicalTraceId
+let internal p_connectionId q = p_predefinedStringField q ["connectionId"] TechJsonLogField.ConnectionId
+let internal p_parentId q = p_predefinedStringField q ["parentId"] TechJsonLogField.ParentId
+let internal p_traceId q = p_predefinedStringField q ["traceId"] TechJsonLogField.TraceId
+let internal p_spanId q = p_predefinedStringField q ["spanId"] TechJsonLogField.SpanId
+let internal p_requestPath q = p_predefinedStringField q ["requestPath"] TechJsonLogField.RequestPath
+let internal p_requestId q = p_predefinedStringField q ["requestId"] TechJsonLogField.RequestId
+let internal p_eventId q = p_predefinedStringField q ["eventId"] TechJsonLogField.EventId
 
 
 let p_specialField q =
@@ -196,21 +196,21 @@ let internal p_nullField q =
     p_fieldIdentifier q
     .>> p_fieldDelimiterSpaceWrapped
     .>>? skipStringCI "null"
-    |>> TechJsonField.Null
+    |>> TechJsonLogField.Null
 
 
 let internal p_stringField q =
     p_fieldIdentifier q
     .>> p_fieldDelimiterSpaceWrapped
     .>>.? p_fieldStringValueChoice q
-    |>> TechJsonField.String
+    |>> TechJsonLogField.String
 
 
 let internal p_quotelessStringField q =
     p_fieldIdentifier q
     .>> p_fieldDelimiterSpaceWrapped
     .>>.? manyCharsTill anyChar (nextCharSatisfies ((=) ',') <|> nextCharSatisfies ((=) '}') <|> nextCharSatisfies ((=) ')') <|> (followedBy newline) <|> (followedBy eof) )
-    |>> (fun t -> TechJsonField.String (fst t, (snd t).Trim()))
+    |>> (fun t -> TechJsonLogField.String (fst t, (snd t).Trim()))
 
 
 let internal p_intField q =
@@ -221,14 +221,14 @@ let internal p_intField q =
     ]
     .>> ws
     .>>? followedBy (skipChar ',' <|> skipChar '}' <|> eof <|> skipNewline)
-    |>> TechJsonField.Int
+    |>> TechJsonLogField.Int
 
 
 let internal p_boolField q value =
     p_fieldIdentifier q
     .>> p_fieldDelimiterSpaceWrapped
     .>>? skipStringCI $"{value}"
-    |>> (fun n -> TechJsonField.Bool (n, value))
+    |>> (fun n -> TechJsonLogField.Bool (n, value))
 
 /// Wrapped q[
 let inline internal p_squareBraketOpenW q =
@@ -262,7 +262,7 @@ let internal p_arrayString q =
         (p_squareBraketOpenW q >>. p .>> p_squareBraketCloseW q) |> attempt
         (p_squareBraketOpen >>. p .>> p_squareBraketClose) |> attempt
     ]
-    |>> TechJsonField.Array
+    |>> TechJsonLogField.Array
 
 
 let internal p_arrayInt q =
@@ -274,7 +274,7 @@ let internal p_arrayInt q =
         (p_squareBraketOpenW q >>. p .>> p_squareBraketCloseW q) |> attempt
         (p_squareBraketOpen >>. p .>> p_squareBraketClose) |> attempt
     ]
-    |>> TechJsonField.ArrayInt
+    |>> TechJsonLogField.ArrayInt
 
 
 let p_arrayPrimitiveField q =
@@ -382,13 +382,13 @@ let p_jsonField q =
     p_fieldIdentifier q
     .>>? p_fieldDelimiterSpaceWrapped
     .>>.? p_jsonChoice q
-    |>> TechJsonField.Json
+    |>> TechJsonLogField.Json
 
 
 let p_body q =
     p_predefinedFieldIdentifierDelimiter q ["body"]
     >>? p_jsonChoice q
-    |>> TechJsonField.Body
+    |>> TechJsonLogField.Body
 
 
 let p_arrayJsonAnnonimous q =
@@ -398,14 +398,14 @@ let p_arrayJsonAnnonimous q =
         (p_squareBraketOpenW q >>. p .>> p_squareBraketCloseW q) |> attempt
         (p_squareBraketOpen >>. p .>> p_squareBraketClose) |> attempt
     ]
-    |>> TechJsonField.ArrayJsonAnnonimous
+    |>> TechJsonLogField.ArrayJsonAnnonimous
 
 let internal p_arrayJsonItems q =
     sepEndBy (
         choice [
-            (nextCharSatisfiesNot ((=) '[') >>. skipStringCI "null" |>> (fun _ -> TechJsonField.NullAnnonimous |> List.singleton)) |> attempt
-            (nextCharSatisfiesNot ((=) '[') >>. p_fieldStringValue q |>> (TechJsonField.StringAnnonimous >> List.singleton)) |> attempt
-            (nextCharSatisfiesNot ((=) '[') >>. pint32 |>> (TechJsonField.IntAnnonimous >> List.singleton)) |> attempt
+            (nextCharSatisfiesNot ((=) '[') >>. skipStringCI "null" |>> (fun _ -> TechJsonLogField.NullAnnonimous |> List.singleton)) |> attempt
+            (nextCharSatisfiesNot ((=) '[') >>. p_fieldStringValue q |>> (TechJsonLogField.StringAnnonimous >> List.singleton)) |> attempt
+            (nextCharSatisfiesNot ((=) '[') >>. pint32 |>> (TechJsonLogField.IntAnnonimous >> List.singleton)) |> attempt
             (nextCharSatisfiesNot ((=) '[') >>. p_jsonChoice q) |> attempt
             p_arrayJsonAnnonimous q |>> List.singleton |> attempt
         ]
@@ -420,7 +420,7 @@ let p_arrayJson q =
         (p_squareBraketOpenW q >>. p_arrayJsonItems q .>> p_squareBraketCloseW q) |> attempt
         (p_squareBraketOpen >>. p_arrayJsonItems q .>> p_squareBraketClose) |> attempt
     ]
-     |>> TechJsonField.ArrayJson
+     |>> TechJsonLogField.ArrayJson
 
 
 
@@ -432,7 +432,7 @@ let p_jsonAnnotated q =
         (skipStringCI q >>. p_jsonAnnotatedValue q .>>? skipStringCI q) |> attempt
         (p_jsonAnnotatedValue NO_QUOTES) |> attempt
     ]
-    |>> (fun (key, jsonAnnotated) -> { jsonAnnotated with Key = key } |> TechJsonField.JsonAnnotated)
+    |>> (fun (key, jsonAnnotated) -> { jsonAnnotated with Key = key } |> TechJsonLogField.JsonAnnotated)
 
 
 let p_arrayJsonAnnotated q =
@@ -443,7 +443,7 @@ let p_arrayJsonAnnotated q =
     .>>.? sepEndBy (p_jsonAnnotatedValue q) (attempt(ws >>. skipChar ',' >>. ws))
     .>> ws
     .>> skipChar ']'
-     |>> TechJsonField.ArrayJsonAnnotated
+     |>> TechJsonLogField.ArrayJsonAnnotated
 
 
 // =============
@@ -454,7 +454,7 @@ let messageFieldNames = ["message"; "@m"; "@mt"; "msg"]
 
 /// \"message\": \"Returning next host: rabbitmq_node:5672\"
 let p_messageString q =
-    p_predefinedStringField q messageFieldNames TechJsonField.Message
+    p_predefinedStringField q messageFieldNames TechJsonLogField.Message
 
 /// Array of json ojects or array of annonimous json objects
 let p_messageArrayJson q =
@@ -463,7 +463,7 @@ let p_messageArrayJson q =
         (p_squareBraketOpenW q >>. p_arrayJsonItems q .>> p_squareBraketCloseW q) |> attempt
         (p_squareBraketOpen >>. p_arrayJsonItems q .>> p_squareBraketClose) |> attempt
     ]
-    |>> TechJsonField.MessageArrayJson
+    |>> TechJsonLogField.MessageArrayJson
 
 /// (<typeJson>)
 let p_jsonSpecialPrimitiveInBraces q =
@@ -503,7 +503,7 @@ let p_messageBoddiedNotClosed q =
 let p_messageBuddied q =
     p_messageBoddiedNotClosed q <??> $"p_messageBoddiedNotClosed (q is <{q}>)"
     .>>? skipChar '\"'
-    |>> (fun t -> TechJsonField.MessageBoddied ((fst t).Trim(), (snd t)))
+    |>> (fun t -> TechJsonLogField.MessageBoddied ((fst t).Trim(), (snd t)))
 
 
 let p_messageBuddiedWithPostfix q =
@@ -512,7 +512,7 @@ let p_messageBuddiedWithPostfix q =
     .>>? skipChar '\"'
     |>> (fun t -> 
         let ((header, body), postfix) = t
-        TechJsonField.MessageBoddiedWithPostfix (header.Trim(), body, postfix.Trim())
+        TechJsonLogField.MessageBoddiedWithPostfix (header.Trim(), body, postfix.Trim())
     )
 
 
@@ -526,7 +526,7 @@ let p_message q =
 
 // ===============================================
 
-let p_TechField q : Parser<TechJsonField, unit> =
+let p_TechField q : Parser<TechJsonLogField, unit> =
     choice [
         skipString "\\n" >>. ws
         ws
@@ -566,7 +566,7 @@ let private mergeFullMessage fieldList =
     fieldList
     |> List.partition (fun f ->
         match f with
-        | TechJsonField.Json (key, _) when key = "fullMessage" -> true // when there is kibana fillMessage
+        | TechJsonLogField.Json (key, _) when key = "fullMessage" -> true // when there is kibana fillMessage
         | _ -> false
     )
     |> (fun (fullMessageJson, other) ->
@@ -575,14 +575,14 @@ let private mergeFullMessage fieldList =
             |> List.tryHead // only one field can be
             |> Option.map (fun f ->
                 match f with
-                | TechJsonField.Json (key, fl) ->
+                | TechJsonLogField.Json (key, fl) ->
                     f :: fl
                 | _ -> []
             )
             |> Option.defaultValue []
 
         (fullMessageFields @ other)
-        |> List.distinctBy (fun f -> f |> TechField.key)
+        |> List.distinctBy (fun f -> f |> TechJsonLogField.key)
     )
 
 let logList (observer: IObserver<LogPosition>) =
@@ -601,7 +601,7 @@ let logList (observer: IObserver<LogPosition>) =
                         if String.IsNullOrWhiteSpace(source) then
                             None
                         else
-                            ("logSource", source.Trim()) |> TechJsonField.String |> Some; 
+                            ("logSource", source.Trim()) |> TechJsonLogField.String |> Some; 
                     Fields = mergeFullMessage fieldList
                 } |> Log.TechLog
 

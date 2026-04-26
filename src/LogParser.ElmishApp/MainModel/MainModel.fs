@@ -72,10 +72,10 @@ module LogModel =
             | Some ls ->
                 sprintf "%s %s"
                     (ls.ToString())
-                    (log.Log.Fields |> LogParser.Core.Types.TechField.toString 1)
+                    (log.Log.Fields |> LogParser.Core.Types.TechJsonLogField.toString 1)
             | None ->
                 sprintf "%s"
-                    (log.Log.Fields |> LogParser.Core.Types.TechField.toString 1)
+                    (log.Log.Fields |> LogParser.Core.Types.TechJsonLogField.toString 1)
         | TextLogModel tl -> tl.Log
 
     let serviceName = function
