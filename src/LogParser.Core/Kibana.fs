@@ -11,6 +11,9 @@ type [<Measure>] day
 let fullMessage =
     between (skipString "\"\"\"") (skipString "\"\"\"") (manyCharsTill anyChar (followedBy (manyMinMaxSatisfy 3 3 ((=) '\"') )))
 
+/// Skips all before """ (beginning of the '_source' fullMessage' field).
+///
+/// Then parses 'fullMessage' field value within ``fullMessage`` parser
 let kibanaOutput =
     skipCharsTillString "\"\"\"" false 2048
     >>. sepEndBy fullMessage (attempt(skipCharsTillString "\"\"\"" false 2048)) 
@@ -24,7 +27,9 @@ let fullJson =
         (skipString "}," >>. unicodeSpaces1 >>. skipString @"""sort"" : [") 
         (manyCharsTill anyChar (followedBy (skipString "}," >>. unicodeSpaces1 >>. skipString @"""sort"" : [")))
 
-
+/// Skips all before _source field.
+///
+///  Then parses '_source' field value within ``fullJson`` parser.
 let kibanaOutput2 =
     skipCharsTillString @"""_source"" : " true 2048
     >>. sepEndBy fullJson (attempt(skipCharsTillString  @"""_source"" : " true 2048)) 
