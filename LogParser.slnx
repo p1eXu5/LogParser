@@ -12,13 +12,16 @@
     <File Path="RELEASE_NOTES.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/FSharp.Control.Reactive/FSharp.Control.Reactive.fsproj" />
-    <Project Path="src/LogParser.Core/LogParser.Core.fsproj" />
+    <Project Path="../../_forks/FSharp.Control.Reactive/src/FSharp.Control.Reactive/FSharp.Control.Reactive.fsproj" />
+    <Project Path="src/LogParser.App/LogParser.App.fsproj" Id="04e70060-21c1-461a-a27d-962e8ad4c558" />
     <Project Path="src/LogParser.ElmishApp/LogParser.ElmishApp.fsproj" />
     <Project Path="src/LogParser.WpfClient/LogParser.WpfClient.csproj" />
+    <Project Path="src/LogParser/LogParser.fsproj" />
   </Folder>
   <Folder Name="/test/">
-    <Project Path="test/FSharp.Control.Reactive.Testing/FSharp.Control.Reactive.Testing.fsproj" />
-    <Project Path="test/LogParser.Core.Tests/LogParser.Core.Tests.fsproj" />
+    <Project Path="../../_forks/FSharp.Control.Reactive/src/FSharp.Control.Reactive.Testing/FSharp.Control.Reactive.Testing.fsproj" />
+    <Project Path="test/LogParser.App.Tests/LogParser.App.Tests.fsproj" />
+    <Project Path="test/LogParser.Tests.Fakers/LogParser.Tests.Fakers.fsproj" Id="e61bcf88-488d-450d-b582-e1c33bd21c72" />
+    <Project Path="test/LogParser.Tests/LogParser.Tests.fsproj" />
   </Folder>
 </Solution>

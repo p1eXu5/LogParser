@@ -6,14 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Interfaces.fs" />
     <Compile Include="Helpers.fs" />
     <Compile Include="TextLogModel.fs" />
     <Compile Include="TechFieldModel.fs" />
-    <Compile Include="TechLogModel.fs" />
+    <Compile Include="TechJsonLogModel.fs" />
     <Compile Include="FiltersModel.fs" />
     <Compile Include="KibanaSearchModel.Services.fs" />
     <Compile Include="KibanaSearchModel.fs" />
+    <Compile Include="techlogmodel\TechLogModel.fs" />
+    <Compile Include="TechLogModel\TechLogModel.Program.fs" />
+    <Compile Include="TechLogModel\TechLogModel.Bindings.fs" />
+    <Compile Include="TechLogListModel\TechLogListModel.fs" />
+    <Compile Include="LogFileModel\LogFileModel.fs" />
+    <Folder Include="LogFileListModel\" />
+    <Compile Include="logfilelistmodel\LogFileListModel.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />
@@ -27,12 +35,11 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
-    <PackageReference Include="p1eXu5.FSharp.ElmishExtensions" Version="1.0.1" />
+    <PackageReference Include="p1eXu5.FSharp.ElmishExtensions" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FSharp.Control.Reactive\FSharp.Control.Reactive.fsproj" />
-    <ProjectReference Include="..\LogParser.Core\LogParser.Core.fsproj" />
+    <ProjectReference Include="..\LogParser.App\LogParser.App.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

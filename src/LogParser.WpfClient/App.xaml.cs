@@ -6,16 +6,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using LogParser.ElmishApp.Interfaces;
-using NspkXsdGenerator.DesktopClient;
+using Microsoft.Extensions.Logging;
 
 namespace LogParser.WpfClient;
+
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
 public partial class App : Application
 {
-    private readonly IErrorMessageQueue _errorMessageQueue;
-    private string? _logFile;
+    private Bootstrap? _bootstrap;
+    private ILogger<App>? _logger;
+    private IErrorMessageQueue? _errorMessageQueue;
+    private readonly CancellationTokenSource _cts = new();
 
     public App()
     {
@@ -26,45 +29,89 @@ public partial class App : Application
         ci.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
         Thread.CurrentThread.CurrentCulture = ci;
 
-        _errorMessageQueue = new ErrorMessageQueue();
-
-        AppDomain.CurrentDomain.UnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
         this.DispatcherUnhandledException += App_DispatcherUnhandledException;
-
-        this.Activated += StartElmish;
     }
 
-    private void StartElmish(object? sender, EventArgs e)
+    private async void Application_Startup(object sender, StartupEventArgs e)
+        => await BootstrapApplicationAsync(e);
+
+    private async Task BootstrapApplicationAsync(StartupEventArgs e)
     {
-        this.Activated -= StartElmish;
-        ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance, _logFile);
+        _bootstrap = Bootstrap.Build<Bootstrap>(e.Args);
+        await _bootstrap.StartHostAsync(_cts.Token);
+
+        _errorMessageQueue = _bootstrap.GetRequiredKeyedService<IErrorMessageQueue>("main");
+        _logger = _bootstrap.GetLogger<App>();
+        _logger.LogInformation("Bootstrapped.");
+
+        string? openningLogFile = null;
+
+        if (e.Args.Length == 1 && File.Exists(e.Args[0]))
+        {
+            openningLogFile = e.Args[0];
+        }
+
+        var mainWindow = new MainWindow();
+
+        ElmishApp.Program.main(
+            mainWindow,
+            _errorMessageQueue,
+            _bootstrap.GetRequiredKeyedService<IErrorMessageQueue>("dialog"),
+            _bootstrap.GetRequiredService<ISettingsManager>(),
+            openningLogFile,
+            _bootstrap.GetRequiredService<ILoggerFactory>()
+        );
+
+        mainWindow.Show();
+    }
+
+    private void Application_Exit(object sender, ExitEventArgs e)
+    {
+        _cts.Cancel();
+
+        if (_bootstrap is not null)
+        {
+            _bootstrap.StopHostAsync(TimeSpan.FromSeconds(5))
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        _cts.Dispose();
     }
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
-        _errorMessageQueue.EnqueueError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+        _logger?.LogError(e.Exception, "App dispatcher unhandled exception!");
+#if DEBUG
+        _errorMessageQueue?.EnqueueError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+#else
+        _errorMessageQueue?.EnqueueError("Error!");
+#endif
         e.Handled = false;
     }
 
-    private void OnDispatcherUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         string errorMessage = e.ExceptionObject.ToString() + Environment.NewLine;
-        _errorMessageQueue.EnqueueError(errorMessage);
+        _logger?.LogError(errorMessage);
+#if DEBUG
+        _errorMessageQueue?.EnqueueError(errorMessage);
+#else
+        _errorMessageQueue?.EnqueueError("Error!");
+#endif
     }
 
     private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         string errorMessage = e.Exception.InnerExceptions.First().Message + Environment.NewLine + e.Exception.GetType();
-        _errorMessageQueue.EnqueueError(errorMessage);
-    }
-
-    private void Application_Startup(object sender, StartupEventArgs e)
-    {
-        if (e.Args.Length == 1 && File.Exists(e.Args[0]))
-        {
-            _logFile = e.Args[0];
-        }
+        _logger?.LogError(errorMessage);
+#if DEBUG
+        _errorMessageQueue?.EnqueueError(errorMessage);
+#else
+        _errorMessageQueue?.EnqueueError("Error!");
+#endif
     }
 }

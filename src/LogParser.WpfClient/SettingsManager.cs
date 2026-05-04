@@ -1,14 +1,14 @@
 ﻿using LogParser.ElmishApp.Interfaces;
 using LogParser.WpfClient.Properties;
 
-namespace NspkXsdGenerator.DesktopClient;
+namespace LogParser.WpfClient;
 
 public class SettingsManager : ISettingsManager
 {
     static private SettingsManager? _settingsManager;
     static public ISettingsManager Instance => _settingsManager ??= new SettingsManager(); 
 
-    private SettingsManager()
+    public SettingsManager()
     {
     }
 

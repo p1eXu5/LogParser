@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
+      xmlns:mainModel="clr-namespace:LogParser.ElmishApp.MainModel;assembly=LogParser.ElmishApp"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       x:Name="m_MainMenu"
@@ -11,6 +12,8 @@
       Padding="0"
       VerticalAlignment="Center"
       VerticalContentAlignment="Center"
+      d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
+                                       IsDesignTimeCreatable=False}"
       d:DesignHeight="32"
       d:DesignWidth="500"
       IsMainMenu="True"
@@ -26,6 +29,7 @@
             <Setter Property="FontWeight" Value="Light" />
         </Style>
     </Menu.Resources>
+
     <MenuItem Height="{Binding ElementName=m_MainMenu,
                                Path=ActualHeight}"
               VerticalAlignment="Bottom"

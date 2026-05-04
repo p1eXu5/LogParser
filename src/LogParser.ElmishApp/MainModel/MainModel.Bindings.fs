@@ -1,4 +1,4 @@
-﻿module LogParser.ElmishApp.MainModel.Bindings
+﻿namespace LogParser.ElmishApp.MainModel
 
 open System
 open System.Windows
@@ -6,138 +6,145 @@ open Elmish.WPF
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.Models.MainModel
+open LogParser.ElmishApp.Interfaces
+open LogParser.ElmishApp.Types
 
+/// Design time bindings
+type IBindings =
+    interface
+        abstract Title: string
+        abstract AssemblyVersion: string
+        abstract ErrorMessageQueue: IErrorMessageQueue
+        //abstract TempTitle: string option with get, set // TODO: move to LogFileModel
 
-let logBindings () =
-    [
-        "Log" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
-            match l.LogModel with
-            | LogModel.TechLogModel tl -> tl.Fields |> List.map (fun f -> f.TechField) |> LogParser.Core.Types.TechJsonLogField.toString 1 |> Some
-            | LogModel.TextLogModel t -> t.Log |> Some
-        )
+        abstract ShowAll: bool with get, set
+        abstract ShowOnlyParsedLogs: bool
 
-        "IsTechLog" |> Binding.oneWay (fun l -> l.LogModel |> function LogModel.TechLogModel _ -> true | _ -> false)
+        abstract LogFileList: LogFileListModel.IBindings
 
-        "LogLevel" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
-            match l.LogModel with
-            | LogModel.TechLogModel tl -> tl.LogLevel |> Some
-            | LogModel.TextLogModel _ -> None
-        )
+        // ToolBars
+        abstract KibanaSearchModel: obj with get
+        abstract IsKibanaSearchModelLoaded: bool with get, set
 
-        "Timestamp" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
-            match l.LogModel with
-            | LogModel.TechLogModel tl -> tl.Timestamp
-            | LogModel.TextLogModel _ -> None
-        )
+        abstract FiltersModel: obj with get
+        abstract IsFiltersModelLoaded: bool with get, set
+    end
 
-        "Message" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
-            match l.LogModel with
-            | LogModel.TechLogModel tl -> tl.Message |> Some
-            | LogModel.TextLogModel _ -> None
-        )
+module Bindings =
 
-        "PinnedValue" |> Binding.oneWayOpt (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
-            l.PinnedFieldName
-            |> Option.bind (fun fn ->
-                match l.LogModel with
-                | LogModel.TechLogModel tl -> 
-                    tl.Fields
-                    |> List.tryFind(fun f -> f.Key = fn)
-                    |> Option.bind (fun f -> f.Text )
-                | LogModel.TextLogModel _ -> None
+    let private __ = Unchecked.defaultof<IBindings>
+
+    let bindings
+        (title: string)
+        (assemblyVersion: string)
+        (mainErrorMessageQueue: IErrorMessageQueue)
+        (dialogErrorMessageQueue: IErrorMessageQueue)
+        : Binding<MainModel, MainModel.Msg> list
+        =
+        [
+            nameof __.AssemblyVersion
+                |> Binding.oneWay (fun _ -> assemblyVersion)
+
+            nameof __.ErrorMessageQueue |> Binding.oneWay (fun _ -> mainErrorMessageQueue)
+            
+            nameof __.Title
+                |> Binding.oneWay (fun m ->
+                    m |> MainModel.documentNameTitle title)
+
+            // TODO: move to LogFileModel
+            // nameof __.TempTitle
+            //     |> Binding.twoWayOpt (_.TempTitle, Msg.SetTempTitle)
+
+            nameof __.KibanaSearchModel
+                |> Binding.SubModel.opt KibanaSearchModel.Bindings.bindings
+                |> Binding.mapModel getKibanaSearchModel
+                |> Binding.mapMsg KibanaSearchModelMsg
+
+            nameof __.IsKibanaSearchModelLoaded
+                |> Binding.twoWay (
+                    (fun m -> m.KibanaSearchModel.IsSome),
+                    (fun v ->
+                        if v then Msg.LoadKibanaSearchModel
+                        else  Msg.UnloadKibanaSearchModel
+                    )
+                )
+
+            // TODO: move to LogFileModel
+            nameof __.FiltersModel
+                |> Binding.SubModel.opt FiltersModel.Bindings.bindings
+                |> Binding.mapModel filtersModel
+                |> Binding.mapMsg FiltersModelMsg
+
+            nameof __.IsFiltersModelLoaded
+                |> Binding.twoWay (
+                    (fun m -> m.FiltersModel.IsSome),
+                    (fun v ->
+                        if v then Msg.LoadFiltersModel
+                        else  Msg.UnloadFiltersModel
+                    )
+                )
+
+            nameof __.ShowAll
+                |> Binding.twoWay ((fun m -> MainModel.showAll m), ToggleShowAll)
+
+            nameof __.ShowOnlyParsedLogs
+                |> Binding.oneWay (fun m -> MainModel.showOnlyParsedLogs m)
+
+            nameof __.LogFileList
+                |> Binding.SubModel.required LogFileListModel.Bindings.bindings
+                |> Binding.mapModel _.LogFileListModel
+                |> Binding.mapMsg Msg.LogFileListModelMsg
+
+            (*
+            "DockerInput" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
+            "KibanaInput" |> Binding.twoWayOpt ((fun m -> m.KibanaInput), Msg.KibanaInputChanged)
+            "SelectedInput" |> Binding.twoWay ((fun m -> m.SelectedInput), Msg.SetSelectedInput)
+
+            //"Output" |> Binding.oneWayOpt (fun m -> m.Output)
+
+            "Loading" |> Binding.oneWay (fun m -> m.Loading)
+
+            "PasteFromClipboardCommand" |> Binding.cmdIf (fun _ ->
+                if Clipboard.ContainsText() then
+                    PastFromClipboardRequested |> Some
+                else
+                    None
             )
-        ) 
 
-        "HierarchyLevel" |> Binding.oneWay (fun (l: {| LogModel: LogModel; PinnedFieldName: string option |}) ->
-            match l.LogModel with
-            | LogModel.TechLogModel tl -> tl.HierarchyLevel
-            | LogModel.TextLogModel _ -> 0
-        )
+            "ClearInputCommand" |> Binding.cmdIf (fun m -> m.Input |> Option.map (fun _ -> CleanInputRequested))
+            "OrderByTimestampCommand" |> Binding.cmdIf (fun m -> if m.Loading then None else m.Input |> Option.map (fun _ -> Msg.OrderByTimestamp))
 
-        "CopyCommand" |> Binding.cmd Msg.CopyLogCommand
-
-
-        "Fields" |> Binding.subModelSeq (
-            (fun l ->
-                    match l.LogModel with
-                    | LogModel.TextLogModel _ -> []
-                    | LogModel.TechLogModel t -> t.Fields),
-            (fun (_, f: TechFieldModel) -> f),
-            (fun f -> f.Key),
-            (Msg.TechFieldMsg),
-            TechFieldModel.Bindings.bindings
+            "DrugFileCommand" |> Binding.cmdParamIf (fun s ->
+                match s with
+                | :? string as fileName -> fileName |> Msg.OpenSpecifiedFile |> Some
+                | _ -> None
             )
-    ]
 
+            "OpenLogsFileCommand" |> Binding.cmd OpenFile
+            "SaveLogsFileAsCommand" |> Binding.cmdIf (fun m -> m.Input |> Option.map (fun _ -> SaveFileAs))
+            "SaveLogsFileCommand" |> Binding.cmdIf (fun m -> 
+                match m.LogFile with
+                | Existing _ -> Msg.SaveFile |> Some
+                | _ -> None
+            )
 
-let bindings () : Binding<MainModel, MainModel.Msg> list =
-    [
-        "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
+            "NewFileCommand" |> Binding.cmdIf (fun m -> 
+                match m.LogFile with
+                | Existing _ -> Msg.NewFile |> Some
+                | _ -> None
+            ) 
 
-        "KibanaSearchModel"
-            |> Binding.SubModel.required KibanaSearchModel.Bindings.bindings
-            |> Binding.mapModel getKibanaSearchModel
-            |> Binding.mapMsg KibanaSearchModelMsg
+            
 
-        "FiltersModel"
-            |> Binding.SubModel.required FiltersModel.Bindings.bindings
-            |> Binding.mapModel filtersModel
-            |> Binding.mapMsg FiltersModelMsg
+            "DocumentName" |> Binding.oneWay getDocumentName
 
-        "DockerInput" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
-        "KibanaInput" |> Binding.twoWayOpt ((fun m -> m.KibanaInput), Msg.KibanaInputChanged)
-        "SelectedInput" |> Binding.twoWay ((fun m -> m.SelectedInput), Msg.SetSelectedInput)
-
-        //"Output" |> Binding.oneWayOpt (fun m -> m.Output)
-
-        "Loading" |> Binding.oneWay (fun m -> m.Loading)
-
-        "PasteFromClipboardCommand" |> Binding.cmdIf (fun _ ->
-            if Clipboard.ContainsText() then
-                PastFromClipboardRequested |> Some
-            else
-                None
-        )
-
-        "ClearInputCommand" |> Binding.cmdIf (fun m -> m.Input |> Option.map (fun _ -> CleanInputRequested))
-        "OrderByTimestampCommand" |> Binding.cmdIf (fun m -> if m.Loading then None else m.Input |> Option.map (fun _ -> Msg.OrderByTimestamp))
-
-        "DrugFileCommand" |> Binding.cmdParamIf (fun s ->
-            match s with
-            | :? string as fileName -> fileName |> OpenSpecifiedFile |> Some
-            | _ -> None
-        )
-
-        "OpenLogsFileCommand" |> Binding.cmd OpenFile
-        "SaveLogsFileAsCommand" |> Binding.cmdIf (fun m -> m.Input |> Option.map (fun _ -> SaveFileAs))
-        "SaveLogsFileCommand" |> Binding.cmdIf (fun m -> 
-            match m.LogFile with
-            | Existing _ -> Msg.SaveFile |> Some
-            | _ -> None
-        )
-
-        "NewFileCommand" |> Binding.cmdIf (fun m -> 
-            match m.LogFile with
-            | Existing _ -> Msg.NewFile |> Some
-            | _ -> None
-        ) 
-
-        "TempTitle" |> Binding.twoWayOpt (getTempTitle, Msg.SetTempTitle)
-
-        "DocumentName" |> Binding.oneWay getDocumentName
-
-        "Logs" |> Binding.subModelSeq (
-            getFilteredLogModels,
-            (fun (m, l) -> {| LogModel = l; PinnedFieldName = m.PinnedFieldName |} ),
-            (fun bm -> bm.LogModel |> LogModel.logId),
-            Msg.TechLogMsg,
-            logBindings
-        )
-
-        "LogCount" |> Binding.oneWay (fun m -> m.Logs.Length)
-
-        "ShowAll" |> Binding.twoWay ((fun m -> MainModel.showAll m), ToggleShowAll)
-        "ShowOnlyParsedLogs" |> Binding.oneWay (fun m -> MainModel.showOnlyParsedLogs m)
-
-        "ErrorMessageQueue" |> Binding.oneWay (fun m -> m.ErrorMessageQueue)
-    ]
+            "Logs" |> Binding.subModelSeq (
+                getFilteredLogModels,
+                (fun (m, l) -> {| LogModel = l; PinnedFieldName = m.PinnedFieldName |} ),
+                (fun bm -> bm.LogModel |> TechLogModel.logId),
+                Msg.TechLogMsg,
+                logBindings
+            )
+            
+            *)
+        ]

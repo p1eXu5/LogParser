@@ -31,9 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="5.3.1" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
-    <PackageReference Include="p1eXu5.Wpf.BootstrapBase" Version="1.0.0" />
+    <PackageReference Include="p1eXu5.Wpf.BootstrapBase" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

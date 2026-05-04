@@ -5,7 +5,7 @@
          xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-         d:DesignWidth="400"
+         d:DesignWidth="700"
          ClipToBounds="True"
          Style="{StaticResource st_LogParserToolBar}"
          mc:Ignorable="d"
@@ -50,4 +50,20 @@
              Text="{Binding TempTitle,
                             UpdateSourceTrigger=PropertyChanged}"
              />
+
+    <TextBlock Style="{StaticResource st_ToolBarTextBlock}"
+               Text="Log Source Type:"
+               />
+
+    <!--  Service name  -->
+    <ComboBox Width="130"
+              materialDesign:HintAssist.Hint="Log Source Type"
+              IsEditable="True"
+              IsTextSearchEnabled="True"
+              ItemsSource="{Binding LogSourceType}"
+              Style="{StaticResource st_ToolBarComboBox}"
+              Text="{Binding LogSourceType,
+                             UpdateSourceTrigger=PropertyChanged,
+                             Mode=OneWayToSource}"
+              />
 </ToolBar>

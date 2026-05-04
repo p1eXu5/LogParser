@@ -1,7 +1,7 @@
 ﻿namespace rec LogParser.ElmishApp.Models
 
 open System
-open LogParser.Core.Types
+open LogParser.Types
 
 
 type TechFieldModel =

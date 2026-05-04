@@ -10,32 +10,39 @@ open Elmish
 open p1eXu5.FSharp.ElmishExtensions
 open FsToolkit.ErrorHandling
 
-open LogParser.Core
-open LogParser.Core.Types
+open LogParser
+open LogParser.Types
 
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.Models.MainModel
 open LogParser.ElmishApp.Interfaces
+open LogParser.ElmishApp.Types
 open LogParser.ElmishApp.Models.LogFile
 
 
-let private toLogModels logs =
-    logs
-    |> List.map (fun l -> 
-        match l with
-        | TechLog.TechJsonLog l ->
-            let techLogModel = TechLogModel.init (l)
-            LogModel.TechLogModel techLogModel
-        | TechLog.TextLog l ->
-            let (textLogModel, _) = TextLogModel.init (l)
-            LogModel.TextLogModel textLogModel
-    )
-
-
-
-let update (settingsManager: ISettingsManager) (observer: IObserver<LogPosition>) (logger: ILogger) (msg: Msg) (model: MainModel) =
+let update
+    (settingsManager: ISettingsManager)
+    (errorMessageQueue: IErrorMessageQueue)
+    (observer: IObserver<LogPosition>)
+    (logger: ILogger)
+    (msg: Msg)
+    (model: MainModel)
+    =
     match msg with
+    | SetTempTitle v ->
+        model |> setTempTitle v, Cmd.none
+
+    | ToggleShowAll _ ->
+        model |> toggleShowMode, Cmd.none
+
+    | Msg.LogFileListModelMsg smsg ->
+        model
+        |> Model.map _.LogFileListModel withLogFileListMoodel
+            (LogFileListModel.Program.update smsg)
+        , Cmd.none
+    (*
+    
     | NewFile -> MainModel.init model.ErrorMessageQueue settingsManager None ()
 
     | OpenFile ->
@@ -255,14 +262,12 @@ let update (settingsManager: ISettingsManager) (observer: IObserver<LogPosition>
         let filtersModel = FiltersModel.Program.update fmsg model.FiltersModel
         model |> withFiltersModel filtersModel, Cmd.none
 
-    | ToggleShowAll _ ->
-        model |> toggleShowMode, Cmd.none
+    
 
+
+    *)
     | Msg.OnError ex ->
-        model.ErrorMessageQueue.EnqueueError(ex.Message)
-        {model with Loading = false}, Cmd.none
-
-    | SetTempTitle v ->
-        model |> setTempTitle v, Cmd.none
+        errorMessageQueue.EnqueueError(ex.Message)
+        model, Cmd.none
 
     | _ -> model, Cmd.none

@@ -2,7 +2,7 @@
 
 open System
 open p1eXu5.FSharp.ElmishExtensions
-open LogParser.Core.Kibana
+open LogParser.Kibana
 open LogParser.ElmishApp.Helpers
 open LogParser.ElmishApp.KibanaSearchModel.Services
 
@@ -323,7 +323,7 @@ module Program =
     open Microsoft.Extensions.Logging
     open Elmish
     open p1eXu5.FSharp.ElmishExtensions
-    open LogParser.Core
+    open LogParser
     open LogParser.ElmishApp.Models
     open LogParser.ElmishApp.Models.KibanaSearchModel
     open LogParser.ElmishApp.Interfaces

@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="LogParser.WpfClient.UserControls.StatusBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
+             xmlns:mainModel="clr-namespace:LogParser.ElmishApp.MainModel;assembly=LogParser.ElmishApp"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             Height="32"
+             d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
+                                              IsDesignTimeCreatable=False}"
+             d:DesignHeight="32"
+             d:DesignWidth="800"
+             Background="{StaticResource br_WindiwBackground}"
+             mc:Ignorable="d"
+             >
+    <Border DockPanel.Dock="Bottom"
+            Height="32"
+            Background="{StaticResource br_WindiwBackground}"
+            >
+        <TextBlock Margin="10,0"
+                   VerticalAlignment="Center"
+                   FontSize="13"
+                   Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                   >
+            <Run Text="Log count:" />
+            <Run Text="{Binding LogCount}" />
+        </TextBlock>
+    </Border>
+</UserControl>
