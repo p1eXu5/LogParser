@@ -7,12 +7,20 @@
 
   <ItemGroup>
     <Compile Include="Types.fs" />
+    <Compile Include="CancellableStream.fs" />
+    <Compile Include="Abstractions.fs" />
+    <Compile Include="FileStorage.fs" />
     <Compile Include="AppSubject.fs" />
+    <Compile Include="LogRepository.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\_forks\FSharp.Control.Reactive\src\FSharp.Control.Reactive\FSharp.Control.Reactive.fsproj" />
     <ProjectReference Include="..\LogParser\LogParser.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="10.1.203" />
   </ItemGroup>
 
 </Project>

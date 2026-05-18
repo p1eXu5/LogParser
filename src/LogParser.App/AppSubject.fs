@@ -6,6 +6,13 @@ open System.Threading
 open Microsoft.Extensions.Logging
 open FSharp.Control.Reactive
 
+type IAppSubject =
+    interface
+        inherit IObservable<Guid * LogParseMsg>
+        inherit IDisposable
+        abstract GetObserver: Guid -> IObserver<LogParseMsg>
+    end
+
 /// AppSubject merges messages from many dynamically-created IObserver<Foo> 
 /// instances into a single IObservable<Foo> stream.
 type AppSubject(logger: ILogger<AppSubject>) =
@@ -20,10 +27,6 @@ type AppSubject(logger: ILogger<AppSubject>) =
 
     // The merged stream — this is what Elmish.Wpf subscribes to.
     let merged : IObservable<Guid * LogParseMsg> = outer |> Observable.mergeInner
-
-    interface IObservable<Guid * LogParseMsg> with
-        member _.Subscribe(observer) =
-            merged.Subscribe(observer)
 
     /// Create and register a new IObserver<Foo> identified by `id`.
     /// The returned observer is linked to the main IObservable.
@@ -65,6 +68,10 @@ type AppSubject(logger: ILogger<AppSubject>) =
         outer.OnNext(inner :> IObservable<LogParseMsg> |> Observable.map (fun msg -> id, msg))
         inner :> IObserver<LogParseMsg>
 
+    interface IObservable<Guid * LogParseMsg> with
+        member _.Subscribe(observer) =
+            merged.Subscribe(observer)
+
     interface IDisposable with
         member _.Dispose() =
             lock _lock (fun () ->
@@ -72,3 +79,7 @@ type AppSubject(logger: ILogger<AppSubject>) =
                 inners.Clear())
             outer.OnCompleted()
             outer.Dispose()
+
+    interface IAppSubject with
+        member this.GetObserver(id: Guid) : IObserver<LogParseMsg> =
+            this.GetObserver(id)
