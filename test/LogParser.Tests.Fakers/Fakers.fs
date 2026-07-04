@@ -133,6 +133,11 @@ module TechLog =
         }
         |> TechLog.JsonLog
 
+    let generateJsonMany () =
+        seq { 0 .. faker.Random.Int(1, 3) }
+        |> Seq.map (fun _ -> generateJson ())
+        |> Seq.toList
+
     let generate () =
         faker.Random.ArrayElement(
             [|
