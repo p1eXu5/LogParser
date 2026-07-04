@@ -1,8 +1,12 @@
 namespace LogParser.App
 
+open System
 open System.IO
+open System.Text
 open System.Threading
+open System.Threading.Tasks
 open LogParser.App.Abstractions
+open System.Buffers
 
 // --------------------------------------------
 // FileStorageState
@@ -25,52 +29,49 @@ module FileStorageState =
                 Error "Could not create file stream"
 
 // --------------------------------------------
-// FileStorageLogger
-// --------------------------------------------
-
-type FileStorageLogger =
-    {
-        LogFailToInitialize: exn -> unit
-        LogFailToCreateStream: exn -> unit
-    }
-
-// --------------------------------------------
 // FileStorage
 // --------------------------------------------
 
 type FileStorage =
     {
-        State: FileStorageState
-        Logger: FileStorageLogger
+        CreateTmpFileTask: LogSourceText -> CancellationToken -> Task<Result<FilePath, FileStorageError>>
     }
-    interface IStorage with
-        member this.GetStream (): Result<CancellableStream,string> = 
-            this.State |> FileStorageState.stream this.Logger.LogFailToCreateStream
+and
+    FileStorageError =
+        | TmpFileCreatingError
+and
+    FileStorageLogger =
+        {
+            LogFailToInitialize: exn -> unit
+            LogFailToCreateStream: exn -> unit
+        }
 
 
 module FileStorage =
 
-    let init logger =
-        try
-            Path.GetTempFileName()
-            |> FilePath.create
-            |> Result.map (fun filePath ->
-                {
-                    State = filePath |> FileStorageState.Initialized
-                    Logger = logger
-                }
-            )
-        with ex ->
-            logger.LogFailToInitialize ex
-            Error "Could not initialize FileStorage"
+    let createTmpFile logger (logSourceText: LogSourceText) (ct: CancellationToken) =
+        task {
+            try
+                let path = Path.GetTempFileName()
+                use sw = File.OpenWrite(path)
 
-// --------------------------------------------
-// FileStorageFactory
-// --------------------------------------------
+                let unvalidatedLogs = logSourceText.Value
+                let buffer = ArrayPool<byte>.Shared.Rent(Encoding.UTF8.GetByteCount(unvalidatedLogs))
 
-module StorageFactory =
+                try
+                    let _ = Encoding.UTF8.GetBytes(unvalidatedLogs, buffer)
+                    let roMemory = buffer.AsMemory()
+                    do! sw.WriteAsync(roMemory, ct).ConfigureAwait(false)
+                finally
+                    ArrayPool<byte>.Shared.Return(buffer)
 
-    let initFileStorage logger =
-        { new IStorageFactory<IStorage> with
-            member _.Init () = FileStorage.init logger |> Result.map (fun s -> s :> IStorage)
+                return path |> FilePath.createTmpUnsafe |> Ok
+            with ex ->
+                logger.LogFailToInitialize ex
+                return Error TmpFileCreatingError
+        }
+
+    let init (logger: FileStorageLogger) =
+        {
+            CreateTmpFileTask = createTmpFile logger
         }
