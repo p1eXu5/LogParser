@@ -12,7 +12,6 @@
     <Compile Include="Abstractions.fs" />
     <Compile Include="FileStorage.fs" />
     <Compile Include="AppSubject.fs" />
-    <Compile Include="LogSource.fs" />
     <Compile Include="LogRepository.fs" />
   </ItemGroup>
 
