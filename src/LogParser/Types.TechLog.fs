@@ -75,7 +75,6 @@ module TechLog =
         }
         |> TechLog.JsonLog
 
-
     let tryFind fieldType log =
         match log with
         | TechLog.TextLog _ -> None
