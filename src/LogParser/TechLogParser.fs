@@ -7,27 +7,31 @@ open LogParser.Types
 open Microsoft.Extensions.Logging
 open System.Net
 
+[<Literal>]
+let internal NO_QUOTES = ""
 
-let [<Literal>] NO_QUOTES = ""
-let [<Literal>] QUOTES = "\""
-let [<Literal>] ESCAPED_QUOTES = "\\\""
+[<Literal>]
+let internal QUOTES = "\""
+
+[<Literal>]
+let internal ESCAPED_QUOTES = "\\\""
 
 
 ///<summary>
 /// Skips over any sequence of *zero* or more whitespaces (space (' '), tab ('\t')
 /// or newline ("\n", "\r\n" or "\r")).
 ///</summary> 
-let ws = unicodeSpaces // skipManySatisfy (fun ch -> Char.IsWhiteSpace(ch))
-let ws1 = unicodeSpaces1 // Parser<unit, unit> = skipMany1Satisfy (fun ch -> Char.IsWhiteSpace(ch))
-let pstr s = pstring s
+let internal ws = unicodeSpaces // skipManySatisfy (fun ch -> Char.IsWhiteSpace(ch))
+let internal ws1 = unicodeSpaces1 // Parser<unit, unit> = skipMany1Satisfy (fun ch -> Char.IsWhiteSpace(ch))
+let internal pstr s = pstring s
 
 
 
 // ----------------
 // identifier setup
 // ----------------
-let isAsciiIdStart    = fun c -> isAsciiLetter c || c = '_' || c = '$' || isDigit c || c = '@' || c = '^' || c = '?' || c = '/'
-let isAsciiIdContinue = fun c -> isAsciiLetter c || isDigit c || c = '_' || c = '.' || c = '-' || c = '#' || c = '/' || c = '\\' || c = '|' || c = ' ' || c = ',' || c = '?'
+let internal isAsciiIdStart    = fun c -> isAsciiLetter c || c = '_' || c = '$' || isDigit c || c = '@' || c = '^' || c = '?' || c = '/'
+let internal isAsciiIdContinue = fun c -> isAsciiLetter c || isDigit c || c = '_' || c = '.' || c = '-' || c = '#' || c = '/' || c = '\\' || c = '|' || c = ' ' || c = ',' || c = '?'
 
 
 /// <summary>
@@ -168,7 +172,7 @@ let internal p_requestId q = p_predefinedStringField q ["requestId"] TechJsonLog
 let internal p_eventId q = p_predefinedStringField q ["eventId"] TechJsonLogField.EventId
 
 
-let p_specialField q =
+let internal p_specialField q =
     choice [
         p_port q
         p_timestamp q
@@ -277,14 +281,14 @@ let internal p_arrayInt q =
     |>> TechJsonLogField.ArrayInt
 
 
-let p_arrayPrimitiveField q =
+let internal p_arrayPrimitiveField q =
     choice [
         p_arrayString q |> attempt
         p_arrayInt q    |> attempt
     ]
 
 
-let p_primitiveField q =
+let internal p_primitiveField q =
     choice [
         p_nullField q |> attempt
         p_intField q |> attempt
@@ -301,9 +305,9 @@ let p_primitiveField q =
 // ===========
 
 
-let p_TechLogNoQuotes, p_TechLogNoQuotesR = createParserForwardedToRef()
-let p_TechLogWithQuotes, p_TechLogWithQuotesR = createParserForwardedToRef()
-let p_TechLogWithEscapedQuotes, p_TechLogWithEscapedQuotesR = createParserForwardedToRef()
+let internal p_TechLogNoQuotes, internal p_TechLogNoQuotesR = createParserForwardedToRef()
+let internal p_TechLogWithQuotes, internal p_TechLogWithQuotesR = createParserForwardedToRef()
+let internal p_TechLogWithEscapedQuotes, internal p_TechLogWithEscapedQuotesR = createParserForwardedToRef()
 
 
 // =============
@@ -369,7 +373,7 @@ let internal p_annotation q =
     )
 
 /// `Annotation {<Json>}`
-let p_jsonAnnotatedValue q =
+let internal p_jsonAnnotatedValue q =
     ws
     >>? p_annotation q
     .>> ws
@@ -378,20 +382,20 @@ let p_jsonAnnotatedValue q =
     .>> ws
 
 
-let p_jsonField q =
+let internal p_jsonField q =
     p_fieldIdentifier q
     .>>? p_fieldDelimiterSpaceWrapped
     .>>.? p_jsonChoice q
     |>> TechJsonLogField.Json
 
 
-let p_body q =
+let internal p_body q =
     p_predefinedFieldIdentifierDelimiter q ["body"]
     >>? p_jsonChoice q
     |>> TechJsonLogField.Body
 
 
-let p_arrayJsonAnnonimous q =
+let internal p_arrayJsonAnnonimous q =
     let p = sepEndBy (p_jsonChoice q) (attempt(ws >>. skipChar ',' >>. ws))
     ws
     >>? choice [
@@ -413,7 +417,7 @@ let internal p_arrayJsonItems q =
 
 
 /// Array of json ojects or array of annonimous json objects
-let p_arrayJson q =
+let internal p_arrayJson q =
     p_fieldIdentifier q
     .>>? p_fieldDelimiterSpaceWrapped
     .>>.? choice [
@@ -424,7 +428,7 @@ let p_arrayJson q =
 
 
 
-let p_jsonAnnotated q =
+let internal p_jsonAnnotated q =
     p_fieldIdentifier q
     .>>? p_fieldDelimiterSpaceWrapped
     .>> ws
@@ -435,7 +439,7 @@ let p_jsonAnnotated q =
     |>> (fun (key, jsonAnnotated) -> { jsonAnnotated with Key = key } |> TechJsonLogField.JsonAnnotated)
 
 
-let p_arrayJsonAnnotated q =
+let internal p_arrayJsonAnnotated q =
     p_fieldIdentifier q
     .>>? p_fieldDelimiterSpaceWrapped
     .>>? skipChar '['
@@ -450,14 +454,14 @@ let p_arrayJsonAnnotated q =
 // message
 // =============
 
-let messageFieldNames = ["message"; "@m"; "@mt"; "msg"]
+let internal messageFieldNames = ["message"; "@m"; "@mt"; "msg"]
 
 /// \"message\": \"Returning next host: rabbitmq_node:5672\"
-let p_messageString q =
+let internal p_messageString q =
     p_predefinedStringField q messageFieldNames TechJsonLogField.Message
 
 /// Array of json ojects or array of annonimous json objects
-let p_messageArrayJson q =
+let internal p_messageArrayJson q =
     p_predefinedFieldIdentifierDelimiter q messageFieldNames
     >>. choice [
         (p_squareBraketOpenW q >>. p_arrayJsonItems q .>> p_squareBraketCloseW q) |> attempt
@@ -466,7 +470,7 @@ let p_messageArrayJson q =
     |>> TechJsonLogField.MessageArrayJson
 
 /// (<typeJson>)
-let p_jsonSpecialPrimitiveInBraces q =
+let internal p_jsonSpecialPrimitiveInBraces q =
     ws
     >>? between (pchar '(' >>. ws) (ws .>> pchar ')') 
         (
@@ -483,12 +487,12 @@ let p_jsonSpecialPrimitiveInBraces q =
 
 
 /// [ (<typeJson>)* ]
-let p_messageJsonList q =
+let internal p_messageJsonList q =
     between (skipChar '[' >>. ws) (ws .>> skipChar ']') 
         (sepEndBy (p_jsonSpecialPrimitiveInBraces q) (skipChar ','))
 
 
-let p_messageBoddiedNotClosed q =
+let internal p_messageBoddiedNotClosed q =
     p_predefinedFieldIdentifierDelimiter q messageFieldNames
     >>? skipChar '\"'
     >>? p_annotation q
@@ -500,13 +504,13 @@ let p_messageBoddiedNotClosed q =
     ]
 
 
-let p_messageBuddied q =
+let internal p_messageBuddied q =
     p_messageBoddiedNotClosed q <??> $"p_messageBoddiedNotClosed (q is <{q}>)"
     .>>? skipChar '\"'
     |>> (fun t -> TechJsonLogField.MessageBoddied ((fst t).Trim(), (snd t)))
 
 
-let p_messageBuddiedWithPostfix q =
+let internal p_messageBuddiedWithPostfix q =
     p_messageBoddiedNotClosed q
     .>>.? many1CharsTill anyChar (nextCharSatisfies ((=) '\"'))
     .>>? skipChar '\"'
@@ -516,7 +520,7 @@ let p_messageBuddiedWithPostfix q =
     )
 
 
-let p_message q =
+let internal p_message q =
     choice [
         attempt (p_messageBuddied q)
         attempt (p_messageBuddiedWithPostfix q)
@@ -526,7 +530,7 @@ let p_message q =
 
 // ===============================================
 
-let p_TechField q : Parser<TechJsonLogField, unit> =
+let internal p_TechField q : Parser<TechJsonLogField, unit> =
     choice [
         skipString "\\n" >>. ws
         ws
@@ -585,54 +589,75 @@ let private mergeFullMessage fieldList =
         |> List.distinctBy (fun f -> f |> TechJsonLogField.key)
     )
 
-let logList (observer: IObserver<LogPosition>) =
-    /// example: `some text {<json>}`
-    let p_sourcedTechLog =
-        getPosition .>>. 
-        manyCharsTill anyChar (nextCharSatisfies ((=) '{') <|> nextCharSatisfies ((=) '\n')) 
-        .>>.? p_TechLogWithQuotes
-        .>>. getPosition
-        |>> (fun (((startPosition, source), fieldList), endPosition) ->
-            let log =
-                {
-                    // start part of docker log:
-                    // PMB_WAN_foo_stub.1.o9sjfn7@srv-baz2.technics.bos    | {"timestamp":"2022-07-13T09:06:13.475Z","message":"...
-                    Source =
-                        if String.IsNullOrWhiteSpace(source) then
-                            None
-                        else
-                            ("logSource", source.Trim()) |> TechJsonLogField.String |> Some; 
-                    Fields = mergeFullMessage fieldList
-                } |> TechLog.JsonLog
+/// example: `some text {<json>}`
+let private p_sourcedTechLog (observer: IObserver<LogPosition>) =
+    getPosition .>>. 
+    manyCharsTill anyChar (nextCharSatisfies ((=) '{') <|> nextCharSatisfies ((=) '\n')) 
+    .>>.? p_TechLogWithQuotes
+    .>>. getPosition
+    |>> (fun (((startPosition, source), fieldList), endPosition) ->
+        let log =
+            {
+                // start part of docker log:
+                // PMB_WAN_foo_stub.1.o9sjfn7@srv-baz2.technics.bos    | {"timestamp":"2022-07-13T09:06:13.475Z","message":"...
+                Source =
+                    if String.IsNullOrWhiteSpace(source) then
+                        None
+                    else
+                        ("logSource", source.Trim()) |> TechJsonLogField.String |> Some; 
+                Fields = mergeFullMessage fieldList
+            } |> TechLog.JsonLog
 
-            observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
-            log
-        )
+        observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
+        log
+    )
         
 
-    let p_TechLog =
-        getPosition .>>. p_TechLogWithQuotes .>>. getPosition
-        |>> (fun ((startPosition, techFieldList), endPosition) ->
-            let log = {Source = None; Fields = techFieldList} |> TechLog.JsonLog
-            observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
-            log
-        )
+let private p_TechLog (observer: IObserver<LogPosition>) =
+    getPosition .>>. p_TechLogWithQuotes .>>. getPosition
+    |>> (fun ((startPosition, techFieldList), endPosition) ->
+        let log = {Source = None; Fields = techFieldList} |> TechLog.JsonLog
+        observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
+        log
+    )
 
-    let p_TextLog =
-        getPosition .>>. many1Satisfy ((<>) '\n') .>>. getPosition
-        |>> (fun ((startPosition, text), endPosition) ->
-            let log = TechLog.TextLog text
-            observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
-            log
-        )
+let private p_TextLog (observer: IObserver<LogPosition>) =
+    getPosition .>>. many1Satisfy ((<>) '\n') .>>. getPosition
+    |>> (fun ((startPosition, text), endPosition) ->
+        let log = TechLog.TextLog text
+        observer.OnNext({ Start = startPosition; End = endPosition; Log = log })
+        log
+    )
 
+let internal logList (observer: IObserver<LogPosition>) =
     ws
     >>? sepEndBy 
         ( 
             choice [
-                p_sourcedTechLog |> attempt
-                p_TechLog |> attempt
-                p_TextLog
+                p_sourcedTechLog observer |> attempt
+                p_TechLog observer |> attempt
+                p_TextLog observer
+            ]
+        )
+        (
+            choice [
+                skipChar ',' >>? newline >>. ws
+                skipChar '.' >>? newline >>. ws
+                newline >>. ws
+                skipChar ','
+                ws >>. nextCharSatisfies ((=)'{')
+            ]
+        )
+    .>> eof
+
+let internal logListIgnore (observer: IObserver<LogPosition>) =
+    ws
+    >>? skipSepEndBy
+        ( 
+            choice [
+                p_sourcedTechLog observer |> attempt
+                p_TechLog observer |> attempt
+                p_TextLog observer
             ]
         )
         (
@@ -650,9 +675,19 @@ let logList (observer: IObserver<LogPosition>) =
 exception LogParsingException of string
 
 
-let parse (observer: IObserver<LogPosition>) input =
-
+let public parse (observer: IObserver<LogPosition>) input =
     run (logList observer) input
+    |> function
+        | Success (ok,_,_) ->
+            observer.OnCompleted()
+            Result.Ok ok
+
+        | Failure (err, _, _) ->
+            observer.OnError(err |> LogParsingException)
+            Result.Error err
+
+let public parseStream (observer: IObserver<LogPosition>) streamName stream =
+    runParserOnStream (logListIgnore observer) () streamName stream (Text.Encoding.UTF8)
     |> function
         | Success (ok,_,_) ->
             observer.OnCompleted()
