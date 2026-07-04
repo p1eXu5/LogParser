@@ -17,11 +17,11 @@
   <ItemGroup>
     <PackageReference Include="Faqt" Version="5.1.0" />
     <PackageReference Include="FsUnit" Version="7.1.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="NUnit" Version="4.6.0" />
+    <PackageReference Include="NUnit" Version="4.6.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
-    <PackageReference Include="coverlet.collector" Version="10.0.0">
+    <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -29,13 +29,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\_forks\FSharp.Control.Reactive\src\FSharp.Control.Reactive.Testing\FSharp.Control.Reactive.Testing.fsproj" />
+    <ProjectReference Include="..\..\..\..\_libs\p1eXu5.FSharp.Reactive\src\p1eXu5.FSharp.Reactive.Testing\p1eXu5.FSharp.Reactive.Testing.fsproj" />
     <ProjectReference Include="..\..\src\LogParser.App\LogParser.App.fsproj" />
     <ProjectReference Include="..\LogParser.Tests.Fakers\LogParser.Tests.Fakers.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.1.203" />
+    <PackageReference Update="FSharp.Core" Version="10.1.301" />
   </ItemGroup>
 
 </Project>
