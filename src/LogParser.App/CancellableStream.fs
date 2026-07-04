@@ -3,41 +3,41 @@ namespace LogParser.App
 open System.IO
 open System.Threading
 
-type CancellableStream (fileStream: FileStream, ?cancellationToken: CancellationToken) =
+type CancellableStream (wrappedStream: Stream, ?cancellationToken: CancellationToken) =
     inherit Stream()
     
     let ct = defaultArg cancellationToken CancellationToken.None
     
-    override this.CanRead = fileStream.CanRead
-    override this.CanWrite = fileStream.CanWrite
-    override this.CanSeek = fileStream.CanSeek
-    override this.Length = fileStream.Length
+    override this.CanRead = wrappedStream.CanRead
+    override this.CanWrite = wrappedStream.CanWrite
+    override this.CanSeek = wrappedStream.CanSeek
+    override this.Length = wrappedStream.Length
     
     override this.Position
-        with get () = fileStream.Position
-        and set value = fileStream.Position <- value
+        with get () = wrappedStream.Position
+        and set value = wrappedStream.Position <- value
     
     override this.Flush() =
         ct.ThrowIfCancellationRequested()
-        fileStream.Flush()
+        wrappedStream.Flush()
     
     override this.Seek(offset: int64, origin: SeekOrigin): int64 =
         ct.ThrowIfCancellationRequested()
-        fileStream.Seek(offset, origin)
+        wrappedStream.Seek(offset, origin)
     
     override this.SetLength(value: int64): unit =
         ct.ThrowIfCancellationRequested()
-        fileStream.SetLength(value)
+        wrappedStream.SetLength(value)
     
     override this.Read(buffer: byte[], offset: int, count: int): int =
         ct.ThrowIfCancellationRequested()
-        fileStream.Read(buffer, offset, count)
+        wrappedStream.Read(buffer, offset, count)
     
     override this.Write(buffer: byte[], offset: int, count: int): unit =
         ct.ThrowIfCancellationRequested()
-        fileStream.Write(buffer, offset, count)
+        wrappedStream.Write(buffer, offset, count)
     
     override this.Dispose(disposing: bool): unit =
         if disposing then
-            fileStream.Dispose()
+            wrappedStream.Dispose()
         base.Dispose(disposing)
