@@ -13,9 +13,6 @@ open LogParser.ElmishApp.MainModel
 open Microsoft.Extensions.Logging
 open FSharp.Control.Reactive
 
-
-let [<Literal>] debugLogLevel = Events.LogEventLevel.Debug
-
 let main (window, mainErrorQueue, dialogErrorQueue, settingsManager, logFile, loggerFactory: ILoggerFactory) =
     let logFileOpt =
         match logFile with
