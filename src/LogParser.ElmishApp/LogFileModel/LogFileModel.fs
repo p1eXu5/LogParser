@@ -5,8 +5,8 @@ open System.IO
 
 type LogFileModel =
     {
-        Id: System.Guid
-        IsSelected: bool
+        Id: int
+        IsSelected: bool // TODO: remove
         State: FileState
         FullPath: string
         TechLogListModel: TechLogListModel
@@ -26,10 +26,10 @@ module LogFileModel =
         | Select of Guid
         | None
 
-    let initNew (isSelected: bool) =
+    let initNew (id: int, isSelected: bool) =
         let tmpFilePath = Path.GetTempFileName()
         {
-            Id = System.Guid.CreateVersion7()
+            Id = id
             IsSelected = isSelected
             State = FileState.NewTemp
             FullPath = tmpFilePath

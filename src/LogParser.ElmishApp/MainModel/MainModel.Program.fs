@@ -24,7 +24,7 @@ open LogParser.ElmishApp.Models.LogFile
 let update
     (settingsManager: ISettingsManager)
     (errorMessageQueue: IErrorMessageQueue)
-    (observer: IObserver<LogPosition>)
+    (observer: IObserver<TechLogPosition>)
     (logger: ILogger)
     (msg: Msg)
     (model: MainModel)

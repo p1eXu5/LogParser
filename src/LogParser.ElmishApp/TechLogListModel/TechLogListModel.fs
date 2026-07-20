@@ -3,8 +3,9 @@
 
 type TechLogListModel =
     {
-        TechLogList: TechLogModel list
-        PinnedFieldName: string option
+        TechLogModelList: TechLogModel list
+        PinnedFieldNameA: string option
+        PinnedFieldNameB: string option
     }
 
 module TechLogListModel =
@@ -32,15 +33,16 @@ module TechLogListModel =
         )
         |> fun models ->
             {
-                TechLogList = models
-                PinnedFieldName = None
+                TechLogModelList = models
+                PinnedFieldNameA = None
+                PinnedFieldNameB = None
             }
 
     let inline length (m: TechLogListModel) =
-        m.TechLogList.Length
+        m.TechLogModelList.Length
 
     let inline withTechLogList techLogList (m: TechLogListModel) =
-        { m with TechLogList = techLogList }
+        { m with TechLogModelList = techLogList }
 
 
 namespace LogParser.ElmishApp.TechLogListModel
@@ -58,7 +60,7 @@ module Program =
         match msg with
         | Msg.TechLogModelMsg (id, smsg) ->
             model
-            |> Model.map _.TechLogList withTechLogList
+            |> Model.map _.TechLogModelList withTechLogList
                 (List.mapFirst (TechLogModel.logId >> (=) id) (TechLogModel.Program.update smsg))
 
 type IBindings =
@@ -74,8 +76,8 @@ module Bindings =
         [
             nameof __.TechLogList
                 |> Binding.subModelSeq (
-                    (fun m -> m.TechLogList),
-                    (fun (m, sm) -> {| TechLogModel = sm; PinnedFieldName = m.PinnedFieldName |}),
+                    (fun m -> m.TechLogModelList),
+                    (fun (m, sm) -> {| TechLogModel = sm; PinnedFieldName = m.PinnedFieldNameA |}),
                     (_.TechLogModel >> TechLogModel.logId),
                     Msg.TechLogModelMsg,
                     TechLogModel.Bindings.bindings

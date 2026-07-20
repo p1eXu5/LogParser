@@ -10,15 +10,15 @@ open LogParser.Types
 
 type AppSubject =
     {
-        GetObserver: LogSourceId -> IObserver<LogPosition>
+        GetObserver: LogSourceId -> IObserver<TechLogPosition>
         Observable: IObservable<LogSourceId * ObservableLogPosition>
         Dispose: unit -> unit
     }
     interface IDisposable with
         member this.Dispose() =
             this.Dispose()
-    interface IObservable<LogSourceId * LogPosition seq> with
-        member this.Subscribe (observer: IObserver<LogSourceId * LogPosition seq>): IDisposable = 
+    interface IObservable<LogSourceId * TechLogPosition seq> with
+        member this.Subscribe (observer: IObserver<LogSourceId * TechLogPosition seq>): IDisposable = 
             this.Observable
             |> Observable.choose (fun (id, lp) -> lp |> function ObservableLogPosition.Next s -> (id, s) |> Some | _ -> None)
             |> Observable.subscribeObserver observer
@@ -29,7 +29,7 @@ type AppSubject =
 and
     [<RequireQualifiedAccess>]
     ObservableLogPosition =
-        | Next of LogPosition seq
+        | Next of TechLogPosition seq
         | Error of string
         | Completed
 and
@@ -45,7 +45,7 @@ and
             LogObserverObtained: LogSourceId -> unit
             LogInnerObserverExists: LogSourceId -> unit
             LogInnerObserverCreated: LogSourceId -> unit
-            LogObserverNext: LogSourceId -> unit
+            LogObserverNext: LogSourceId -> TechLogPosition -> unit
             LogObserverError: LogSourceId -> exn -> unit
             LogObserverCompleted: LogSourceId -> unit
             LogSwitchingToIteration: int -> unit
@@ -68,10 +68,10 @@ and
                     ) fmt
                 {
                     LogRequestingObserver = log "Requesting: %A"
-                    LogObserverObtained = log "Obtained: %A"
+                    LogObserverObtained = log "Observer is obtained for the log source '%A'"
                     LogInnerObserverExists = log "Inner observer exists: %A"
-                    LogInnerObserverCreated = log "Inner observer has been created for source '%A'"
-                    LogObserverNext = log "Next: %A"
+                    LogInnerObserverCreated = log "Inner observer has been created for log source '%A'"
+                    LogObserverNext = fun id l -> log "Next: %A.\n\t%O" id l.Log
                     LogObserverError = log "Error: %A - %A"
                     LogObserverCompleted = log "Completed: %A"
                     LogSwitchingToIteration = log "Switching to the %i iteration"
@@ -84,7 +84,7 @@ module AppSubject =
 
     type private State =
         {
-            Observers: Map<LogSourceId, (System.Reactive.Subjects.Subject<LogPosition> * IDisposable)>
+            Observers: Map<LogSourceId, (System.Reactive.Subjects.Subject<TechLogPosition> * IDisposable)>
             Merged: System.Reactive.Subjects.Subject<IObservable<LogSourceId * LogPositionSignal>>
             InnerSignal: System.Reactive.Subjects.Subject<LogSourceId * LogPositionSignal>
             Iteration: int
@@ -102,12 +102,12 @@ module AppSubject =
     and
         [<RequireQualifiedAccess>]
         private LogPositionSignal =
-            | Next of LogPosition
+            | Next of TechLogPosition
             | Error of string
             | Completed
 
     type private Msg =
-        | GetObserver of LogSourceId * mainObserver: IObserver<IObservable<LogSourceId * ObservableLogPosition>> * AsyncReplyChannel<IObserver<LogPosition>>
+        | GetObserver of LogSourceId * mainObserver: IObserver<IObservable<LogSourceId * ObservableLogPosition>> * AsyncReplyChannel<IObserver<TechLogPosition>>
         | FinishObserver of LogSourceId * error: string option
         | Dispose of AsyncReplyChannel<unit>
 
@@ -123,15 +123,15 @@ module AppSubject =
                     match state.Observers |> Map.tryFind logSourceId with
                     | Some (inner, _) ->
                         logger.LogInnerObserverExists logSourceId
-                        reply.Reply(inner :> IObserver<LogPosition>)
+                        reply.Reply(inner :> IObserver<TechLogPosition>)
                         return! loop state
                     | None ->
                         let inner = Subject.broadcast
                         let d =
                             inner
                             |> Observable.subscribeSafeWithCallbacks
-                                (fun _ ->
-                                    logger.LogObserverNext logSourceId
+                                (fun techLogPosition ->
+                                    logger.LogObserverNext logSourceId techLogPosition
                                 )
                                 (fun ex -> 
                                     logger.LogObserverError logSourceId ex
@@ -174,7 +174,7 @@ module AppSubject =
                                 state.Iteration
                         
                         state.Merged.OnNext(inner |> Observable.map (fun log -> (logSourceId, log |> LogPositionSignal.Next)))
-                        reply.Reply(inner :> IObserver<LogPosition>)
+                        reply.Reply(inner :> IObserver<TechLogPosition>)
 
                         logger.LogInnerObserverCreated logSourceId
 

@@ -8,6 +8,7 @@
   </Configurations>
   <Folder Name="/Solution Items/">
     <File Path="build.fsx" />
+    <File Path="investigation.fsx" />
     <File Path="README.md" />
     <File Path="RELEASE_NOTES.md" />
   </Folder>
@@ -18,6 +19,7 @@
     <Project Path="src/LogParser/LogParser.fsproj" />
   </Folder>
   <Folder Name="/src/3rd/">
+    <Project Path="../../../CSharp/_libs/p1eXu5/p1eXu5.Wpf.PaginationViews/src/p1eXu5.Wpf.PaginationViews/p1eXu5.Wpf.PaginationViews.csproj" />
     <Project Path="../../_libs/p1eXu5.FSharp.Reactive/src/p1eXu5.FSharp.Reactive/p1eXu5.FSharp.Reactive.fsproj" />
   </Folder>
   <Folder Name="/test/">

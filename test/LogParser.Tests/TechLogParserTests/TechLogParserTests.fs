@@ -9,7 +9,7 @@ module TechLogParserTests =
 
     open Microsoft.Extensions.Logging
     open FsToolkit.ErrorHandling
-    open FSharp.Control.Reactive.Testing
+    open p1eXu5.FSharp.Reactive.Testing
 
     open LogParser
     open LogParser.Dsl
@@ -17,7 +17,7 @@ module TechLogParserTests =
     open System.Collections
 
     let private testScheduler = TestScheduler.create ()
-    let private testObserver = TestScheduler.createObserver<LogPosition> testScheduler
+    let private testObserver = TestScheduler.createObserver<TechLogPosition> testScheduler
 
     // ------------------------------------
     // p_fieldIdentifier tests

@@ -590,7 +590,7 @@ let private mergeFullMessage fieldList =
     )
 
 /// example: `some text {<json>}`
-let private p_sourcedTechLog (observer: IObserver<LogPosition>) =
+let private p_sourcedTechLog (observer: IObserver<TechLogPosition>) =
     getPosition .>>. 
     manyCharsTill anyChar (nextCharSatisfies ((=) '{') <|> nextCharSatisfies ((=) '\n')) 
     .>>.? p_TechLogWithQuotes
@@ -613,7 +613,7 @@ let private p_sourcedTechLog (observer: IObserver<LogPosition>) =
     )
         
 
-let private p_TechLog (observer: IObserver<LogPosition>) =
+let private p_TechLog (observer: IObserver<TechLogPosition>) =
     getPosition .>>. p_TechLogWithQuotes .>>. getPosition
     |>> (fun ((startPosition, techFieldList), endPosition) ->
         let log = {Source = None; Fields = techFieldList} |> TechLog.JsonLog
@@ -621,7 +621,7 @@ let private p_TechLog (observer: IObserver<LogPosition>) =
         log
     )
 
-let private p_TextLog (observer: IObserver<LogPosition>) =
+let private p_TextLog (observer: IObserver<TechLogPosition>) =
     getPosition .>>. many1Satisfy ((<>) '\n') .>>. getPosition
     |>> (fun ((startPosition, text), endPosition) ->
         let log = TechLog.TextLog text
@@ -629,7 +629,7 @@ let private p_TextLog (observer: IObserver<LogPosition>) =
         log
     )
 
-let internal logList (observer: IObserver<LogPosition>) =
+let internal logList (observer: IObserver<TechLogPosition>) =
     ws
     >>? sepEndBy 
         ( 
@@ -650,7 +650,7 @@ let internal logList (observer: IObserver<LogPosition>) =
         )
     .>> eof
 
-let internal logListIgnore (observer: IObserver<LogPosition>) =
+let internal logListIgnore (observer: IObserver<TechLogPosition>) =
     ws
     >>? skipSepEndBy
         ( 
@@ -675,7 +675,7 @@ let internal logListIgnore (observer: IObserver<LogPosition>) =
 exception LogParsingException of string
 
 
-let public parse (observer: IObserver<LogPosition>) input =
+let public parse (observer: IObserver<TechLogPosition>) input =
     run (logList observer) input
     |> function
         | Success (ok,_,_) ->
@@ -686,7 +686,7 @@ let public parse (observer: IObserver<LogPosition>) input =
             observer.OnError(err |> LogParsingException)
             Result.Error err
 
-let public parseStream (observer: IObserver<LogPosition>) streamName stream =
+let public parseStream (observer: IObserver<TechLogPosition>) streamName stream =
     runParserOnStream (logListIgnore observer) () streamName stream (Text.Encoding.UTF8)
     |> function
         | Success (ok,_,_) ->

@@ -3,8 +3,8 @@ namespace LogParser.ElmishApp.Models
 open LogParser.Types
 
 type TechLogModel =
-    | TextLogModel of UIProps: TechLogUIProps * Model: TextLogModel
-    | JsonLogModel of UIProps: TechLogUIProps * Model: TechJsonLogModel
+    | TextLogModel of UIProps: TechLogUIProps * Model: TextLogModelV2
+    | JsonLogModel of UIProps: TechLogUIProps * Model: JsonLogModelV2
 and
     TechLogUIProps =
         {
@@ -19,6 +19,7 @@ module TechLogModel =
         | TechLogModel.TextLogModel (_, l) -> l.Id
         | TechLogModel.JsonLogModel (_, l) -> l.Id 
 
+    (*
     let timestamp = function
         | TechLogModel.TextLogModel _ -> None
         | TechLogModel.JsonLogModel (_, log) -> log.Timestamp
@@ -38,5 +39,6 @@ module TechLogModel =
     let serviceName = function
         | TechLogModel.JsonLogModel (_, log) -> log.ServiceName |> Some
         | _ -> None
+    *)
 
     

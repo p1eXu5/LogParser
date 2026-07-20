@@ -175,13 +175,20 @@ module TechJsonLogField =
 
                 let innerTab = String.replicate ((state.TabLevel + 1) * 4) " "
 
-                fields
-                |> List.take (fields.Length - 1)
-                |> List.iter (fun f ->
-                    state.Result.Append(innerTab).Append($"{f},\n") |> ignore
-                )
+                if fields.Length > 0 then
+                    fields
+                    |> List.take (fields.Length - 1)
+                    |> List.iter (fun f ->
+                        state.Result.Append(innerTab).Append($"{f},\n") |> ignore
+                    )
                 
-                state.Result.Append(innerTab).Append($"{List.last fields}\n").Append(tab).Append("]") |> ignore
+                state.Result.Append(innerTab)
+                |> fun sb ->
+                    if fields.Length > 0 then
+                        sb.Append($"{List.last fields}\n")
+                    else
+                        sb
+                |> _.Append(tab).Append("]") |> ignore
 
             | Array (key, fields) when fields.Length > 0 ->
                 state.Result.Append(tab).Append($"\"{key}\": [\n") |> ignore

@@ -35,11 +35,12 @@ type TechJsonLog =
             override this.ToString() =
                 this.Fields
                 |> List.map (sprintf "%O")
-                |> (fun l -> String.Join("\n", l))
+                |> (fun l -> String.Join(",\n", l))
 
+type TechTextLog = string
 
 type TechLog =
-    | TextLog of string
+    | TextLog of TechTextLog
     | JsonLog of TechJsonLog
     with
         override this.ToString() =
@@ -48,7 +49,7 @@ type TechLog =
             | JsonLog tl -> tl.ToString()
 
 
-type LogPosition =
+type TechLogPosition =
     {
         Start: Position
         End: Position

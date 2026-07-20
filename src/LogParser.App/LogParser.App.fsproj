@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="TrieNet" Version="1.0.3.26316" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\..\_libs\p1eXu5.FSharp.Reactive\src\p1eXu5.FSharp.Reactive\p1eXu5.FSharp.Reactive.fsproj" />
     <ProjectReference Include="..\LogParser\LogParser.fsproj" />
   </ItemGroup>

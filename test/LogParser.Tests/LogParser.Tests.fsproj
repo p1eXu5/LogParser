@@ -47,6 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\_libs\p1eXu5.FSharp.Reactive\src\p1eXu5.FSharp.Reactive.Testing\p1eXu5.FSharp.Reactive.Testing.fsproj" />
     <ProjectReference Include="..\..\src\LogParser\LogParser.fsproj" />
   </ItemGroup>
 

@@ -3,63 +3,66 @@
 open System
 open LogParser.Types
 
-type FilePath =
-    private
-    | TmpFilePath of string
-    | UserFilePath of string
-
-[<Struct>]
-type ClientId = private ClientId of Guid
-
+/// Log source identifier. Used in AppSubject.
 [<Struct>]
 type LogSourceId = private LogSourceId of Guid
 
+[<Struct>]
+type TechLogId =
+    private {
+        StartIndex: int64
+        EndIndex: int64
+    }
+
+type TechLogMap = Map<TechLogId, TechLog>
+
+type FilePath = private FilePath of string
+    //private
+    //| TmpFilePath of string
+    //| UserFilePath of string
+
+/// Text containing logs.
 type LogSourceText = private LogSourceText of string
 
 type LogParseMsg =
-    | LogPosition of LogPosition
-    | LogPositionBunch of LogPosition list
+    | LogPosition of TechLogPosition
+    | LogPositionBunch of TechLogPosition list
     | ParsingError of string
 
 
-type internal LogStreamSource =
+type LogFile =
     | MemoryStream
     | TempFile of FilePath
     | UserFile of FilePath
 
+type FieldKey = string
+
+// ===========================
+// Modules
+// ===========================
+
 module FilePath =
     open System.IO
 
-    let createTmp filePath =
+    let create filePath =
         if File.Exists filePath then
-            filePath |> FilePath.TmpFilePath |> Ok
+            filePath |> FilePath |> Ok
         else
             "Temp file does not exist" |> Error
 
-    let createTmpUnsafe filePath =
-        match createTmp filePath with
+    let createUnsafe filePath =
+        match create filePath with
         | Ok p -> p
         | Error err ->
             raise (InvalidOperationException(err))
 
-    let createUser filePath =
-        if File.Exists filePath then
-            filePath |> FilePath.UserFilePath |> Ok
-        else
-            "User file does not exist" |> Error
-
-    let value = function
-        | FilePath.TmpFilePath v
-        | FilePath.UserFilePath v -> v
-
-module ClientId =
-    let create () = Guid.CreateVersion7() |> ClientId
-    let value (ClientId v) = v
+    let value (FilePath filePath) = filePath
 
 module LogSourceId =
     let create () = Guid.CreateVersion7() |> LogSourceId
     let value (LogSourceId v) = v
 
+/// Text containing logs.
 module LogSourceText =
     let create (text: string) =
         if String.IsNullOrWhiteSpace(text) then
@@ -77,3 +80,16 @@ module LogSourceText =
 
 type LogSourceText with
     member this.Value with get () = this |> LogSourceText.value
+
+module LogFile =
+    let isNotUserFile (logFile: LogFile) =
+        match logFile with
+        | LogFile.UserFile _ -> false
+        | _ -> true
+
+module TechLogId =
+    let fromTechLogPosition (techLogPosition: TechLogPosition) =
+        {
+            StartIndex = techLogPosition.Start.Index
+            EndIndex = techLogPosition.End.Index
+        }

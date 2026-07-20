@@ -108,6 +108,7 @@ module TechJsonLogField =
     let generateMany () =
         seq { 0 .. faker.Random.Int(1, 3) }
         |> Seq.map (fun _ -> generate ())
+        |> Seq.distinctBy (fun f -> f |> TechJsonLogField.key)
         |> Seq.toList
 
     let generatePrimitiveMany () =
@@ -133,8 +134,9 @@ module TechLog =
         }
         |> TechLog.JsonLog
 
-    let generateJsonMany () =
-        seq { 0 .. faker.Random.Int(1, 3) }
+    /// Generates from 2 to 5 logs.
+    let generateJsonFrom2To5 () =
+        seq { 0 .. faker.Random.Int(2, 5) }
         |> Seq.map (fun _ -> generateJson ())
         |> Seq.toList
 

@@ -13,3 +13,4 @@ type ShowMode =
 type FileState =
     | NewTemp
     | Existing
+

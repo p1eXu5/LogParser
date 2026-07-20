@@ -65,7 +65,7 @@ module FileStorage =
                 finally
                     ArrayPool<byte>.Shared.Return(buffer)
 
-                return path |> FilePath.createTmpUnsafe |> Ok
+                return path |> FilePath.createUnsafe |> Ok
             with ex ->
                 logger.LogFailToInitialize ex
                 return Error TmpFileCreatingError

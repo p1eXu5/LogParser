@@ -11,16 +11,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace LogParser.WpfClient.UserControls
+namespace LogParser.WpfClient.UserControls;
+
+/// <summary>
+/// Interaction logic for MainContent.xaml
+/// </summary>
+public partial class LogFileList : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MainContent.xaml
-    /// </summary>
-    public partial class MainContent : UserControl
+    public LogFileList()
     {
-        public MainContent()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

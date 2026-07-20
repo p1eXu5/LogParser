@@ -33,9 +33,10 @@
         <ListBoxItem IsSelected="{Binding ShowAll}"
                      Style="{DynamicResource st_ToolBarListBoxItem}"
                      >
+            <!-- or FileDocumentCheckOutline when document is edited -->
             <materialDesign:PackIcon Width="18"
                                      Height="18"
-                                     Kind="TextBoxOutline"
+                                     Kind="FileDocumentEdit"
                                      />
         </ListBoxItem>
     </ListBox>

@@ -23,10 +23,10 @@ module AppSubjectTests =
         AppSubject.init AppSubjectLogger.Console appConfig
 
     let private createBufAndSubscribe (appSubject: AppSubject) =
-        let buf = ResizeArray<LogSourceId * LogPosition list>()
+        let buf = ResizeArray<LogSourceId * TechLogPosition list>()
         let sub =
             appSubject
-            :> IObservable<LogSourceId * LogPosition seq>
+            :> IObservable<LogSourceId * TechLogPosition seq>
             |> Observable.subscribeNext
                 (fun (id, positions) ->
                     let now = DateTimeOffset.Now.ToString("HH':'mm':'ss.fffff")
@@ -38,11 +38,11 @@ module AppSubjectTests =
     let private msg () = LogPosition.generate ()
     let private errMsg () = Guid.NewGuid().ToString("N") |> LogParseMsg.ParsingError
 
-    let spinWait buffCount (buf: ResizeArray<LogSourceId * LogPosition list>) =
+    let spinWait buffCount (buf: ResizeArray<LogSourceId * TechLogPosition list>) =
         let res = SpinWait.SpinUntil(Func<bool> (fun _ -> buf.Count = buffCount), 5000)
         %res.Should().BeTrue()
 
-    let spinWaitItems (lastItemsCounts: int list) (buf: ResizeArray<LogSourceId * LogPosition list>) =
+    let spinWaitItems (lastItemsCounts: int list) (buf: ResizeArray<LogSourceId * TechLogPosition list>) =
         let res = SpinWait.SpinUntil(Func<bool> (fun _ -> buf |> Seq.map (snd >> _.Length) |> Seq.toList |> List.sort |> (=) (lastItemsCounts |> List.sort)), 5000)
         %res.Should().BeTrue()
 
@@ -140,11 +140,11 @@ module AppSubjectTests =
     [<Test>]
     let ``05: OnCompleted on one observer does not complete the merged stream`` () =
         let appSubject = appSubject 1
-        let buf = ResizeArray<LogSourceId * LogPosition list>()
+        let buf = ResizeArray<LogSourceId * TechLogPosition list>()
         let mutable completed = false
         let _ =
             appSubject
-            :> IObservable<LogSourceId * LogPosition seq>
+            :> IObservable<LogSourceId * TechLogPosition seq>
             |> Observable.subscribeNext
                 (fun (id, positions) -> buf.Add((id, Seq.toList positions)))
 
@@ -161,6 +161,8 @@ module AppSubjectTests =
         // Stream remains open — oB still works.
         let msgB = msg ()
         oB.OnNext(msgB)
+
+        buf |> spinWait 2
 
         %buf.Should()
             .SequenceEqual(
@@ -265,7 +267,7 @@ module AppSubjectTests =
         let mutable completed = false
         let _ =
             appSubject
-            :> IObservable<LogSourceId * LogPosition seq>
+            :> IObservable<LogSourceId * TechLogPosition seq>
             |> Observable.subscribeCompleted
                 (fun () -> completed <- true)
 
@@ -282,7 +284,7 @@ module AppSubjectTests =
         let testObserver = scheduler |> TestScheduler.createObserver
         let _ = 
             appSubject
-            :> IObservable<LogSourceId * LogPosition seq>
+            :> IObservable<LogSourceId * TechLogPosition seq>
             |> Observable.subscribeObserver(testObserver)
 
         let idA = LogSourceId.create ()
@@ -333,7 +335,7 @@ module AppSubjectTests =
         let testObserver = scheduler |> TestScheduler.createObserver
         let _ = 
             appSubject
-            :> IObservable<LogSourceId * LogPosition seq>
+            :> IObservable<LogSourceId * TechLogPosition seq>
             |> Observable.subscribeObserver(testObserver)
 
         let idA = LogSourceId.create ()
