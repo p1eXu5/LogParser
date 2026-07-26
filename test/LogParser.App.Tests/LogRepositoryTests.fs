@@ -121,3 +121,21 @@ module LogRepositoryTests =
                 .BeInRange(1, 2)
         }
 
+    [<Test>]
+    let ``GetLogs. When repo is in parsing state, logs exist, returns log in correct order`` () =
+        async {
+            let appConfig = appConfig 3
+            let appSubject = appSubject appConfig
+            let logSourceId = LogSourceId.create ()
+            let logRepository = logRepository appConfig appSubject logSourceId
+            let logs = TechLog.generateLogLevelMessageN 3
+            let logText = logSourceText logs
+
+            let! _ = logRepository.ParseTextAsync logText
+            let! logMetaBatch = logRepository.GetNextLogBatch ()
+            let! logBatch = logRepository.GetLogs logMetaBatch.TechLogIds
+            %logBatch.TechLogs[0]
+                .Should()
+                .Be(logs[0])
+        }
+

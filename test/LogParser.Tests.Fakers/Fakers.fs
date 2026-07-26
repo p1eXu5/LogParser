@@ -168,7 +168,7 @@ module TechLog =
         |> TechLog.JsonLog
 
     let generateLogLevelMessageN (n: int) =
-        seq { 0 .. n }
+        seq { 1 .. n }
         |> Seq.map (fun _ -> generateLogLevelMessage ())
         |> Seq.toList
 

@@ -13,6 +13,7 @@ open LogParser.App
 open LogParser.Types
 open p1eXu5.FSharp.Reactive
 open Gma.DataStructures.StringSearch
+open System.Buffers
 
 type LogRepository =
     {
@@ -281,14 +282,17 @@ module LogRepository =
         }
 
     let private logs (appConfig: AppConfig) (stateLogs: IStateLogs) =
-        if stateLogs.Skip >= stateLogs.Logs.Length - 1 then
+        let skip = stateLogs.Skip
+        if skip >= stateLogs.Logs.Length - 1 then
             List.empty
         else
+            let length = stateLogs.Logs.Length
             if stateLogs.Filter |> Map.isEmpty then
                 stateLogs.Logs
-                |> List.skip stateLogs.Skip
+                |> List.rev
+                |> List.skip skip
                 |> List.take appConfig.ParserSubscriptionBatchSize
-                |> List.mapi (fun ind _ -> TechLogId.fromTechLogPosition
+                |> List.mapi (fun ind l -> TechLogId.fromTechLogPosition (length - skip - ind - 1) length l)
             else
                 stateLogs.Fields
                 |> Map.fold (fun s key ind ->
@@ -297,11 +301,11 @@ module LogRepository =
                         s |> Seq.append (stateLogs.FieldValueToLogs[ind].Retrieve(v))
                     | None -> s
                 ) Seq.empty
-                |> Seq.sort
-                |> Seq.skip stateLogs.Skip
+                |> Seq.sortDescending
+                |> Seq.skip skip
                 |> Seq.take appConfig.ParserSubscriptionBatchSize
                 |> Seq.map (fun ind ->
-                    stateLogs.Logs[ind] |> TechLogId.fromTechLogPosition
+                    stateLogs.Logs[length - ind - 1] |> TechLogId.fromTechLogPosition ind length
                 )
                 |> Seq.toList
 
@@ -503,12 +507,37 @@ module LogRepository =
                                 return! running state
 
                         | Msg.GetLogs (logIdList, reply) ->
-                            match state with
-                            | State.LogsStream s ->
-
-                            | _ ->
+                            if logIdList.Length = 0 then
                                 reply.Reply (LogBatch.create [] [])
                                 return! running state
+                            else
+                                match state with
+                                | State.LogsStream s ->
+                                    let mutable buf = ArrayPool<char>.Shared.Rent(int (logIdList[0].EndIndex - logIdList[0].StartIndex))
+                                    use sr = new StreamReader(s.Stream, leaveOpen = true)
+                                    let logBatch =
+                                        logIdList
+                                        |> List.fold
+                                            (fun batch logId ->
+                                                let count = int (logId.EndIndex - logId.StartIndex)
+                                                if count > buf.Length then
+                                                    ArrayPool<char>.Shared.Return(buf);
+                                                    buf <- ArrayPool<char>.Shared.Rent(count)
+                                                let _ = sr.BaseStream.Seek(logId.StartIndex, SeekOrigin.Begin)
+                                                let read = sr.ReadBlock(buf, 0, count)
+                                                { batch with
+                                                    TechLogs = s.Logs[logId.Ind].Log :: batch.TechLogs
+                                                    RawLogs = System.String(buf, 0, read) :: batch.RawLogs
+                                                }
+                                            )
+                                            ({ TechLogs = []; RawLogs = [] })
+                                    sr.Dispose()
+                                    ArrayPool<char>.Shared.Return(buf);
+                                    reply.Reply (logBatch)
+                                    return! running state
+                                | _ ->
+                                    reply.Reply (LogBatch.create [] [])
+                                    return! running state
                     }
 
                 running (Initialized { Filter = Map.empty })

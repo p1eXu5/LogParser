@@ -687,12 +687,13 @@ let public parse (observer: IObserver<TechLogPosition>) input =
             Result.Error err
 
 let public parseStream (observer: IObserver<TechLogPosition>) streamName stream =
-    runParserOnStream (logListIgnore observer) () streamName stream (Text.Encoding.UTF8)
-    |> function
-        | Success (ok,_,_) ->
-            observer.OnCompleted()
-            Result.Ok ok
-
-        | Failure (err, _, _) ->
-            observer.OnError(err |> LogParsingException)
-            Result.Error err
+    use charStream = new CharStream<unit>(stream, true, Text.Encoding.UTF8)
+    let reply = (logListIgnore observer) charStream
+    if reply.Status = Ok then
+        observer.OnCompleted()
+        Result.Ok reply.Result
+    else
+        let error = ParserError(charStream.Position, charStream.UserState, reply.Error)
+        let err = error.ToString()
+        observer.OnError(err |> LogParsingException)
+        Result.Error err
