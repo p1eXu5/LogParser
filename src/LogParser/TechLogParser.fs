@@ -686,6 +686,8 @@ let public parse (observer: IObserver<TechLogPosition>) input =
             observer.OnError(err |> LogParsingException)
             Result.Error err
 
+#nowarn "3397"
+
 let public parseStream (observer: IObserver<TechLogPosition>) streamName stream =
     use charStream = new CharStream<unit>(stream, true, Text.Encoding.UTF8)
     let reply = (logListIgnore observer) charStream
