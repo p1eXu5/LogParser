@@ -26,6 +26,12 @@ module Timespan =
         )()
 
 module TechJsonLogField =
+    let generateLogLevel () =
+        faker.Random.Enum<LogLevel>() |> TechJsonLogField.Level
+
+    let generateMessage () =
+        faker.Lorem.Sentence() |> TechJsonLogField.Message
+        
     let private primitiveGenerators = 
         let key () =
             faker.Hacker.Noun()
@@ -37,8 +43,8 @@ module TechJsonLogField =
 
         [|
             Timespan.generate >> TechJsonLogField.Timespan
-            fun () -> faker.Lorem.Sentence() |> TechJsonLogField.Message
-            fun () -> faker.Random.Enum<LogLevel>() |> TechJsonLogField.Level
+            generateMessage
+            generateLogLevel
             fun () -> faker.Lorem.Word() |> TechJsonLogField.Method
             fun () -> faker.Random.Enum<HttpStatusCode>() |> TechJsonLogField.StatusCode
             fun () -> faker.Internet.UrlWithPath() |> TechJsonLogField.Path
@@ -52,6 +58,7 @@ module TechJsonLogField =
             fun () -> key () |> TechJsonLogField.Null
             // TODO: add other
         |]
+
 
     let private complexGenerators =
         let generatePrimitiveMany () =
@@ -121,15 +128,17 @@ module TechLog =
     let generateText () =
         faker.Lorem.Sentence() |> TechLog.TextLog
 
+    let generateSource () =
+        faker.Random.ArrayElement(
+            [|
+                fun () -> None
+                fun () -> TechJsonLogField.generatePrimitive () |> Some
+            |]
+        )()
+
     let generateJson () =
         {
-            Source =
-                faker.Random.ArrayElement(
-                    [|
-                        fun () -> None
-                        fun () -> TechJsonLogField.generatePrimitive () |> Some
-                    |]
-                )()
+            Source = generateSource ()
             Fields = TechJsonLogField.generateMany ()
         }
         |> TechLog.JsonLog
@@ -147,6 +156,21 @@ module TechLog =
                 generateJson
             |]
         )()
+
+    let generateLogLevelMessage () =
+        {
+            Source = generateSource ()
+            Fields = [
+                TechJsonLogField.generateLogLevel ()
+                TechJsonLogField.generateMessage ()
+            ]
+        }
+        |> TechLog.JsonLog
+
+    let generateLogLevelMessageN (n: int) =
+        seq { 0 .. n }
+        |> Seq.map (fun _ -> generateLogLevelMessage ())
+        |> Seq.toList
 
 module LogPosition =
     let generate () =

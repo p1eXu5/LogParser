@@ -10,6 +10,7 @@ type LogSourceId = private LogSourceId of Guid
 [<Struct>]
 type TechLogId =
     private {
+        Ind: int
         StartIndex: int64
         EndIndex: int64
     }
@@ -88,8 +89,9 @@ module LogFile =
         | _ -> true
 
 module TechLogId =
-    let fromTechLogPosition (techLogPosition: TechLogPosition) =
+    let fromTechLogPosition (ind: int) (techLogPosition: TechLogPosition) =
         {
+            Ind = ind
             StartIndex = techLogPosition.Start.Index
             EndIndex = techLogPosition.End.Index
         }

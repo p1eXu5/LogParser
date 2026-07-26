@@ -34,8 +34,7 @@ type TechJsonLog =
         with
             override this.ToString() =
                 this.Fields
-                |> List.map (sprintf "%O")
-                |> (fun l -> String.Join(",\n", l))
+                |> TechJsonLogField.toString 1
 
 type TechTextLog = string
 

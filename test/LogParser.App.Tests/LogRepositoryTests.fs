@@ -14,6 +14,8 @@ open LogParser.Tests.Fakers
 
 
 open LogParser.App
+open LogParser.App.LogRepository
+open LogParser.Types
 
 module LogRepositoryTests =
     let private appConfig (parserSubscriptionBatchSize: int) =
@@ -38,7 +40,16 @@ module LogRepositoryTests =
         String.Join(
             "," + newLine,
             TechLog.generateJsonFrom2To5 ()
-            |> List.map (fun l -> $"{{{newLine}{l.ToString()}{newLine}}}")
+            |> List.map (fun l -> l.ToString())
+        )
+        |> LogSourceText.createUnsafe
+
+    let private logSourceText (logs: TechLog list) =
+        let newLine = Environment.NewLine
+        String.Join(
+            "," + newLine,
+            logs
+            |> List.map (fun l -> l.ToString())
         )
         |> LogSourceText.createUnsafe
 
@@ -54,7 +65,7 @@ module LogRepositoryTests =
             let! res = logRepository.ParseTextAsync logText
             %res
                 .Should()
-                .BeOfCase(LogRepositoryParseTextRequestResult.Accepted)
+                .BeOfCase(ParseTextRequestResult.Accepted)
         }
 
     [<Test>]
@@ -66,7 +77,8 @@ module LogRepositoryTests =
             let logRepository = logRepository appConfig appSubject logSourceId
 
             let! res = logRepository.GetNextLogBatch ()
-            %(fst res)
+            %res
+                .TechLogIds
                 .Should()
                 .BeEmpty()
         }
@@ -82,8 +94,30 @@ module LogRepositoryTests =
 
             let! _ = logRepository.ParseTextAsync logText
             let! res = logRepository.GetNextLogBatch ()
-            %(fst res)
+            %res
+                .TechLogIds
                 .Should()
                 .HaveLength 2
+        }
+
+    [<Test>]
+    let ``GetNextFilteredLogBatch. When repo is in parsing state, logs exist, batch less than log count, returns filtered log batch`` () =
+        async {
+            let appConfig = appConfig 2
+            let appSubject = appSubject appConfig
+            let logSourceId = LogSourceId.create ()
+            let logRepository = logRepository appConfig appSubject logSourceId
+            let logs = TechLog.generateLogLevelMessageN 20
+            let logText = logSourceText logs
+            let filter = [(nameof TechJsonLogField.Level, logs[0] |> TechLog.tryFind TechJsonSpecialFieldType.Level |> _.Value)] |> Map.ofList
+
+            let! _ = logRepository.ParseTextAsync logText
+            let! res = logRepository.GetNextFilteredLogBatch filter
+
+            %res
+                .TechLogIds
+                .Length
+                .Should()
+                .BeInRange(1, 2)
         }
 

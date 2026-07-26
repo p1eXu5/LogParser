@@ -259,6 +259,41 @@ module TechJsonLogField =
                 fold folder tj.Body {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
                 state.Result.Append("\n").Append(tab).Append("}") |> ignore
 
+            | MessageBoddied (header, body) ->
+                state.Result.Append(tab).Append($"\"message\": \"{header} {{\n") |> ignore
+                fold folder body {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
+                state.Result.Append("\n").Append(tab).Append("}\"") |> ignore
+
+            | MessageBoddiedWithPostfix (header, body, postfix) ->
+                state.Result.Append(tab).Append($"\"message\": \"{header} {{\n") |> ignore
+                fold folder body {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
+                state.Result.Append("\n").Append(tab).Append($"}} {postfix}\"") |> ignore
+
+            | MessageArrayJson fields ->
+                state.Result.Append(tab).Append("\"message\": [\n") |> ignore
+
+                fields
+                |> List.iter (fun f ->
+                    match f |> List.tryHead with
+                    | Some (ArrayJsonAnnonimous _) ->
+                        fold folder f {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
+                        state.Result.Append("]").Append("\n") |> ignore
+                    | Some (StringAnnonimous _)
+                    | Some (IntAnnonimous _)
+                    | Some (NullAnnonimous) ->
+                        fold folder f {| state with TabLevel = state.TabLevel + 1; Comma = false |} |> ignore
+                        state.Result.Append(",\n") |> ignore
+                    | Some _ ->
+                        state.Result.Append(tab).Append("    {\n") |> ignore
+                        fold folder f {| state with TabLevel = state.TabLevel + 2; Comma = false |} |> ignore
+                        state.Result.Append("\n").Append(tab).Append("    },\n") |> ignore
+                    | None ->
+                        state.Result.Append(tab).Append("    { },\n") |> ignore
+                )
+                
+                do
+                    state.Result.Remove(state.Result.Length - 2, 1).Append(tab).Append("]") |> ignore
+
             | _ ->
                 state.Result.Append(tab).Append(field.ToString()) |> ignore
 

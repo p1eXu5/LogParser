@@ -6,6 +6,7 @@ open FParsec
 open System.Diagnostics
 open NUnit.Framework.Constraints
 open System.Threading.Tasks
+open System
 
 [<AutoOpen>]
 module FsUnit =
@@ -22,7 +23,7 @@ module FsUnit =
 
         let y =
             match y with
-            | :? (unit -> unit) -> box(TestDelegate(y :?> unit -> unit))
+            | :? (unit -> unit) -> box(Action(y :?> unit -> unit))
             | _ -> y
 
         if isNull(box c) 
