@@ -5,6 +5,7 @@
          xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         x:Name="m_StandardToolBarRoot"
          d:DesignWidth="700"
          ClipToBounds="True"
          Style="{StaticResource st_LogParserToolBar}"
@@ -26,14 +27,15 @@
                                  />
     </Button>
 
-    <ListBox x:Name="c"
-             VerticalAlignment="Center"
+    <ListBox VerticalAlignment="Center"
              SelectionMode="Extended"
              >
-        <ListBoxItem IsSelected="{Binding ShowAll}"
+        <ListBoxItem x:Name="m_RawLogsToggler"
+                     IsSelected="{Binding ElementName=m_StandardToolBarRoot,
+                                          Path=RawLogsToggler}"
                      Style="{DynamicResource st_ToolBarListBoxItem}"
                      >
-            <!-- or FileDocumentCheckOutline when document is edited -->
+            <!--  or FileDocumentCheckOutline when document is edited  -->
             <materialDesign:PackIcon Width="18"
                                      Height="18"
                                      Kind="FileDocumentEdit"

@@ -128,12 +128,9 @@ module MainModel =
     let inline setTempTitle v m = { m with TempTitle = v }
 
     let documentNameTitle defaultTitle m =
-        match m.LogFileListModel |> LogFileListModel.selecteLogFileNameAndPath with
-            | Some (name, fullPath)->
-                let docName = $"{name}        ({fullPath})"
-                m.TempTitle
-                |> Option.map (fun t -> $"{t}    {docName}")
-                |> Option.defaultValue docName
+        match m.LogFileListModel |> LogFileListModel.selecteLogFileTitle with
+            | Some (title)->
+                title
             | _ -> m.TempTitle |> Option.defaultValue $"{defaultTitle} - New"
 
     let inline  showAll model =

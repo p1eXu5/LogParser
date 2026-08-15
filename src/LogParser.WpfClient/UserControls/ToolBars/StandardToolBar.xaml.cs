@@ -13,16 +13,29 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace LogParser.WpfClient.UserControls.ToolBars
+namespace LogParser.WpfClient.UserControls.ToolBars;
+
+/// <summary>
+/// Interaction logic for StandardToolBar.xaml
+/// </summary>
+public partial class StandardToolBar : ToolBar
 {
-    /// <summary>
-    /// Interaction logic for StandardToolBar.xaml
-    /// </summary>
-    public partial class StandardToolBar : ToolBar
+    public StandardToolBar()
     {
-        public StandardToolBar()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
+
+    public bool RawLogsToggler
+    {
+        get => (bool)GetValue(RawLogsTogglerProperty);
+        set => SetValue(RawLogsTogglerProperty, value);
+    }
+
+    // Using a DependencyProperty as the backing store for RawLogsToggler.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty RawLogsTogglerProperty =
+        DependencyProperty.Register(
+            nameof(RawLogsToggler),
+            typeof(bool),
+            typeof(StandardToolBar),
+            new PropertyMetadata(false));
 }

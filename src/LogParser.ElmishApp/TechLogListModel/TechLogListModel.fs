@@ -14,29 +14,29 @@ module TechLogListModel =
     open LogParser.Types
 
     type Msg =
-        | TechLogModelMsg of Guid * TechLogModel.Msg
+        | TechLogModelMsg of int * TechLogModel.Msg
 
     let init logs =
-        let uiProps =
-            {
-                IsExpanded = false
-            }
-        logs
-        |> List.map (fun l -> 
-            match l with
-            | TechLog.JsonLog l ->
-                let techLogModel = TechJsonLogModel.init (l)
-                TechLogModel.JsonLogModel (uiProps, techLogModel)
-            | TechLog.TextLog l ->
-                let (textLogModel, _) = TextLogModel.init (l)
-                TechLogModel.TextLogModel (uiProps, textLogModel)
-        )
-        |> fun models ->
-            {
-                TechLogModelList = models
-                PinnedFieldNameA = None
-                PinnedFieldNameB = None
-            }
+        //let uiProps =
+        //    {
+        //        IsExpanded = false
+        //    }
+        //logs
+        //|> List.map (fun l -> 
+        //    match l with
+        //    | TechLog.JsonLog l ->
+        //        let techLogModel = JsonLogModelV2.init (l)
+        //        TechLogModel.JsonLogModel (uiProps, techLogModel)
+        //    | TechLog.TextLog l ->
+        //        let (textLogModel, _) = TextLogModelV2.init (l)
+        //        TechLogModel.TextLogModel (uiProps, textLogModel)
+        //)
+        //|> fun models ->
+        {
+            TechLogModelList = []
+            PinnedFieldNameA = None
+            PinnedFieldNameB = None
+        }
 
     let inline length (m: TechLogListModel) =
         m.TechLogModelList.Length

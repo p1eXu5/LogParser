@@ -38,9 +38,11 @@ let update
 
     | Msg.LogFileListModelMsg smsg ->
         model
-        |> Model.map _.LogFileListModel withLogFileListMoodel
+        |> Model.mapCmd
+            _.LogFileListModel
+            withLogFileListMoodel
             (LogFileListModel.Program.update smsg)
-        , Cmd.none
+            Msg.LogFileListModelMsg
     (*
     
     | NewFile -> MainModel.init model.ErrorMessageQueue settingsManager None ()

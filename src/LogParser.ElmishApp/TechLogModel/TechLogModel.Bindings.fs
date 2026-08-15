@@ -16,6 +16,7 @@ module Bindings =
 
     let bindings () : Binding<{| TechLogModel: TechLogModel; PinnedFieldName: string option |}, TechLogModel.Msg> list =
         [
+            (*
             "Log"
                 |> Binding.oneWayOpt (fun (l: {| TechLogModel: TechLogModel; PinnedFieldName: string option |}) ->
                     match l.TechLogModel with
@@ -75,7 +76,6 @@ module Bindings =
                     | TechLogModel.TextLogModel _ -> 0
                 )
 
-            (*
             "CopyCommand"
                 |> Binding.cmd Msg.CopyLogCommand
 

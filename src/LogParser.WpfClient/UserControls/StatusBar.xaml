@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
              xmlns:mainModel="clr-namespace:LogParser.ElmishApp.MainModel;assembly=LogParser.ElmishApp"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             Height="32"
+             VerticalAlignment="Bottom"
              d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="32"
@@ -13,13 +13,13 @@
              Background="{StaticResource br_WindiwBackground}"
              mc:Ignorable="d"
              >
-    <Border DockPanel.Dock="Bottom"
-            Height="32"
-            Background="{StaticResource br_WindiwBackground}"
+    <Border Height="28"
+            Background="{DynamicResource MaterialDesign.Brush.ToolBar.Background}"
             >
         <TextBlock Margin="10,0"
                    VerticalAlignment="Center"
-                   FontSize="13"
+                   FontSize="11"
+                   FontWeight="Light"
                    Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                    >
             <Run Text="Log count:" />

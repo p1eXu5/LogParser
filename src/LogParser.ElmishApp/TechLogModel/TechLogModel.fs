@@ -1,10 +1,16 @@
 namespace LogParser.ElmishApp.Models
 
 open LogParser.Types
+open LogParser.App
 
+/// Respond to change log in log repository
+///
+/// Provides on time set bindings
+///
+/// Sorting, ordering and logContext separation are moved to the Wpf-scope
 type TechLogModel =
-    | TextLogModel of UIProps: TechLogUIProps * Model: TextLogModelV2
-    | JsonLogModel of UIProps: TechLogUIProps * Model: JsonLogModelV2
+    | TextLogModel of UIProps: TechLogUIProps * Model: TechLogId
+    | JsonLogModel of UIProps: TechLogUIProps * Model: TechLogId
 and
     TechLogUIProps =
         {
@@ -16,8 +22,8 @@ module TechLogModel =
     type Msg = Msg
 
     let logId = function
-        | TechLogModel.TextLogModel (_, l) -> l.Id
-        | TechLogModel.JsonLogModel (_, l) -> l.Id 
+        | TechLogModel.TextLogModel (_, l) -> l.Ind
+        | TechLogModel.JsonLogModel (_, l) -> l.Ind 
 
     (*
     let timestamp = function

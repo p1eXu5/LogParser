@@ -15,15 +15,18 @@
     <Compile Include="FiltersModel.fs" />
     <Compile Include="KibanaSearchModel.Services.fs" />
     <Compile Include="KibanaSearchModel.fs" />
-    <Compile Include="JsonLogModelV2.fs" />
-    <Compile Include="TextLogModelV2.fs" />
+    <Compile Include="KibanaAccountModel.fs" />
+    <Compile Include="KibanaAccountSelectorModel.fs" />
     <Compile Include="techlogmodel\TechLogModel.fs" />
     <Compile Include="TechLogModel\TechLogModel.Program.fs" />
     <Compile Include="TechLogModel\TechLogModel.Bindings.fs" />
     <Compile Include="TechLogListModel\TechLogListModel.fs" />
     <Compile Include="LogFileModel\LogFileModel.fs" />
-    <Folder Include="LogFileListModel\" />
+    <Compile Include="LogFileModel\LogFileModel.Program.fs" />
+    <Compile Include="LogFileModel\LogFileModel.Bindings.fs" />
     <Compile Include="logfilelistmodel\LogFileListModel.fs" />
+    <Compile Include="LogFileListModel\LogFileListModel.Program.fs" />
+    <Compile Include="LogFileListModel\LogFileListModel.Bindings.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />
@@ -37,7 +40,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.1.0" />
-    <PackageReference Include="p1eXu5.FSharp.ElmishExtensions" Version="1.0.4" />
+    <PackageReference Include="p1eXu5.FSharp.ElmishExtensions" Version="1.0.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.1.301" />
+    <PackageReference Update="FSharp.Core" Version="10.1.302" />
   </ItemGroup>
 
 </Project>

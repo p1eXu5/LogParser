@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:LogFileListModel="clr-namespace:LogParser.ElmishApp.LogFileListModel;assembly=LogParser.ElmishApp"
+             xmlns:LogFileModel="clr-namespace:LogParser.ElmishApp.LogFileModel;assembly=LogParser.ElmishApp"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
-             xmlns:logFileModel="clr-namespace:LogParser.ElmishApp.LogFileModel;assembly=LogParser.ElmishApp"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="m_LogFileListRoot"
              d:Background="{StaticResource br_WindiwBackground}"
              d:DataContext="{d:DesignInstance Type=LogFileListModel:IBindings,
                                               IsDesignTimeCreatable=False}"
@@ -17,27 +18,52 @@
              >
     <UserControl.Resources>
         <ResourceDictionary>
-            <Style x:Key="st_TabRadioButton"
+            <Style x:Key="st_TabRadioButtonBase"
                    BasedOn="{StaticResource st_MaterialDesignTabRadioButtonDerived}"
                    TargetType="RadioButton"
                    >
                 <Setter Property="MinHeight" Value="0" />
-                <Setter Property="Height" Value="30" />
-                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="FontWeight" Value="Medium" />
+                <Setter Property="FontStretch" Value="SemiExpanded" />
+
                 <Style.Triggers>
                     <Trigger Property="IsChecked" Value="False">
                         <Setter Property="Background" Value="{DynamicResource MaterialDesign.Brush.ToolBar.Background}" />
+                        <Setter Property="FontWeight" Value="Light" />
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Background" Value="{StaticResource br_WindiwBackground}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="st_TabRadioButton"
+                   BasedOn="{StaticResource st_TabRadioButtonBase}"
+                   TargetType="RadioButton"
+                   >
+                <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.SelectLogFileIdCommand}" />
+                <Setter Property="CommandParameter" Value="{Binding Id}" />
+                <Setter Property="IsChecked">
+                    <Setter.Value>
+                        <MultiBinding Converter="{StaticResource conv_IdEqualsSelectedId}"
+                                      Mode="OneWay"
+                                      >
+                            <Binding Path="Id" />
+                            <Binding Path="DataContext.SelectedLogFileId"
+                                     RelativeSource="{RelativeSource AncestorType=UserControl, Mode=FindAncestor}"
+                                     />
+                        </MultiBinding>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <DataTemplate x:Key="dt_LogFileItemTemplate"
-                          DataType="{x:Type logFileModel:IBindings}"
+                          DataType="{x:Type LogFileModel:IBindings}"
                           >
-                <RadioButton IsChecked="{Binding IsSelected}"
-                             Style="{StaticResource st_TabRadioButton}"
-                             >
-                    <TextBlock Text="{Binding FileName}" />
+                <RadioButton Style="{StaticResource st_TabRadioButton}">
+                    <TextBlock Text="{Binding Title}" />
                 </RadioButton>
             </DataTemplate>
         </ResourceDictionary>
@@ -50,12 +76,14 @@
                                   >
             <ScrollViewer HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Hidden"
+                          Background="{DynamicResource MaterialDesign.Brush.ToolBar.Background}"
+                          Margin="0,0,0,3"
                           >
                 <StackPanel Orientation="Horizontal">
 
                     <ItemsControl x:Name="m_Tabs"
                                   ItemTemplate="{StaticResource dt_LogFileItemTemplate}"
-                                  ItemsSource="{Binding LogFileList.LogFiles}"
+                                  ItemsSource="{Binding LogFiles}"
                                   >
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -66,65 +94,21 @@
                     </ItemsControl>
 
                     <RadioButton x:Name="m_AddNewTab"
-                                 Style="{StaticResource st_TabRadioButton}"
+                                 Width="Auto"
+                                 MinWidth="20"
+                                 Click="m_AddNewTab_Click"
+                                 Style="{StaticResource st_TabRadioButtonBase}"
                                  >
-                        <Behaviors:Interaction.Triggers>
-                            <Behaviors:EventTrigger EventName="Click"
-                                                    SourceObject="{Binding ElementName=m_AddNewTab}"
-                                                    >
-                                <Behaviors:InvokeCommandAction Command="{Binding AddNewLogFileCommand}" />
-                            </Behaviors:EventTrigger>
-                        </Behaviors:Interaction.Triggers>
-                        <TextBlock Text="Add New" />
+                        <materialDesign:PackIcon Kind="Plus" />
                     </RadioButton>
                 </StackPanel>
             </ScrollViewer>
-
-            
-            
-            <!--<StackPanel DockPanel.Dock="Top"
-                        Margin="0"
-                        Orientation="Horizontal"
-                        >
-                <RadioButton Style="{StaticResource st_TabRadioButton}"
-                             IsChecked="False"
-                             >
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="4,0,0,0"
-                                   Text="First document document"
-                                   />
-                    </StackPanel>
-                </RadioButton>
-
-                <RadioButton Style="{StaticResource st_TabRadioButton}"
-                             IsChecked="True"
-                             >
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="4,0,0,0"
-                                   Text="Second document"
-                                   />
-                    </StackPanel>
-                </RadioButton>
-                <RadioButton Style="{StaticResource st_TabRadioButton}"
-                             IsChecked="False"
-                             >
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="4,0,0,0"
-                                   Text="First document document"
-                                   />
-                    </StackPanel>
-                </RadioButton>
-                <RadioButton Style="{StaticResource st_TabRadioButton}"
-                             IsChecked="False"
-                             >
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="4,0,0,0"
-                                   Text="First document document"
-                                   />
-                    </StackPanel>
-                </RadioButton>
-            </StackPanel>-->
         </materialDesign:ColorZone>
-        <Border />
+
+        <local:LogFileContent x:Name="m_LogFileContent"
+                              DataContext="{Binding SelectedLogFile}"
+                              RawLogsInputVisibility="{Binding ElementName=m_LogFileListRoot,
+                                                               Path=RawLogsInputVisibility}"
+                              />
     </DockPanel>
 </UserControl>

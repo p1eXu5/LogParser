@@ -10,11 +10,15 @@ type LogSourceId = private LogSourceId of Guid
 [<Struct>]
 type TechLogId =
     private {
-        Ind: int
-        Length: int
-        StartIndex: int64
-        EndIndex: int64
+        ind: int
+        length: int
+        startIndex: int64
+        endIndex: int64
     }
+    member x.Ind = x.ind
+    member x.Length = x.length
+    member x.StartIndex = x.startIndex
+    member x.EndIndex = x.endIndex
 
 type TechLogMap = Map<TechLogId, TechLog>
 
@@ -46,19 +50,25 @@ type FieldKey = string
 module FilePath =
     open System.IO
 
-    let create filePath =
+    let inline create filePath =
         if File.Exists filePath then
             filePath |> FilePath |> Ok
         else
             "Temp file does not exist" |> Error
 
-    let createUnsafe filePath =
+    let inline createUnsafe filePath =
         match create filePath with
         | Ok p -> p
         | Error err ->
             raise (InvalidOperationException(err))
 
-    let value (FilePath filePath) = filePath
+    let inline value (FilePath filePath) = filePath
+
+    let inline fileNameWithoutExtension (FilePath filePath) =
+        System.IO.Path.GetFileNameWithoutExtension(filePath)
+
+    let inline fullPath (FilePath filePath) =
+        System.IO.Path.GetFullPath(filePath)
 
 module LogSourceId =
     let create () = Guid.CreateVersion7() |> LogSourceId
@@ -84,16 +94,30 @@ type LogSourceText with
     member this.Value with get () = this |> LogSourceText.value
 
 module LogFile =
-    let isNotUserFile (logFile: LogFile) =
+    let inline isNotUserFile (logFile: LogFile) =
         match logFile with
         | LogFile.UserFile _ -> false
         | _ -> true
 
+    let inline fileNameWithoutExtension (logFile: LogFile) =
+        match logFile with
+        | LogFile.TempFile fp
+        | LogFile.UserFile fp ->
+            fp |> FilePath.fileNameWithoutExtension |> Some
+        | _ -> None
+
+    let inline fullPath (logFile: LogFile) =
+        match logFile with
+        | LogFile.TempFile fp
+        | LogFile.UserFile fp ->
+            fp |> FilePath.fullPath |> Some
+        | _ -> None
+
 module TechLogId =
     let fromTechLogPosition (ind: int) (length: int) (techLogPosition: TechLogPosition) =
         {
-            Ind = ind
-            Length = length
-            StartIndex = techLogPosition.Start.Index
-            EndIndex = techLogPosition.End.Index
+            ind = ind
+            length = length
+            startIndex = techLogPosition.Start.Index
+            endIndex = techLogPosition.End.Index
         }

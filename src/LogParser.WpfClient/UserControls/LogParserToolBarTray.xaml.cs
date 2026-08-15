@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LogParser.WpfClient.UserControls.ToolBars;
 
 namespace LogParser.WpfClient.UserControls;
 
@@ -24,6 +25,16 @@ public partial class LogParserToolBarTray : UserControl
     {
         InitializeComponent();
     }
+
+    public bool RawLogsToggler
+    {
+        get => (bool)GetValue(RawLogsTogglerProperty);
+        set => SetValue(RawLogsTogglerProperty, value);
+    }
+
+    // Using a DependencyProperty as the backing store for RawLogsToggler.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty RawLogsTogglerProperty =
+        DependencyProperty.Register(nameof(RawLogsToggler), typeof(bool), typeof(LogParserToolBarTray), new PropertyMetadata(false));
 
     private void MenuItem_Click(object sender, RoutedEventArgs e)
     {

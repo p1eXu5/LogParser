@@ -1,13 +1,14 @@
 ﻿<UserControl x:Class="LogParser.WpfClient.UserControls.LogParserToolBarTray"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:LogFileModel="clr-namespace:LogParser.ElmishApp.LogFileModel;assembly=LogParser.ElmishApp"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
-             xmlns:mainModel="clr-namespace:LogParser.ElmishApp.MainModel;assembly=LogParser.ElmishApp"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:LogParser.ElmishApp.Models;assembly=LogParser.ElmishApp"
-             d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
+             x:Name="m_LogParserToolBarTrayRoot"
+             d:DataContext="{d:DesignInstance Type=LogFileModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="96"
              d:DesignWidth="1800"
@@ -35,28 +36,29 @@
             </ContextMenu>
         </ToolBarTray.ContextMenu>
 
-        <local:StandardToolBar Band="0"
+        <local:StandardToolBar x:Name="m_StandardToolBar"
+                               Band="0"
                                BandIndex="0"
-                               DataContext="{Binding LogFileList.SelectedLogFile}"
+                               RawLogsToggler="{Binding ElementName=m_LogParserToolBarTrayRoot,
+                                                        Path=RawLogsToggler}"
                                Style="{StaticResource st_LogParserToolBar}"
                                />
         <local:FiltersToolBar Band="0"
                               BandIndex="1"
-                              DataContext="{Binding SelectedLogFile}"
                               Style="{StaticResource st_LogParserToolBar}"
                               />
         <local:KibanaSearchToolBar x:Name="m_KibanaSearchToolBar"
                                    Width="1400"
                                    Band="1"
                                    BandIndex="0"
-                                   DataContext="{Binding KibanaSearchModel}"
+                                   IsEnabled="False"
                                    Style="{StaticResource st_LogParserToolBar}"
                                    Visibility="Collapsed"
                                    />
         <local:KibanaAccountToolBar x:Name="m_KibanaAccountToolBar"
                                     Band="1"
                                     BandIndex="1"
-                                    DataContext="{Binding KibanaSearchModel}"
+                                    IsEnabled="False"
                                     Style="{StaticResource st_LogParserToolBar}"
                                     Visibility="Collapsed"
                                     />
