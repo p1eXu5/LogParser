@@ -11,9 +11,8 @@
         Width="1000"
         d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
                                          IsDesignTimeCreatable=False}"
-        d:Height="200"
+        d:Height="400"
         AllowDrop="True"
-        Background="{StaticResource br_WindiwBackground}"
         Drop="Window_Drop"
         Icon=".\Resources\gnomelogs_103380.ico"
         Style="{StaticResource MaterialDesignWindow}"
@@ -24,44 +23,48 @@
         <sel:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
     </Window.Resources>
 
-    <materialDesign:DialogHost x:Name="m_RootDialogHost"
-                               CloseOnClickAway="False"
-                               DialogTheme="Inherit"
-                               Identifier="RootDialog"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
-                                                              Path=MessageQueue}"
-                               >
-        <DockPanel LastChildFill="True">
-            <!--  MainMenu  -->
-            <uc:MainMenuBar DockPanel.Dock="Top"
-                            Margin="2,0,2,0"
-                            />
+    <materialDesign:ColorZone VerticalAlignment="Stretch">
+        <materialDesign:DialogHost x:Name="m_RootDialogHost"
+                                   CloseOnClickAway="False"
+                                   DialogTheme="Inherit"
+                                   Identifier="RootDialog"
+                                   SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
+                                                                  Path=MessageQueue}"
+                                   >
+            <DockPanel LastChildFill="True">
+                <!--  MainMenu  -->
+                <uc:MainMenuBar DockPanel.Dock="Top"
+                                Margin="2,0,2,0"
+                                />
 
-            <!--  ToolBar  -->
-            <uc:LogParserToolBarTray DockPanel.Dock="Top"
-                                     DataContext="{Binding LogFileList.SelectedLogFile}"
-                                     RawLogsToggler="{Binding ElementName=m_LogFileList,
-                                                              Path=RawLogsInputVisibility,
-                                                              Converter={StaticResource conv_VisibleToBoolean},
-                                                              Mode=OneWay,
-                                                              UpdateSourceTrigger=PropertyChanged}"
-                                     />
+                <!--  ToolBar  -->
+                <uc:LogParserToolBarTray DockPanel.Dock="Top"
+                                         DataContext="{Binding LogFileList.SelectedLogFile}"
+                                         RawLogsToggler="{Binding ElementName=m_LogFileList,
+                                                                  Path=RawLogsInputVisibility,
+                                                                  Converter={StaticResource conv_VisibleToBoolean},
+                                                                  Mode=OneWay,
+                                                                  UpdateSourceTrigger=PropertyChanged}"
+                                         />
 
-            <!--  ErrorMessage Snackbar  -->
-            <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
-                                     DockPanel.Dock="Bottom"
-                                     HorizontalAlignment="Stretch"
-                                     MessageQueue="{Binding ErrorMessageQueue}"
-                                     />
+                <!--  ErrorMessage Snackbar  -->
+                <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
+                                         DockPanel.Dock="Bottom"
+                                         HorizontalAlignment="Stretch"
+                                         MessageQueue="{Binding ErrorMessageQueue}"
+                                         />
 
-            <!--  Status Bar  -->
-            <uc:StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom" />
+                <!--  Status Bar  -->
+                <uc:StatusBar DockPanel.Dock="Bottom"
+                              VerticalAlignment="Bottom"
+                              />
 
-            <!--  Content  -->
-            <uc:LogFileList x:Name="m_LogFileList"
-                            Margin="2,0,2,2"
-                            DataContext="{Binding LogFileList}"
-                            />
-        </DockPanel>
-    </materialDesign:DialogHost>
+                <!--  Content  -->
+                <uc:LogFileList x:Name="m_LogFileList"
+                                Margin="2,4,2,2"
+                                DataContext="{Binding LogFileList}"
+                                />
+            </DockPanel>
+        </materialDesign:DialogHost>
+    </materialDesign:ColorZone>
 </Window>

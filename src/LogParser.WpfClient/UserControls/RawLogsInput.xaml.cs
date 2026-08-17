@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MaterialDesignThemes.Wpf;
 
 namespace LogParser.WpfClient.UserControls;
 /// <summary>
@@ -40,6 +41,21 @@ public partial class RawLogsInput : UserControl
             if (openFileCommand.CanExecute(files[0]))
             {
                 openFileCommand.Execute(files[0]);
+            }
+
+            e.Handled = true;
+        }
+    }
+
+    private void InvokeParseTextCommand(object sender, RoutedEventArgs e)
+    {
+        string text = m_TextBox.Text;
+        if (sender is FrameworkElement button)
+        {
+            ICommand parseCmd = ((dynamic)button.DataContext).PArseCommand;
+            if (!(parseCmd is null) && parseCmd.CanExecute(text))
+            {
+                parseCmd.Execute(text);
             }
 
             e.Handled = true;

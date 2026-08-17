@@ -8,5 +8,6 @@
     <conv:HierarchyLevelToThicknessConverter x:Key="conv_HierarchyLevel" />
     <conv:VisibilityToBooleanConverter x:Key="conv_VisToBool" />
     <conv:BooleanToVisibleConverter x:Key="conv_BoolToVis" />
+    <conv:StringExistanceToBooleanConverter x:Key="conv_StringExistanceToBool" />
 
 </ResourceDictionary>

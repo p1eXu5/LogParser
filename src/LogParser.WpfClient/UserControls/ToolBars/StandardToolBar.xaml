@@ -8,7 +8,7 @@
          x:Name="m_StandardToolBarRoot"
          d:DesignWidth="700"
          ClipToBounds="True"
-         Style="{StaticResource st_LogParserToolBar}"
+         d:Style="{StaticResource st_LogParserToolBar}"
          mc:Ignorable="d"
          >
     <Button Command="{Binding PasteFromClipboardCommand}"

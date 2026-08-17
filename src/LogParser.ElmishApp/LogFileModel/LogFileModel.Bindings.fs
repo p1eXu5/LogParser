@@ -9,6 +9,7 @@ open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.Models.LogFileModel
 open System.Windows.Input
 open System.Windows
+open LogParser.ElmishApp.Helpers
 
 type IBindings =
     interface
@@ -18,6 +19,7 @@ type IBindings =
         abstract LogCount: int with get
         abstract TechLogList: TechLogListModel.IBindings seq with get
         abstract PasteFromClipboardCommand: ICommand
+        abstract PasteCommand: ICommand
     end
 
 module Bindings =
@@ -49,6 +51,19 @@ module Bindings =
                 | AsyncDeferredState.NotRequested, true ->
                     Msg.PastFromClipboardRequested |> AsyncOperation.startWith (Clipboard.GetText()) |> Some
                 | _ ->
+                    None
+            )
+
+            nameof __.PasteCommand |> Binding.cmdParamIf (fun str (m: LogFileModel) ->
+                let s = str :?> string
+                if s |> notEmpty then
+                    match m.ImportLogsState with
+                    | AsyncDeferredState.Retrieved
+                    | AsyncDeferredState.NotRequested ->
+                        Msg.PastFromClipboardRequested |> AsyncOperation.startWith s |> Some
+                    | _ ->
+                        None
+                else
                     None
             )
         ]

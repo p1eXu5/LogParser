@@ -4,7 +4,8 @@
                     >
 
     <Color x:Key="col_Background">#0E0E0E</Color>
-    <Color x:Key="col_WindowBackground">#151515</Color>
+    <Color x:Key="col_WindowBackground">#1C1C1C</Color>
+    <Color x:Key="col_Neutral70">#262626</Color>
     <Color x:Key="col_ToolBarInput">#2F2F2F</Color>
     <Color x:Key="col_Foreground">#E6E6E6</Color>
     <Color x:Key="col_ForegroundLight">#EEEEE2</Color>

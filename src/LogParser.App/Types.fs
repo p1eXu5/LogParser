@@ -50,24 +50,24 @@ type FieldKey = string
 module FilePath =
     open System.IO
 
-    let inline create filePath =
+    let create filePath =
         if File.Exists filePath then
             filePath |> FilePath |> Ok
         else
             "Temp file does not exist" |> Error
 
-    let inline createUnsafe filePath =
+    let createUnsafe filePath =
         match create filePath with
         | Ok p -> p
         | Error err ->
             raise (InvalidOperationException(err))
 
-    let inline value (FilePath filePath) = filePath
+    let value (FilePath filePath) = filePath
 
-    let inline fileNameWithoutExtension (FilePath filePath) =
+    let fileNameWithoutExtension (FilePath filePath) =
         System.IO.Path.GetFileNameWithoutExtension(filePath)
 
-    let inline fullPath (FilePath filePath) =
+    let fullPath (FilePath filePath) =
         System.IO.Path.GetFullPath(filePath)
 
 module LogSourceId =
@@ -94,19 +94,19 @@ type LogSourceText with
     member this.Value with get () = this |> LogSourceText.value
 
 module LogFile =
-    let inline isNotUserFile (logFile: LogFile) =
+    let isNotUserFile (logFile: LogFile) =
         match logFile with
         | LogFile.UserFile _ -> false
         | _ -> true
 
-    let inline fileNameWithoutExtension (logFile: LogFile) =
+    let fileNameWithoutExtension (logFile: LogFile) =
         match logFile with
         | LogFile.TempFile fp
         | LogFile.UserFile fp ->
             fp |> FilePath.fileNameWithoutExtension |> Some
         | _ -> None
 
-    let inline fullPath (logFile: LogFile) =
+    let fullPath (logFile: LogFile) =
         match logFile with
         | LogFile.TempFile fp
         | LogFile.UserFile fp ->

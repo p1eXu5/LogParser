@@ -10,7 +10,7 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Light" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-        <Setter Property="Margin" Value="2,0,2,2" />
+        <Setter Property="Margin" Value="2,0,2,0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <!--<Setter Property="BorderThickness" Value="1" />
@@ -21,63 +21,63 @@
                     <Condition Property="Band" Value="0" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="1" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="2" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="3" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="4" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="5" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="6" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="7" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Band" Value="8" />
                     <Condition Property="BandIndex" Value="0" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Margin" Value="0,0,2,2" />
+                <Setter Property="Margin" Value="0,0,2,0" />
             </MultiTrigger>
         </Style.Triggers>
     </Style>

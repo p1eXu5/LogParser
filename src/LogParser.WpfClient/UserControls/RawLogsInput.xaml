@@ -5,23 +5,36 @@
              xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DesignHeight="450"
-             d:DesignWidth="800"
+             xmlns:LogFileModel="clr-namespace:LogParser.ElmishApp.LogFileModel;assembly=LogParser.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=LogFileModel:IBindings,
+                                 IsDesignTimeCreatable=False}"
+             d:DesignHeight="150"
+             d:DesignWidth="200"
              mc:Ignorable="d"
              >
     <StackPanel Orientation="Vertical">
-        <Label FontSize="10" Foreground="#888888">Log Text:</Label>
-        <TextBox MinWidth="280"
-                 Margin="5,0,5,5"
+        <Label Margin="0,5"
+               Padding="0"
+               HorizontalAlignment="Left"
+               FontSize="10"
+               Foreground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
+               >
+            Log Text:
+        </Label>
+        <TextBox x:Name="m_TextBox"
+                 Margin="0,0,0,5"
                  Padding="10"
                  VerticalAlignment="Stretch"
+                 d:Text="{}{ &quot;logText&quot;: &quot;Log text&quot; }"
                  materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                  materialDesign:TextFieldAssist.TextBoxIsMultiLine="True"
+                 materialDesign:TextFieldAssist.TextFieldCornerRadius="4"
                  AcceptsReturn="True"
                  AllowDrop="true"
-                 Background="#1E1E1E"
-                 BorderThickness="0"
-                 Foreground="#E6E6E6"
+                 Background="{DynamicResource MaterialDesign.Brush.ToolBar.Background}"
+                 BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
+                 BorderThickness="1"
+                 Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
                  PreviewDragOver="TextBox_PreviewDragOver"
                  PreviewDrop="Window_Drop"
                  Style="{StaticResource MaterialDesignTextBox}"
@@ -29,10 +42,16 @@
                  TextWrapping="Wrap"
                  VerticalScrollBarVisibility="Auto"
                  />
-        <Button Margin="0,3,5,0"
+        <Button Margin="0,3,0,0"
                 HorizontalAlignment="Right"
                 Content="Parse"
+                FontWeight="Light"
+                Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
+                IsEnabled="{Binding ElementName=m_TextBox,
+                                    Path=Text,
+                                    Converter={StaticResource conv_StringExistanceToBool}}"
                 Style="{StaticResource MaterialDesignPaperDarkButton}"
+                Click="InvokeParseTextCommand"
                 />
     </StackPanel>
 </UserControl>

@@ -21,15 +21,19 @@
         </Grid.ColumnDefinitions>
 
         <!--  LogsInput  -->
-        <local:RawLogsInput x:Name="m_RawLogsInput"
-                            DataContext="{Binding}"
-                            Visibility="{Binding ElementName=m_LogFileContentRoot,
-                                                 Path=RawLogsInputVisibility}"
-                            />
+        <Grid VerticalAlignment="Top">
+            <local:RawLogsInput x:Name="m_RawLogsInput"
+                                Margin="3,0,0,0"
+                                DataContext="{Binding}"
+                                Visibility="{Binding ElementName=m_LogFileContentRoot,
+                                                     Path=RawLogsInputVisibility}"
+                                />
+        </Grid>
 
         <!--  Splitter  -->
         <GridSplitter Grid.Column="1"
                       Width="4"
+                      Margin="5,0"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource br_ToolBarInput}"

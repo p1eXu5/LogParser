@@ -4,6 +4,7 @@
              xmlns:conv="clr-namespace:LogParser.WpfClient.Converters"
              xmlns:local="clr-namespace:LogParser.WpfClient"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:materialDesignInt="clr-namespace:MaterialDesignThemes.Wpf.Themes.Internal;assembly=MaterialDesignThemes.Wpf"
              Exit="Application_Exit"
              Startup="Application_Startup"
              >
@@ -12,20 +13,23 @@
             <ResourceDictionary.MergedDictionaries>
 
                 <!--  for IntelliSense, must be placed before BundledTheme  -->
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors.Wpf;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors.Wpf;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
 
                 <materialDesign:BundledTheme BaseTheme="Dark"
                                              PrimaryColor="BlueGrey"
                                              SecondaryColor="Lime"
                                              >
+
                     <materialDesign:BundledTheme.ColorAdjustment>
                         <materialDesign:ColorAdjustment Colors="All"
-                                                        Contrast="Medium"
+                                                        Contrast="High"
                                                         DesiredContrastRatio="4.5"
                                                         />
                     </materialDesign:BundledTheme.ColorAdjustment>
+
                 </materialDesign:BundledTheme>
+
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
 
@@ -37,6 +41,18 @@
                 <ResourceDictionary Source="pack://application:,,,/LogParser.WpfClient;component/Resources/ToolBarStyle.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
+
+            <!--  overrides  -->
+            <!--<SolidColorBrush x:Key="MaterialDesign.Brush.Background"
+                             Color="{x:Static materialDesignInt:BaseThemeColors.Neutral50}"
+                             />-->
+            <!--<SolidColorBrush x:Key="MaterialDesign.Brush.Background" Color="{StaticResource Primary900}" />-->
+            <SolidColorBrush x:Key="MaterialDesign.Brush.Background"
+                             Color="{StaticResource col_WindowBackground}"
+                             />
+            <SolidColorBrush x:Key="MaterialDesign.Brush.ToolBar.Background"
+                 Color="{StaticResource col_Neutral70}"
+                 />
 
             <!--  Converters  -->
             <conv:CollapsedToBooleanConverter x:Key="conv_CollapsedToBoolean" />

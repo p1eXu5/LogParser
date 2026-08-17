@@ -12,12 +12,11 @@
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="96"
              d:DesignWidth="1800"
-             Background="{StaticResource br_WindiwBackground}"
              mc:Ignorable="d"
              >
     <ToolBarTray x:Name="m_ToolBarTray"
                  VerticalAlignment="Top"
-                 Background="{StaticResource br_WindiwBackground}"
+                 Background="{DynamicResource MaterialDesign.Brush.Background}"
                  >
         <ToolBarTray.ContextMenu>
             <ContextMenu materialDesign:MenuAssist.MenuItemsPresenterMargin="0">

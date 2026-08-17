@@ -52,7 +52,8 @@
                                       >
                             <Binding Path="Id" />
                             <Binding Path="DataContext.SelectedLogFileId"
-                                     RelativeSource="{RelativeSource AncestorType=UserControl, Mode=FindAncestor}"
+                                     RelativeSource="{RelativeSource AncestorType=UserControl,
+                                                                     Mode=FindAncestor}"
                                      />
                         </MultiBinding>
                     </Setter.Value>
@@ -74,10 +75,9 @@
                                   Background="Transparent"
                                   Mode="Standard"
                                   >
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+            <ScrollViewer Margin="0,0,0,3"
+                          HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Hidden"
-                          Background="{DynamicResource MaterialDesign.Brush.ToolBar.Background}"
-                          Margin="0,0,0,3"
                           >
                 <StackPanel Orientation="Horizontal">
 
