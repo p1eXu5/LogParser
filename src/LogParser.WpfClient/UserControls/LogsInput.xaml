@@ -32,9 +32,7 @@
                          PreviewDragOver="TextBox_PreviewDragOver"
                          PreviewDrop="Window_Drop"
                          Style="{StaticResource MaterialDesignFilledTextBox}"
-                         Text="{Binding DockerInput,
-                                        Mode=TwoWay,
-                                        UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding DockerInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          TextAlignment="Left"
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Auto"
@@ -55,9 +53,7 @@
                      PreviewDragOver="TextBox_PreviewDragOver"
                      PreviewDrop="Window_Drop"
                      Style="{StaticResource MaterialDesignFilledTextBox}"
-                     Text="{Binding KibanaInput,
-                                    Mode=TwoWay,
-                                    UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding KibanaInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      TextAlignment="Left"
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"

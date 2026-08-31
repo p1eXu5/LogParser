@@ -1,4 +1,5 @@
-﻿using LogParser.ElmishApp.Interfaces;
+﻿using LogParser.App;
+using LogParser.ElmishApp.Interfaces;
 using LogParser.WpfClient.Properties;
 
 namespace LogParser.WpfClient;
@@ -22,5 +23,15 @@ public class SettingsManager : ISettingsManager
         Settings.Default[key] = value;
         Settings.Default.Save();
         Settings.Default.Reload();
+    }
+
+    public AppConfig AppConfig
+    {
+        get
+        {
+            var parserSubscriptionBatchSize = Settings.Default.ParserSubscriptionBatchSize;
+            var parserBatchFlushTimeSpan = Settings.Default.ParserBatchFlushTimeSpan;
+            return new AppConfig(parserSubscriptionBatchSize, parserBatchFlushTimeSpan);
+        }
     }
 }

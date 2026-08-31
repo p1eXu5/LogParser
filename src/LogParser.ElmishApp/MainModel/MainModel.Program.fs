@@ -24,8 +24,7 @@ open LogParser.ElmishApp.Models.LogFile
 let update
     (settingsManager: ISettingsManager)
     (errorMessageQueue: IErrorMessageQueue)
-    (observer: IObserver<TechLogPosition>)
-    (logger: ILogger)
+    (updateLogFileListModel)
     (msg: Msg)
     (model: MainModel)
     =
@@ -41,7 +40,7 @@ let update
         |> Model.mapCmd
             _.LogFileListModel
             withLogFileListMoodel
-            (LogFileListModel.Program.update smsg)
+            (updateLogFileListModel smsg)
             Msg.LogFileListModelMsg
     (*
     

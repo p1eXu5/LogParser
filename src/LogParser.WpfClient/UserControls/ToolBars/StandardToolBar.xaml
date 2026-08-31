@@ -7,8 +7,8 @@
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
          x:Name="m_StandardToolBarRoot"
          d:DesignWidth="700"
-         ClipToBounds="True"
          d:Style="{StaticResource st_LogParserToolBar}"
+         ClipToBounds="True"
          mc:Ignorable="d"
          >
     <Button Command="{Binding PasteFromClipboardCommand}"

@@ -9,7 +9,10 @@ open LogParser.ElmishApp.Models.LogFileListModel
 
 module Program =
 
-    let update msg model =
+    let update
+        (updateLogFileModel)
+        msg 
+        model =
         match msg with
         | Msg.SelectLogFileId id ->
             { model with SelectedLogFileModelId = id }
@@ -20,8 +23,8 @@ module Program =
             |> Model.mapCmd 
                 _.LogFileModelList
                 withLogFileList
-                (List.mapFirstCmd (_.Id >> (=) id) (LogFileModel.Program.update smsg))
-                Msg.LogFileModelMsg
+                (List.mapFirstCmd (_.Id >> (=) id) (updateLogFileModel smsg))
+                (fun subMsg -> Msg.LogFileModelMsg (id, subMsg))
 
         | Msg.AddNewLogFile ->
             model |> addLogFileModel

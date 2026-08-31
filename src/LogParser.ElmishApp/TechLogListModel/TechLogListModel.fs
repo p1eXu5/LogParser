@@ -1,6 +1,6 @@
 ﻿namespace LogParser.ElmishApp.Models
 
-
+// TODO: rename to TechLogListFilter
 type TechLogListModel =
     {
         TechLogModelList: TechLogModel list
@@ -60,8 +60,8 @@ module Program =
         match msg with
         | Msg.TechLogModelMsg (id, smsg) ->
             model
-            |> Model.map _.TechLogModelList withTechLogList
-                (List.mapFirst (TechLogModel.logId >> (=) id) (TechLogModel.Program.update smsg))
+            //|> Model.map _.TechLogModelList withTechLogList
+            //    (List.mapFirst (TechLogModel.logId >> (=) id) (TechLogModel.Program.update smsg))
 
 type IBindings =
     interface
@@ -74,12 +74,12 @@ module Bindings =
 
     let bindings () : Binding<TechLogListModel, TechLogListModel.Msg> list =
         [
-            nameof __.TechLogList
-                |> Binding.subModelSeq (
-                    (fun m -> m.TechLogModelList),
-                    (fun (m, sm) -> {| TechLogModel = sm; PinnedFieldName = m.PinnedFieldNameA |}),
-                    (_.TechLogModel >> TechLogModel.logId),
-                    Msg.TechLogModelMsg,
-                    TechLogModel.Bindings.bindings
-                )
+            //nameof __.TechLogList
+            //    |> Binding.subModelSeq (
+            //        (fun m -> m.TechLogModelList),
+            //        (fun (m, sm) -> {| TechLogModel = sm; PinnedFieldName = m.PinnedFieldNameA |}),
+            //        (_.TechLogModel >> TechLogModel.logId),
+            //        Msg.TechLogModelMsg,
+            //        TechLogModel.Bindings.bindings
+            //    )
         ]

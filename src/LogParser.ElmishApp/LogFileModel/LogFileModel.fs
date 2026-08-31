@@ -9,9 +9,12 @@ open LogParser.App.LogRepository
 type LogFileModel =
     {
         Id: int
+        Repo: LogRepository
         Title: string option
         LogFile: LogFile option
-        TechLogListModel: TechLogListModel
+        TechLogModelList: TechLogModel list
+        SelectedTechLogId: TechLogId voption
+        CacheKey: CacheKey
         ImportLogsState: AsyncDeferredState
     }
 
@@ -20,15 +23,39 @@ module LogFileModel =
     open System
 
     type Msg = 
-        | TechLogListModelMsg of TechLogListModel.Msg
+        | TechLogModelMsg of TechLogId * TechLogModel.Msg
         | PastFromClipboardRequested of AsyncOperation<string, ParseTextRequestResult>
+        | AppendFirstLogBatch of LogMetaBatch
+        | SetSelectedTechLogId of TechLogId voption
+        | OrderByTimestamp
+        | OnError of string
 
-    let initNew (id: int) =
+    module MsgWith =
+
+        let (|``Start of PastFromClipboardRequested``|_|) (model: LogFileModel) (msg: Msg) =
+            match msg, model.ImportLogsState with
+            | Msg.PastFromClipboardRequested (AsyncOperation.Start text), AsyncDeferredState.NotRequested
+            | Msg.PastFromClipboardRequested (AsyncOperation.Start text), AsyncDeferredState.Retrieved ->
+                let (state, cts) = model.ImportLogsState |> AsyncDeferredState.forceInProgressWithCancellation
+                (text, state, cts) |> Some
+            | _ -> None
+
+        let (|``Finish of PastFromClipboardRequested``|_|) (model: LogFileModel) (msg: Msg) =
+            match msg with
+            | Msg.PastFromClipboardRequested (AsyncOperation.Finish (res, cts)) ->
+                model.ImportLogsState
+                |> AsyncDeferredState.chooseRetrieved res cts
+            | _ -> None
+
+    let initNew (id: int) (repo: LogRepository) =
         {
             Id = id
+            Repo = repo
             LogFile = None
             Title = None
-            TechLogListModel = TechLogListModel.init []
+            TechLogModelList = []
+            SelectedTechLogId = ValueNone
+            CacheKey = Guid.NewGuid()
             ImportLogsState = AsyncDeferredState.NotRequested
         }
 
@@ -49,6 +76,6 @@ module LogFileModel =
             |> Option.defaultValue "New"
 
     let inline withTechLogListModel techLogListModel (m: LogFileModel) =
-        { m with TechLogListModel = techLogListModel }
+        { m with TechLogModelList = techLogListModel }
 
 

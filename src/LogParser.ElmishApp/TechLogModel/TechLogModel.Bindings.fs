@@ -2,6 +2,8 @@
 
 open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.Models.TechLogModel
+open LogParser.App
+open LogParser.Types
 
 type IBindings =
     interface
@@ -14,7 +16,7 @@ module Bindings =
 
     let private __ = Unchecked.defaultof<IBindings>
 
-    let bindings () : Binding<{| TechLogModel: TechLogModel; PinnedFieldName: string option |}, TechLogModel.Msg> list =
+    let bindings () : Binding<TechLogModel * TechLog, TechLogModel.Msg> list =
         [
             (*
             "Log"

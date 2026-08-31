@@ -1,34 +1,41 @@
 ﻿<UserControl x:Class="LogParser.WpfClient.UserControls.LogCardList"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:LogFileModel="clr-namespace:LogParser.ElmishApp.LogFileModel;assembly=LogParser.ElmishApp"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:inf="clr-namespace:p1eXu5.Wpf.PaginationViews;assembly=p1eXu5.Wpf.PaginationViews"
              xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sel="clr-namespace:LogParser.WpfClient.TemplateSelectors"
-             d:DesignHeight="150"
+             d:DataContext="{d:DesignInstance Type=LogFileModel:IBindings,
+                                              IsDesignTimeCreatable=False}"
+             d:DesignHeight="50"
              d:DesignWidth="200"
              mc:Ignorable="d"
              >
     <UserControl.Resources>
         <sel:LogDataTemplateSelector x:Key="ts_LogDataTemplateSelector" />
-        <materialDesign:BooleanToVisibilityConverter x:Key="conv_BoolToVis" />
     </UserControl.Resources>
 
-    <Grid>
-        <ListBox Background="#1E1E1E"
-                 Grid.IsSharedSizeScope="True"
-                 ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}"
-                 ItemsSource="{Binding Logs}"
-                 ScrollViewer.CanContentScroll="False"
-                 >
-            <ListBox.ItemContainerStyle>
+    <Grid x:Name="m_Grid">
+        <inf:InfiniteListBox Height="{Binding ElementName=m_Grid,
+                                              Path=ActualHeight}"
+                             Style="{StaticResource MaterialDesignListBox}"
+                             Grid.IsSharedSizeScope="True"
+                             ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}"
+                             ItemsSource="{Binding TechLogList}"
+                             NextItemsRequested="{Binding LoadNextLogBatchCommand}"
+                             ScrollThreshold="0.8"
+                             ScrollViewer.CanContentScroll="False"
+                             >
+            <inf:InfiniteListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.Template>
+            </inf:InfiniteListBox.ItemContainerStyle>
+            <inf:InfiniteListBox.Template>
                 <ControlTemplate>
                     <ScrollViewer VirtualizingStackPanel.IsVirtualizing="True"
                                   VirtualizingStackPanel.VirtualizationMode="Recycling"
@@ -36,20 +43,22 @@
                         <ItemsPresenter />
                     </ScrollViewer>
                 </ControlTemplate>
-            </ListBox.Template>
+            </inf:InfiniteListBox.Template>
 
-            <ListBox.ItemsPanel>
+            <inf:InfiniteListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=Background}" />
                 </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-        </ListBox>
+            </inf:InfiniteListBox.ItemsPanel>
+        </inf:InfiniteListBox>
+
         <ProgressBar Width="100"
                      Height="100"
                      IsIndeterminate="True"
                      Style="{StaticResource MaterialDesignCircularProgressBar}"
-                     Visibility="{Binding Loading,
-                                          Converter={StaticResource conv_BoolToVis}}"
+                     Visibility="{Binding IsLoading,
+                                          Converter={StaticResource conv_VisibleToBoolean},
+                                          FallbackValue=Collapsed}"
                      Value="0"
                      />
     </Grid>

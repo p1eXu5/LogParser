@@ -8,6 +8,8 @@ open p1eXu5.FSharp.ElmishExtensions
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Interfaces
 open LogParser.ElmishApp.Types
+open LogParser.App
+open LogParser.App.LogRepository
 
 
 type MainModel =
@@ -75,10 +77,10 @@ module MainModel =
         | OnError of exn
 
 
-    let init (settingsManager: ISettingsManager) (logFile: string option) =
+    let init (settingsManager: ISettingsManager) (initLogRepository: LogSourceId -> LogRepository) (logFile: string option) =
         fun () ->
 
-            let logFileListModel = LogFileListModel.init ()
+            let logFileListModel = LogFileListModel.init initLogRepository
 
             let cmds =
                 [

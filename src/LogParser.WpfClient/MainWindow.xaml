@@ -57,6 +57,7 @@
                 <!--  Status Bar  -->
                 <uc:StatusBar DockPanel.Dock="Bottom"
                               VerticalAlignment="Bottom"
+                              DataContext="{Binding LogFileList.SelectedLogFile}"
                               />
 
                 <!--  Content  -->

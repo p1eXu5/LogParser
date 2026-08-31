@@ -20,12 +20,17 @@ type LogRepository =
         ParseTextAsync: LogSourceText -> Async<ParseTextRequestResult>
         GetNextLogBatch: unit -> Async<LogMetaBatch>
         GetNextFilteredLogBatch: Map<FieldKey, string> -> Async<LogMetaBatch>
+        /// Returns Tech and Raw logs asynchronously.
         GetLogs: TechLogId list -> Async<LogBatch>
+        GetTechLogs: TechLogId list -> CacheKey -> Map<TechLogId, TechLog>
+        GetRawLogs: TechLogId list -> Map<TechLogId, string>
         Dispose: unit -> unit
     }
     interface IDisposable with
         member this.Dispose() =
             this.Dispose()
+and
+    CacheKey = Guid
 and
     ParseTextRequestResult =
         | Accepted of LogFile
@@ -39,8 +44,9 @@ and
     LogMetaBatch =
         {
             ///// Is needed to cache result
-            //BatchId: Guid
+            // BatchId: Guid
             TechLogIds: TechLogId list
+            /// All known field keys
             FieldKeys: Set<FieldKey>
             ParsingError: bool
         }
@@ -140,6 +146,7 @@ module LogRepository =
                 Fields: Map<FieldKey, int> // get field -> get field to value (UkkonenTrie) -> get log list
                 FieldValueToLogs: UkkonenTrie<int> list
                 Filter: Map<FieldKey, string>
+                /// Set when log meta batch was requested
                 LogsRequested: bool
             }
             interface IStateLogs with
@@ -216,6 +223,8 @@ module LogRepository =
         | GetNextBatch of AsyncReplyChannel<LogMetaBatch>
         | GetNextFilteredBatch of filter: Map<FieldKey, string> * AsyncReplyChannel<LogMetaBatch>
         | GetLogs of logIdList: TechLogId list * AsyncReplyChannel<LogBatch>
+        | GetTechLogs of logIdList: TechLogId list * AsyncReplyChannel<Map<TechLogId, TechLog>>
+        | GetRawLogs of logIdList: TechLogId list * AsyncReplyChannel<Map<TechLogId, string>>
 
 
     let [<Literal>] TEXT_LOG_KEY = "{T}"
@@ -321,27 +330,44 @@ module LogRepository =
             (fun processor ->
                 let rec running (state: State) =
                     async {
+                        // get prioritized message
                         let! msg =
-                            match state with
-                            | State.Parsing s when s.LogsRequested ->
-                                async {
-                                    let! msgOpt =
-                                        processor.TryScan(
-                                            fun m ->
-                                                match m with
-                                                | Msg.AppendLogBatch _ -> async.Return m |> Some
-                                                | _ -> None
-                                            , 0
-                                        )
-                                    return!
-                                        match msgOpt with
-                                        | None -> processor.Receive()
-                                        | Some m -> async.Return m
-                                }
-                            | _ -> processor.Receive()
+                            async {
+                                let! msgOpt =
+                                    processor.TryScan(
+                                        fun m ->
+                                            match m with
+                                            | Msg.GetTechLogs _ -> async.Return m |> Some
+                                            | _ -> None
+                                        , 0
+                                    )
 
+                                match msgOpt with
+                                | Some m -> return m
+                                | None ->
+                                    match state with
+                                    | State.Parsing s when s.LogsRequested ->
+                                     
+                                            let! msgOpt =
+                                                processor.TryScan(
+                                                    fun m ->
+                                                        match m with
+                                                        | Msg.AppendLogBatch _ -> async.Return m |> Some
+                                                        | _ -> None
+                                                    , 0
+                                                )
+                                            return!
+                                                match msgOpt with
+                                                | None -> processor.Receive()
+                                                | Some m -> async.Return m
+                                        
+                                    | _ -> return! processor.Receive()
+                        }
+
+                        // log message:
                         logger.LogProcessingMsg (msg |> sprintf "%A") (state |> State.name) 
 
+                        // handling:
                         match msg with
                         | Msg.ParseText (logSourceText, reply) ->
                             match state with
@@ -457,7 +483,7 @@ module LogRepository =
                                 if logs.Length = 0
                                 then
                                     let s = { s with LogsRequested = true }
-                                    processor.Post(Msg.GetNextBatch reply)
+                                    processor.Post(Msg.GetNextFilteredBatch (filter, reply))
                                     return! running state
                                 else 
                                     reply.Reply ((logs, s.Fields.Keys |> Set.ofSeq, false) |> LogMetaBatch.create)
@@ -538,6 +564,56 @@ module LogRepository =
                                 | _ ->
                                     reply.Reply (LogBatch.create [] [])
                                     return! running state
+
+                        | Msg.GetTechLogs (logIdList, reply) ->
+                            if logIdList.Length = 0 then
+                                reply.Reply (Map.empty)
+                                return! running state
+                            else
+                                match state with
+                                | State.LogsStream s ->
+                                    let logBatch =
+                                        logIdList
+                                        |> Seq.map (fun logId ->
+                                            (logId, s.Logs[logId.Ind].Log)
+                                        )
+                                        |> Map.ofSeq
+
+                                    reply.Reply (logBatch)
+                                    return! running state
+                                | _ ->
+                                    reply.Reply (Map.empty)
+                                    return! running state
+
+                        | Msg.GetRawLogs (logIdList, reply) ->
+                            if logIdList.Length = 0 then
+                                reply.Reply (Map.empty)
+                                return! running state
+                            else
+                                match state with
+                                | State.LogsStream s ->
+                                    let mutable buf = ArrayPool<char>.Shared.Rent(int (logIdList[0].EndIndex - logIdList[0].StartIndex))
+                                    use sr = new StreamReader(s.Stream, leaveOpen = true)
+                                    let logBatch =
+                                        logIdList
+                                        |> Seq.map
+                                            (fun logId ->
+                                                let count = int (logId.EndIndex - logId.StartIndex)
+                                                if count > buf.Length then
+                                                    ArrayPool<char>.Shared.Return(buf);
+                                                    buf <- ArrayPool<char>.Shared.Rent(count)
+                                                let _ = sr.BaseStream.Seek(logId.StartIndex, SeekOrigin.Begin)
+                                                let read = sr.ReadBlock(buf, 0, count)
+                                                (logId, System.String(buf, 0, read))
+                                            )
+                                        |> Map.ofSeq
+                                    sr.Dispose()
+                                    ArrayPool<char>.Shared.Return(buf);
+                                    reply.Reply (logBatch)
+                                    return! running state
+                                | _ ->
+                                    reply.Reply (Map.empty)
+                                    return! running state
                     }
 
                 running (Initialized { Filter = Map.empty })
@@ -558,6 +634,9 @@ module LogRepository =
 
         agent.Start()
 
+        let mutable (_cacheKey: CacheKey) = Guid.Empty
+        let mutable _techLogs = Map.empty
+
         {
             ParseTextAsync = fun (logSourceText: LogSourceText) ->
                 agent.PostAndAsyncReply(fun reply -> Msg.ParseText (logSourceText, reply))
@@ -567,6 +646,15 @@ module LogRepository =
                 agent.PostAndAsyncReply(fun reply -> Msg.GetNextFilteredBatch (filter, reply))
             GetLogs = fun logIdList ->
                 agent.PostAndAsyncReply(fun reply -> Msg.GetLogs (logIdList, reply))
+            GetTechLogs= fun logIdList cacheKey ->
+                if cacheKey = _cacheKey then _techLogs
+                else
+                    let techLogs = agent.PostAndReply(fun reply -> Msg.GetTechLogs (logIdList, reply))
+                    _cacheKey <- cacheKey
+                    _techLogs <- techLogs
+                    techLogs
+            GetRawLogs= fun logIdList ->
+                agent.PostAndReply(fun reply -> Msg.GetRawLogs (logIdList, reply))
             Dispose = fun () ->
                 subscription.Dispose()
                 agent.Dispose()

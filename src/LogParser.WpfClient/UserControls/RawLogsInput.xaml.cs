@@ -52,7 +52,7 @@ public partial class RawLogsInput : UserControl
         string text = m_TextBox.Text;
         if (sender is FrameworkElement button)
         {
-            ICommand parseCmd = ((dynamic)button.DataContext).PArseCommand;
+            ICommand parseCmd = ((dynamic)button.DataContext).ParseCommand;
             if (!(parseCmd is null) && parseCmd.CanExecute(text))
             {
                 parseCmd.Execute(text);

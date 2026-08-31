@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\CSharp\_libs\p1eXu5\p1eXu5.Wpf.PaginationViews\src\p1eXu5.Wpf.PaginationViews\p1eXu5.Wpf.PaginationViews.csproj" />
     <ProjectReference Include="..\LogParser.ElmishApp\LogParser.ElmishApp.fsproj" />
   </ItemGroup>
 

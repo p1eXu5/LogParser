@@ -8,7 +8,7 @@
              x:Name="m_LogFileContentRoot"
              d:DataContext="{d:DesignInstance Type=LogFileModel:IBindings,
                                               IsDesignTimeCreatable=False}"
-             d:DesignHeight="450"
+             d:DesignHeight="150"
              d:DesignWidth="800"
              mc:Ignorable="d"
              >

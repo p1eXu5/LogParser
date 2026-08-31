@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Loggers\AppSubjectLogger.fs" />
+    <Compile Include="loggers\FileStorageLogger.fs" />
+    <Compile Include="loggers\LogRepositoryLogger.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Interfaces.fs" />
     <Compile Include="Helpers.fs" />

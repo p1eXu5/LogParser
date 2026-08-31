@@ -51,8 +51,8 @@
                              Color="{StaticResource col_WindowBackground}"
                              />
             <SolidColorBrush x:Key="MaterialDesign.Brush.ToolBar.Background"
-                 Color="{StaticResource col_Neutral70}"
-                 />
+                             Color="{StaticResource col_Neutral70}"
+                             />
 
             <!--  Converters  -->
             <conv:CollapsedToBooleanConverter x:Key="conv_CollapsedToBoolean" />

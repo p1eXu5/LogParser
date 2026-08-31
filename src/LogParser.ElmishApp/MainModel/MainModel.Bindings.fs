@@ -2,6 +2,7 @@
 
 open System
 open System.Windows
+open System.Windows.Input
 open Elmish.WPF
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Models
@@ -28,6 +29,14 @@ type IBindings =
 
         abstract FiltersModel: obj with get
         abstract IsFiltersModelLoaded: bool with get, set
+
+        // Menu
+        abstract OpenLogsFileCommand: ICommand with get
+        abstract SaveLogsFileAsCommand: ICommand with get
+        abstract SaveLogsFileCommand: ICommand with get
+        abstract NewFileCommand: ICommand with get
+
+        abstract DrugFileCommand: ICommand with get
     end
 
 module Bindings =
@@ -95,6 +104,17 @@ module Bindings =
                 |> Binding.mapModel _.LogFileListModel
                 |> Binding.mapMsg Msg.LogFileListModelMsg
 
+            nameof __.OpenLogsFileCommand |> Binding.cmd Msg.OpenFile
+            nameof __.SaveLogsFileAsCommand |> Binding.cmdIf (fun m -> None |> Option.map (fun _ -> Msg.SaveFileAs))
+            nameof __.SaveLogsFileCommand |> Binding.cmdIf (fun m -> None |> Option.map (fun _ -> Msg.SaveFile))
+            nameof __.NewFileCommand |> Binding.cmdIf (fun m -> None |> Option.map (fun _ -> Msg.NewFile))
+
+            nameof __.DrugFileCommand |> Binding.cmdParamIf (fun s ->
+                match s with
+                | :? string as fileName -> fileName |> Msg.OpenSpecifiedFile |> Some
+                | _ -> None
+            )
+
             (*
             "DockerInput" |> Binding.twoWayOpt ((fun m -> m.Input), Msg.InputChanged)
             "KibanaInput" |> Binding.twoWayOpt ((fun m -> m.KibanaInput), Msg.KibanaInputChanged)
@@ -104,38 +124,7 @@ module Bindings =
 
             "Loading" |> Binding.oneWay (fun m -> m.Loading)
 
-            "PasteFromClipboardCommand" |> Binding.cmdIf (fun _ ->
-                if Clipboard.ContainsText() then
-                    PastFromClipboardRequested |> Some
-                else
-                    None
-            )
-
-            "ClearInputCommand" |> Binding.cmdIf (fun m -> m.Input |> Option.map (fun _ -> CleanInputRequested))
-            "OrderByTimestampCommand" |> Binding.cmdIf (fun m -> if m.Loading then None else m.Input |> Option.map (fun _ -> Msg.OrderByTimestamp))
-
-            "DrugFileCommand" |> Binding.cmdParamIf (fun s ->
-                match s with
-                | :? string as fileName -> fileName |> Msg.OpenSpecifiedFile |> Some
-                | _ -> None
-            )
-
-            "OpenLogsFileCommand" |> Binding.cmd OpenFile
-            "SaveLogsFileAsCommand" |> Binding.cmdIf (fun m -> m.Input |> Option.map (fun _ -> SaveFileAs))
-            "SaveLogsFileCommand" |> Binding.cmdIf (fun m -> 
-                match m.LogFile with
-                | Existing _ -> Msg.SaveFile |> Some
-                | _ -> None
-            )
-
-            "NewFileCommand" |> Binding.cmdIf (fun m -> 
-                match m.LogFile with
-                | Existing _ -> Msg.NewFile |> Some
-                | _ -> None
-            ) 
-
             
-
             "DocumentName" |> Binding.oneWay getDocumentName
 
             "Logs" |> Binding.subModelSeq (

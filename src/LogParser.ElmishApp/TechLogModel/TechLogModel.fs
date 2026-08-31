@@ -8,23 +8,20 @@ open LogParser.App
 /// Provides on time set bindings
 ///
 /// Sorting, ordering and logContext separation are moved to the Wpf-scope
+[<Struct>]
 type TechLogModel =
-    | TextLogModel of UIProps: TechLogUIProps * Model: TechLogId
-    | JsonLogModel of UIProps: TechLogUIProps * Model: TechLogId
-and
-    TechLogUIProps =
         {
-            IsExpanded: bool
+            TechLogId: TechLogId
         }
 
 module TechLogModel =
 
     type Msg = Msg
 
-    let logId = function
-        | TechLogModel.TextLogModel (_, l) -> l.Ind
-        | TechLogModel.JsonLogModel (_, l) -> l.Ind 
-
+    let init (techLogId: TechLogId) =
+        {
+            TechLogId = techLogId
+        }
     (*
     let timestamp = function
         | TechLogModel.TextLogModel _ -> None

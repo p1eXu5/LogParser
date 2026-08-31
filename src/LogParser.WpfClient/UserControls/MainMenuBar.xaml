@@ -5,7 +5,8 @@
              xmlns:local="clr-namespace:LogParser.WpfClient.UserControls"
              xmlns:mainModel="clr-namespace:LogParser.ElmishApp.MainModel;assembly=LogParser.ElmishApp"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DataContext="{d:DesignInstance Type=mainModel:IBindings, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
+                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="34"
              d:DesignWidth="500"
              mc:Ignorable="d"
@@ -20,8 +21,8 @@
                    />
 
         <local:MainMenu DockPanel.Dock="Left"
-                        DataContext="{Binding}"
                         VerticalAlignment="Center"
+                        DataContext="{Binding}"
                         />
     </DockPanel>
 </UserControl>

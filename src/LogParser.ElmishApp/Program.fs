@@ -1,19 +1,31 @@
 ﻿module LogParser.ElmishApp.Program
 
 open System
-open Serilog
-open Serilog.Extensions.Logging
+
 open Elmish
 open Elmish.WPF
+open Microsoft.Extensions.Logging
+open Serilog
+open Serilog.Extensions.Logging
+open p1eXu5.FSharp.Reactive
+
 open LogParser.App
+open LogParser.App.LogRepository
 open LogParser.ElmishApp
 open LogParser.ElmishApp.Models
 open LogParser.ElmishApp.MainModel
 
-open Microsoft.Extensions.Logging
-open p1eXu5.FSharp.Reactive
+open LogParser.ElmishApp.Loggers
+open LogParser.ElmishApp.Interfaces
 
-let main (window, mainErrorQueue, dialogErrorQueue, settingsManager, logFile, loggerFactory: ILoggerFactory) =
+let main (
+    window,
+    mainErrorQueue,
+    dialogErrorQueue,
+    settingsManager: ISettingsManager,
+    logFile,
+    loggerFactory: ILoggerFactory)
+    =
     let logFileOpt =
         match logFile with
         | null -> None
@@ -21,13 +33,12 @@ let main (window, mainErrorQueue, dialogErrorQueue, settingsManager, logFile, lo
 
     let subject = Subject.broadcast
 
-    ////let subscribe m =
-    ////    let logStream dispatch =
-    ////        subject
-    ////        |> Observable.subscribe (dispatch (MainModel.Msg.))
-    ////    []
+    //let subscribe m =
+    //    let logStream dispatch =
+    //        subject
+    //        |> Observable.subscribe (dispatch (MainModel.Msg.))
+    //    []
 
-    //let appSubject = new AppSubject(loggerFactory.CreateLogger<AppSubject>())
 
     //let subscribe (appSubject: AppSubject) _ : Sub<MainModel.Msg> =
     //    let fooSub dispatch =
@@ -46,10 +57,42 @@ let main (window, mainErrorQueue, dialogErrorQueue, settingsManager, logFile, lo
     let assemblyVer = "Version " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
     let mainModelLogger = loggerFactory.CreateLogger<MainModel>()
+    let appSubjectLogger = loggerFactory.CreateLogger<AppSubject>()
+    let fileStorageLogger = loggerFactory.CreateLogger<FileStorage>()
+    let logRepositoryLogger = loggerFactory.CreateLogger<LogRepository>()
+
+    let appConfig = settingsManager.AppConfig
+
+    let appSubject = 
+        AppSubject.init
+            (AppSubjectLogger.init appSubjectLogger)
+            appConfig
+
+    let fileStorage =
+        FileStorage.init
+            (FileStorageLogger.init fileStorageLogger)
+
+    let initLogRepository =
+        LogRepository.init
+            appConfig
+            appSubject
+            fileStorage
+            (LogRepositoryLogger.init logRepositoryLogger)
+
+    let updateLogFileModel =
+        LogFileModel.Program.update
+            mainErrorQueue
+
+    let updateLogFileListModel =
+        LogFileListModel.Program.update updateLogFileModel
 
     WpfProgram.mkProgram
-        (MainModel.init settingsManager logFileOpt)
-        (Program.update settingsManager mainErrorQueue subject mainModelLogger)
+        (MainModel.init settingsManager initLogRepository logFileOpt)
+        (Program.update
+            settingsManager
+            mainErrorQueue
+            updateLogFileListModel
+        )
         (fun () -> MainModel.Bindings.bindings "Log Parser" assemblyVer mainErrorQueue dialogErrorQueue)
     // |> WpfProgram.withSubscription (subscribe appSubject)
     |> WpfProgram.withLogger loggerFactory
