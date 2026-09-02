@@ -13,7 +13,8 @@
     <ListBox VerticalAlignment="Center"
              SelectionMode="Extended"
              >
-        <ListBoxItem IsSelected="{Binding FilterOn}"
+        <!--  FilterOn switcher - IsSelected="{Binding FilterOn}"  -->
+        <ListBoxItem IsSelected="False"
                      Style="{DynamicResource st_ToolBarListBoxItem}"
                      ToolTip="Enable filtering by TraceId"
                      >
@@ -21,7 +22,9 @@
                                      Kind="Filter"
                                      />
         </ListBoxItem>
-        <ListBoxItem IsSelected="{Binding ShowInnerHierarchyLogs}"
+
+        <!--  ShowInnerHierarchyLogs switcher - IsSelected="{Binding ShowInnerHierarchyLogs}"  -->
+        <ListBoxItem IsSelected="False"
                      Style="{DynamicResource st_ToolBarListBoxItem}"
                      ToolTip="When disabled only root logs are shown"
                      >
@@ -31,10 +34,8 @@
         </ListBoxItem>
     </ListBox>
 
+    <!--  OrderByTimestampCommand - Command="{Binding OrderByTimestampCommand}  -->
     <ToggleButton Padding="10,0"
-                  Command="{Binding DataContext.OrderByTimestampCommand,
-                                    RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                   AncestorType=Window}}"
                   Style="{StaticResource st_ToolBarIconToggleButton}"
                   >
         <materialDesign:PackIcon Height="22"
@@ -46,37 +47,34 @@
                Text="From:  "
                />
 
-    <local:ToolBarDateTimePicker DateTime="{Binding Start}" />
+    <!--  Start date time - DateTime="{Binding Start}"  -->
+    <local:ToolBarDateTimePicker />
 
     <TextBlock Style="{StaticResource st_ToolBarTextBlock}"
                Text="To:  "
                />
 
-    <local:ToolBarDateTimePicker VerticalAlignment="Center"
-                                 DateTime="{Binding End}"
-                                 />
+    <!--  End date time - DateTime="{Binding End}"  -->
+    <local:ToolBarDateTimePicker VerticalAlignment="Center" />
 
-    <!--  Log Levels  -->
+    <!--  LogLevels items source - ItemsSource="{Binding LogLevels}"  -->
     <ComboBox materialDesign:HintAssist.Hint="Log Level"
               IsEditable="True"
               IsTextSearchEnabled="True"
-              ItemsSource="{Binding LogLevels}"
               Style="{StaticResource st_ToolBarComboBox}"
               Text="{Binding SelectedLogLevel,
                              UpdateSourceTrigger=PropertyChanged,
                              Mode=OneWayToSource}"
               />
 
-    <!--  Service name  -->
+    <!--  ServiceNames items source -  ItemsSource="{Binding ServiceNames}"  -->
     <ComboBox materialDesign:HintAssist.Hint="Service name"
               IsEditable="True"
               IsTextSearchEnabled="True"
-              ItemsSource="{Binding ServiceNames}"
               Style="{StaticResource st_ToolBarComboBox}"
               Text="{Binding SelectedServiceName,
                              UpdateSourceTrigger=PropertyChanged,
                              Mode=OneWayToSource}"
               />
-
 
 </ToolBar>
