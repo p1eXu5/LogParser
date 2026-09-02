@@ -233,11 +233,10 @@ module LogRepository =
     let [<Literal>] TEXT_LOG_KEY = "{T}"
 
     let private parseTask (logger: LogRepositoryLogger) (logSourceId: LogSourceId) (observer: IObserver<TechLogPosition>) (ct: CancellationToken) (stream: Stream) =
-        let streamName = sprintf "%O" logSourceId
         Task.Factory.StartNew(
             Action (fun () ->
                               
-                let parseResult = TechLogParser.parseStream observer streamName stream
+                let parseResult = TechLogParser.parseStream observer stream
                 match parseResult with
                 | Ok () -> logger.LogLogStreamParsedSuccessfully logSourceId
                 | Error err -> logger.LogLogStreamParsingError logSourceId err

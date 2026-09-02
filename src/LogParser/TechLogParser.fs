@@ -688,7 +688,7 @@ let public parse (observer: IObserver<TechLogPosition>) input =
 
 #nowarn "3397"
 
-let public parseStream (observer: IObserver<TechLogPosition>) streamName stream =
+let public parseStream (observer: IObserver<TechLogPosition>) (stream: IO.Stream) : Result<unit, string> =
     use charStream = new CharStream<unit>(stream, true, Text.Encoding.UTF8)
     let reply = (logListIgnore observer) charStream
     if reply.Status = Ok then
