@@ -36,7 +36,7 @@ type LogParseMsg =
     | ParsingError of string
 
 
-type LogFile =
+type LogSource =
     | MemoryStream
     | TempFile of FilePath
     | UserFile of FilePath
@@ -94,22 +94,22 @@ type LogSourceText with
     member this.Value with get () = this |> LogSourceText.value
 
 module LogFile =
-    let isNotUserFile (logFile: LogFile) =
+    let isNotUserFile (logFile: LogSource) =
         match logFile with
-        | LogFile.UserFile _ -> false
+        | LogSource.UserFile _ -> false
         | _ -> true
 
-    let fileNameWithoutExtension (logFile: LogFile) =
+    let fileNameWithoutExtension (logFile: LogSource) =
         match logFile with
-        | LogFile.TempFile fp
-        | LogFile.UserFile fp ->
+        | LogSource.TempFile fp
+        | LogSource.UserFile fp ->
             fp |> FilePath.fileNameWithoutExtension |> Some
         | _ -> None
 
-    let fullPath (logFile: LogFile) =
+    let fullPath (logFile: LogSource) =
         match logFile with
-        | LogFile.TempFile fp
-        | LogFile.UserFile fp ->
+        | LogSource.TempFile fp
+        | LogSource.UserFile fp ->
             fp |> FilePath.fullPath |> Some
         | _ -> None
 

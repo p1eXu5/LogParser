@@ -11,7 +11,7 @@ type LogFileModel =
         Id: int
         Repo: LogRepository
         Title: string option
-        LogFile: LogFile option
+        LogFile: LogSource option
         TechLogModelList: TechLogModel list
         SelectedTechLogId: TechLogId voption
         CacheKey: CacheKey

@@ -18,6 +18,7 @@ open System.Buffers
 type LogRepository =
     {
         ParseTextAsync: LogSourceText -> Async<ParseTextRequestResult>
+        ParseFileAsync: FilePath -> Async<ParseTextRequestResult>
         GetNextLogBatch: unit -> Async<LogMetaBatch>
         GetNextFilteredLogBatch: Map<FieldKey, string> -> Async<LogMetaBatch>
         /// Returns Tech and Raw logs asynchronously.
@@ -33,9 +34,10 @@ and
     CacheKey = Guid
 and
     ParseTextRequestResult =
-        | Accepted of LogFile
+        | Accepted of LogSource
         | PreviousInProgress
         | PreviousNotStorred
+        | CouldNotOpenUserFile of FilePath
 //        | LogRepositoryError of LogRepositoryError
 //and
 //    LogRepositoryError =
@@ -62,7 +64,7 @@ and
     LogRepositoryLogger =
         {
             LogInitializingLogSourceItem: LogSourceId -> unit
-            LogLogSourceItemInitialized: LogSourceId -> LogFile -> unit
+            LogLogSourceItemInitialized: LogSourceId -> LogSource -> unit
             LogCreateTmpFileError: LogSourceId -> FileStorageError -> unit
             LogOpenTmpFileError: LogSourceId -> exn -> unit
             LogCreateMemoryStreamError: LogSourceId -> exn -> unit
@@ -134,7 +136,7 @@ module LogRepository =
                 Cts: CancellationTokenSource
                 ParseTask: Task
                 Stream: Stream
-                StreamSource: LogFile
+                StreamSource: LogSource
                 Logs: TechLogPosition list
                 Skip: int
                 (*
@@ -162,7 +164,7 @@ module LogRepository =
         private ParsedState =
             {
                 Stream: Stream
-                StreamSource: LogFile
+                StreamSource: LogSource
                 Logs: TechLogPosition list
                 Skip: int
                 Fields: Map<FieldKey, int>
@@ -217,6 +219,7 @@ module LogRepository =
 
     type private Msg =
         | ParseText of LogSourceText * AsyncReplyChannel<ParseTextRequestResult>
+        | ParseFile of FilePath * AsyncReplyChannel<ParseTextRequestResult>
         | AppendLogBatch of TechLogPosition seq
         | SetError of exn
         | SetParsedState
@@ -244,7 +247,7 @@ module LogRepository =
             TaskScheduler.Default
         )
 
-    let private logFileStream
+    let private logFileStreamOfText
         (logger: LogRepositoryLogger)
         (fileStorage: FileStorage)
         (logSourceId: LogSourceId)
@@ -256,7 +259,7 @@ module LogRepository =
                 new MemoryStream(Encoding.UTF8.GetBytes(text.Value)) :> Stream,
                 ct
             ) :> Stream
-            , LogFile.MemoryStream
+            , LogSource.MemoryStream
 
         async {
             do logger.LogInitializingLogSourceItem logSourceId
@@ -274,7 +277,7 @@ module LogRepository =
                                 File.Open(filePath |> FilePath.value, FileMode.Open, FileAccess.ReadWrite),
                                 ct
                             ) :> Stream
-                            , LogFile.TempFile filePath
+                            , LogSource.TempFile filePath
                         )
                     with ex ->
                         logger.LogOpenTmpFileError logSourceId ex
@@ -289,6 +292,32 @@ module LogRepository =
             return
                 streamResult
         }
+
+    let private logFileStreamOfFile
+        (logger: LogRepositoryLogger)
+        (fileStorage: FileStorage)
+        (logSourceId: LogSourceId)
+        (ct: CancellationToken)
+        (filePath: FilePath)
+        =
+        do logger.LogInitializingLogSourceItem logSourceId
+
+        try
+            let (stream, source) =
+                (
+                    new CancellableStream(
+                        File.Open(filePath |> FilePath.value, FileMode.Open, FileAccess.ReadWrite),
+                        ct
+                    ) :> Stream
+                    , LogSource.UserFile filePath
+                )
+
+            do logger.LogLogSourceItemInitialized logSourceId (source)
+
+            (stream, source) |> Ok
+        with ex ->
+            logger.LogOpenTmpFileError logSourceId ex
+            Error ()
 
     let private logs (appConfig: AppConfig) (stateLogs: IStateLogs) =
         let skip = stateLogs.Skip
@@ -347,7 +376,6 @@ module LogRepository =
                                 | None ->
                                     match state with
                                     | State.Parsing s when s.LogsRequested ->
-                                     
                                             let! msgOpt =
                                                 processor.TryScan(
                                                     fun m ->
@@ -376,7 +404,7 @@ module LogRepository =
                             // msg can be an Initialized or a Parsed with saved user file
                             | _ ->
                                 let cts = new CancellationTokenSource()
-                                let! streamLogFile = logSourceText |> logFileStream logger fileStorage logSourceId cts.Token
+                                let! streamLogFile = logSourceText |> logFileStreamOfText logger fileStorage logSourceId cts.Token
                                 let (stream, logFile) = streamLogFile
                                 
                                 reply.Reply(ParseTextRequestResult.Accepted logFile)
@@ -398,6 +426,39 @@ module LogRepository =
                                     |> State.Parsing
 
                                 return! running parsingState
+
+                        | Msg.ParseFile (filePath, reply) ->
+                            match state with
+                            | Parsing _ -> reply.Reply (ParseTextRequestResult.PreviousInProgress)
+                            | Parsed s when s.StreamSource |> LogFile.isNotUserFile -> reply.Reply (ParseTextRequestResult.PreviousInProgress)
+                            // msg can be an Initialized or a Parsed with saved user file
+                            | _ ->
+                                let cts = new CancellationTokenSource()
+                                match filePath |> logFileStreamOfFile logger fileStorage logSourceId cts.Token with
+                                | Ok streamLogFile ->
+                                    let (stream, logFile) = streamLogFile
+                                
+                                    reply.Reply(ParseTextRequestResult.Accepted logFile)
+
+                                    let observer = appSubject.GetObserver logSourceId
+                                    let parsingState =
+                                        {
+                                            Cts = cts
+                                            Stream = stream
+                                            StreamSource = logFile
+                                            ParseTask = stream |> parseTask logger logSourceId observer cts.Token
+                                            Logs = []
+                                            Skip = 0
+                                            Fields = seq { (TEXT_LOG_KEY, 0) } |> Map.ofSeq 
+                                            FieldValueToLogs = [ UkkonenTrie<int>() ]
+                                            Filter = state |> State.filter
+                                            LogsRequested = false
+                                        }
+                                        |> State.Parsing
+
+                                    return! running parsingState
+                                | Error _ ->
+                                    reply.Reply (ParseTextRequestResult.CouldNotOpenUserFile filePath)
 
                         | Msg.AppendLogBatch logs ->
                             match state with
@@ -640,6 +701,8 @@ module LogRepository =
         {
             ParseTextAsync = fun (logSourceText: LogSourceText) ->
                 agent.PostAndAsyncReply(fun reply -> Msg.ParseText (logSourceText, reply))
+            ParseFileAsync = fun (logFile: FilePath) ->
+                agent.PostAndAsyncReply(fun reply -> Msg.ParseFile (logFile, reply))
             GetNextLogBatch = fun () ->
                 agent.PostAndAsyncReply(fun reply -> Msg.GetNextBatch reply)
             GetNextFilteredLogBatch = fun filter ->

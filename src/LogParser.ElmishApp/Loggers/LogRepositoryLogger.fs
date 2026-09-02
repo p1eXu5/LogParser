@@ -28,7 +28,7 @@ module private LogRepositoryMessage =
             "Initializing the log source item {LogSourceId}")
 
     let logSourceItemInitialized =
-        LoggerMessage.Define<LogSourceId, LogFile>(
+        LoggerMessage.Define<LogSourceId, LogSource>(
             LogLevel.Debug, LogRepositoryEvent.LogSourceItemInitialized,
             "The log source item {LogSourceId} has been initialized from the log file {LogFile}")
 
