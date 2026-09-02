@@ -1,11 +1,14 @@
 ﻿<ToolBar x:Class="LogParser.WpfClient.UserControls.ToolBars.StandardToolBar"
          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:LogFileModel="clr-namespace:LogParser.ElmishApp.LogFileModel;assembly=LogParser.ElmishApp"
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
          xmlns:local="clr-namespace:LogParser.WpfClient.UserControls.ToolBars"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
          x:Name="m_StandardToolBarRoot"
+         d:DataContext="{d:DesignInstance Type=LogFileModel:IBindings,
+                                          IsDesignTimeCreatable=False}"
          d:DesignWidth="700"
          d:Style="{StaticResource st_LogParserToolBar}"
          ClipToBounds="True"
@@ -19,14 +22,14 @@
                                  />
     </Button>
 
-    <Button Command="{Binding ClearInputCommand}"
-            Style="{StaticResource st_ToolBarIconButton}"
-            >
+    <!--  ClearInputCommand - Command="{Binding ClearInputCommand}"  -->
+    <Button Style="{StaticResource st_ToolBarIconButton}">
         <materialDesign:PackIcon Height="20"
                                  Kind="DeleteOutline"
                                  />
     </Button>
 
+    <!--  RawLogsToggler  -->
     <ListBox VerticalAlignment="Center"
              SelectionMode="Extended"
              >
@@ -47,26 +50,21 @@
                Text="Tmp Title:"
                />
 
+    <!--  TempTitle - Text="{Binding TempTitle, UpdateSourceTrigger=PropertyChanged}"  -->
     <TextBox Width="120"
              materialDesign:HintAssist.Hint="Temp Title"
              Style="{StaticResource st_ToolBarTextBox}"
-             Text="{Binding TempTitle,
-                            UpdateSourceTrigger=PropertyChanged}"
              />
 
     <TextBlock Style="{StaticResource st_ToolBarTextBlock}"
                Text="Log Source Type:"
                />
 
-    <!--  Service name  -->
+    <!--  LogSourceType (Kibana or Docker probably) items source - ItemsSource="{Binding LogSourceType}", Text="{Binding LogSourceType, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"  -->
     <ComboBox Width="130"
               materialDesign:HintAssist.Hint="Log Source Type"
               IsEditable="True"
               IsTextSearchEnabled="True"
-              ItemsSource="{Binding LogSourceType}"
               Style="{StaticResource st_ToolBarComboBox}"
-              Text="{Binding LogSourceType,
-                             UpdateSourceTrigger=PropertyChanged,
-                             Mode=OneWayToSource}"
               />
 </ToolBar>

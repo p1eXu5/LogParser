@@ -11,7 +11,8 @@
          Style="{StaticResource st_LogParserToolBar}"
          mc:Ignorable="d"
          >
-    <!--  Trace ID  -->
+    
+    <!--  Trace ID  --><!--
     <TextBox Width="250"
              Margin="0,1,0,1"
              materialDesign:HintAssist.Hint="Trace ID or message (when starts with 'm:') "
@@ -20,7 +21,7 @@
                             UpdateSourceTrigger=PropertyChanged}"
              />
 
-    <!--  Service name  -->
+    --><!--  Service name  --><!--
     <ComboBox materialDesign:HintAssist.Hint="Service name"
               IsEditable="True"
               IsTextSearchEnabled="True"
@@ -38,7 +39,7 @@
         <materialDesign:PackIcon Kind="StepBackward" />
     </Button>
 
-    <!--  Log count From  -->
+    --><!--  Log count From  --><!--
     <TextBox Width="50"
              materialDesign:HintAssist.Hint="From"
              materialDesign:HintAssist.HintHorizontalAlignment="Center"
@@ -47,7 +48,7 @@
              TextAlignment="Center"
              />
 
-    <!--  Log count To  -->
+    --><!--  Log count To  --><!--
     <TextBox Width="50"
              materialDesign:HintAssist.Hint="Size"
              materialDesign:HintAssist.HintHorizontalAlignment="Center"
@@ -94,5 +95,5 @@
             FontSize="13"
             Style="{StaticResource MaterialDesignPaperSecondaryButton}"
             ToolTip="Copy Kibana search request for DevTools"
-            />
+            />-->
 </ToolBar>

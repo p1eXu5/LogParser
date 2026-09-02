@@ -57,24 +57,18 @@
     <!--  End date time - DateTime="{Binding End}"  -->
     <local:ToolBarDateTimePicker VerticalAlignment="Center" />
 
-    <!--  LogLevels items source - ItemsSource="{Binding LogLevels}"  -->
+    <!--  LogLevels items source - ItemsSource="{Binding LogLevels}", Text="{Binding SelectedLogLevel, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"  -->
     <ComboBox materialDesign:HintAssist.Hint="Log Level"
               IsEditable="True"
               IsTextSearchEnabled="True"
               Style="{StaticResource st_ToolBarComboBox}"
-              Text="{Binding SelectedLogLevel,
-                             UpdateSourceTrigger=PropertyChanged,
-                             Mode=OneWayToSource}"
               />
 
-    <!--  ServiceNames items source -  ItemsSource="{Binding ServiceNames}"  -->
+    <!--  ServiceNames items source -  ItemsSource="{Binding ServiceNames}", Text="{Binding SelectedServiceName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"  -->
     <ComboBox materialDesign:HintAssist.Hint="Service name"
               IsEditable="True"
               IsTextSearchEnabled="True"
               Style="{StaticResource st_ToolBarComboBox}"
-              Text="{Binding SelectedServiceName,
-                             UpdateSourceTrigger=PropertyChanged,
-                             Mode=OneWayToSource}"
               />
 
 </ToolBar>

@@ -10,6 +10,7 @@
          Style="{StaticResource st_LogParserToolBar}"
          mc:Ignorable="d"
          >
+    <!--
     <ComboBox Margin="0,1,0,1"
               materialDesign:HintAssist.Hint="Kibana Account"
               IsEditable="False"
@@ -36,4 +37,5 @@
                                                                      UpdateSourceTrigger=PropertyChanged}"
                  Style="{StaticResource st_ToolBarPasswordBox}"
                  />
+    -->
 </ToolBar>
