@@ -20,7 +20,33 @@
                  >
         <ToolBarTray.ContextMenu>
             <ContextMenu materialDesign:MenuAssist.MenuItemsPresenterMargin="0">
-                <MenuItem Click="MenuItem_Click">
+                <MenuItem Click="ToggleStandardBarVisibility">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon x:Name="m_StandardBarCheckIcon"
+                                                     Margin="0,0,5,0"
+                                                     IsHitTestVisible="False"
+                                                     Kind="Check"
+                                                     />
+                            <TextBlock VerticalAlignment="Center">Standard</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+
+                <MenuItem Click="ToggleFiltersBarVisibility">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon x:Name="m_FiltersBarCheckIcon"
+                                                     Margin="0,0,5,0"
+                                                     IsHitTestVisible="False"
+                                                     Kind="Check"
+                                                     />
+                            <TextBlock VerticalAlignment="Center">Filters</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+
+                <MenuItem Click="ToggleKibanaToolBarsVisibility">
                     <MenuItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon x:Name="m_KibanaCheckIcon"
@@ -41,10 +67,13 @@
                                RawLogsToggler="{Binding ElementName=m_LogParserToolBarTrayRoot,
                                                         Path=RawLogsToggler}"
                                Style="{StaticResource st_LogParserToolBar}"
+                               Visibility="Collapsed"
                                />
-        <local:FiltersToolBar Band="0"
+        <local:FiltersToolBar x:Name="m_FiltersToolBar"
+                              Band="0"
                               BandIndex="1"
                               Style="{StaticResource st_LogParserToolBar}"
+                              Visibility="Collapsed"
                               />
         <local:KibanaSearchToolBar x:Name="m_KibanaSearchToolBar"
                                    Width="1400"

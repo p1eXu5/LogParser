@@ -21,13 +21,13 @@
     <Grid x:Name="m_Grid">
         <inf:InfiniteListBox Height="{Binding ElementName=m_Grid,
                                               Path=ActualHeight}"
-                             Style="{StaticResource MaterialDesignListBox}"
                              Grid.IsSharedSizeScope="True"
                              ItemTemplateSelector="{StaticResource ResourceKey=ts_LogDataTemplateSelector}"
                              ItemsSource="{Binding TechLogList}"
                              NextItemsRequested="{Binding LoadNextLogBatchCommand}"
                              ScrollThreshold="0.8"
                              ScrollViewer.CanContentScroll="False"
+                             Style="{StaticResource MaterialDesignListBox}"
                              >
             <inf:InfiniteListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
