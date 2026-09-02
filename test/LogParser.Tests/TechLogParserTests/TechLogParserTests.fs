@@ -1,5 +1,6 @@
 ﻿namespace LogParser.Tests.TechLogParserTests
 
+open System
 open NUnit.Framework
 
 module TechLogParserTests =
@@ -458,6 +459,75 @@ module TechLogParserTests =
             |> should not' (contain false)
         } |> Result.runTest
 
+    [<Test>]
+    let ``parse - empty json`` () =
+        result {
+            let input = 
+                """{}"""
+
+            // Act:
+            let! res = LogParser.TechLogParser.parse testObserver input
+
+            // Assert:
+            res |> should haveLength 1
+            res[0] |> should be (equal (TechLog.JsonLog ({Source = None; Fields = []})))
+        } |> Result.runTest
+
+    [<Test>]
+    let ``parseStream - empty json`` () =
+        result {
+            let input =
+                """{}"""
+
+            let observed = ResizeArray<TechLogPosition>()
+            let mutable completed = false
+
+            let observer =
+                { new IObserver<TechLogPosition> with
+                    member _.OnNext value = observed.Add value
+                    member _.OnError ex = raise ex
+                    member _.OnCompleted() = completed <- true }
+
+            use stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes input)
+
+            // Act:
+            do! LogParser.TechLogParser.parseStream observer stream
+
+            // Assert:
+            completed |> should be True
+            observed |> should haveCount 1
+            observed[0].Log |> should be (equal (TechLog.JsonLog ({Source = None; Fields = []})))
+        } |> Result.runTest
+
+    [<Test>]
+    let ``parseStream - file with empty json`` () =
+        let path = IO.Path.GetTempFileName()
+
+        try
+            IO.File.WriteAllText(path, """{}""", Text.Encoding.UTF8)
+
+            result {
+                let observed = ResizeArray<TechLogPosition>()
+                let mutable completed = false
+
+                let observer =
+                    { new IObserver<TechLogPosition> with
+                        member _.OnNext value = observed.Add value
+                        member _.OnError ex = raise ex
+                        member _.OnCompleted() = completed <- true }
+
+                use stream = new IO.FileStream(path, IO.FileMode.Open, IO.FileAccess.Read)
+
+                // Act:
+                do! LogParser.TechLogParser.parseStream observer stream
+
+                // Assert:
+                completed |> should be True
+                observed |> should haveCount 1
+                observed[0].Log |> should be (equal (TechLog.JsonLog ({Source = None; Fields = []})))
+            } |> Result.runTest
+        finally
+            IO.File.Delete path
 
     [<Test>]
     let ``parse - log source test`` () =
