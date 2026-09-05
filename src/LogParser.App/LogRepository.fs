@@ -71,6 +71,7 @@ and
             LogLogStreamParsedSuccessfully: LogSourceId -> unit
             LogLogStreamParsingError: LogSourceId -> string -> unit
             LogLogStreamError: LogSourceId -> exn -> unit
+            LogLogStreamErrorStr: LogSourceId -> string -> unit
             LogProcessingMsg: string -> string -> unit
             LogUnprocessedMsg: string -> string -> unit
         }
@@ -96,6 +97,7 @@ and
                     LogLogStreamParsedSuccessfully = log "Log stream %A has been parsed successfully"
                     LogLogStreamParsingError = log "Log stream %A has not been parsed - %s"
                     LogLogStreamError = log "Log stream %A has not been parsed - %O"
+                    LogLogStreamErrorStr = log "Log stream %A has not been parsed - %s"
                     LogProcessingMsg = log "Message %s is processing. State - %s"
                     LogUnprocessedMsg = log "Message %s is skipped. State - %s"
                 }
@@ -222,6 +224,7 @@ module LogRepository =
         | ParseFile of FilePath * AsyncReplyChannel<ParseTextRequestResult>
         | AppendLogBatch of TechLogPosition seq
         | SetError of exn
+        | SetErrorStr of string
         | SetParsedState
         | GetNextBatch of AsyncReplyChannel<LogMetaBatch>
         | GetNextFilteredBatch of filter: Map<FieldKey, string> * AsyncReplyChannel<LogMetaBatch>
@@ -516,7 +519,11 @@ module LogRepository =
                                 if logs.Length = 0
                                 then
                                     let s = { s with LogsRequested = true }
-                                    processor.Post(Msg.GetNextBatch reply)
+                                    async {
+                                        do! Async.Sleep appConfig.ParserBatchFlushTimeSpan
+                                        processor.Post(Msg.GetNextBatch reply)
+                                    }
+                                    |> Async.Start
                                     return! running state
                                 else 
                                     reply.Reply ((logs, s.Fields.Keys |> Set.ofSeq, false) |> LogMetaBatch.create)
@@ -543,7 +550,11 @@ module LogRepository =
                                 if logs.Length = 0
                                 then
                                     let s = { s with LogsRequested = true }
-                                    processor.Post(Msg.GetNextFilteredBatch (filter, reply))
+                                    async {
+                                        do! Async.Sleep appConfig.ParserBatchFlushTimeSpan
+                                        processor.Post(Msg.GetNextFilteredBatch (filter, reply))
+                                    }
+                                    |> Async.Start
                                     return! running state
                                 else 
                                     reply.Reply ((logs, s.Fields.Keys |> Set.ofSeq, false) |> LogMetaBatch.create)
@@ -572,6 +583,28 @@ module LogRepository =
 
                         | Msg.SetError ex ->
                             logger.LogLogStreamError logSourceId ex
+                            match state with
+                            | State.Parsing s ->
+                                let parsedState =
+                                    {
+                                        Stream = s.Stream
+                                        StreamSource = s.StreamSource
+                                        Logs = s.Logs
+                                        Skip = s.Skip
+                                        Fields = s.Fields
+                                        FieldValueToLogs = s.FieldValueToLogs
+                                        Filter = s.Filter
+                                        ParsingError = true
+                                    }
+
+                                return! running (parsedState |> State.Parsed)
+
+                            | _ ->
+                                logger.LogUnprocessedMsg (nameof Msg.SetError) (state |> State.name)
+                                return! running state
+
+                        | Msg.SetErrorStr err ->
+                            logger.LogLogStreamErrorStr logSourceId err
                             match state with
                             | State.Parsing s ->
                                 let parsedState =
@@ -684,13 +717,19 @@ module LogRepository =
         let agent = agent appConfig appSubject fileStorage logger logSourceId
 
         let subscription =
-            appSubject
-            :> IObservable<LogSourceId * TechLogPosition seq>
+            appSubject.Observable
             |> Observable.filter (fun (id, _) -> id = logSourceId)
             |> Observable.subscribeWithCallbacks
-                (fun (_, l) -> agent.Post(Msg.AppendLogBatch(l)))
-                (fun ex -> agent.Post(Msg.SetError ex))
-                (fun () -> agent.Post(Msg.SetParsedState))
+                    (fun (_, p) -> 
+                        match p with
+                        | ObservableLogPosition.Next s ->
+                            agent.Post(Msg.AppendLogBatch(s))
+                        | ObservableLogPosition.Error err ->
+                            agent.Post(Msg.SetErrorStr err)
+                        | ObservableLogPosition.Completed ->
+                            agent.Post(Msg.SetParsedState))
+                    (fun ex -> agent.Post(Msg.SetError ex))
+                    (fun () -> agent.Post(Msg.SetParsedState))
 
         agent.Start()
 

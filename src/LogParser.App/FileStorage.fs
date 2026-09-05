@@ -56,12 +56,12 @@ module FileStorage =
                 use sw = File.OpenWrite(path)
 
                 let unvalidatedLogs = logSourceText.Value
+                let bytesCount = Encoding.UTF8.GetByteCount(unvalidatedLogs)
                 let buffer = ArrayPool<byte>.Shared.Rent(Encoding.UTF8.GetByteCount(unvalidatedLogs))
 
                 try
                     let _ = Encoding.UTF8.GetBytes(unvalidatedLogs, buffer)
-                    let roMemory = buffer.AsMemory()
-                    do! sw.WriteAsync(roMemory, ct).ConfigureAwait(false)
+                    do! sw.WriteAsync(buffer, 0, bytesCount, ct).ConfigureAwait(false)
                 finally
                     ArrayPool<byte>.Shared.Return(buffer)
 

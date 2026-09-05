@@ -64,6 +64,11 @@ module private LogRepositoryMessage =
             LogLevel.Error, LogRepositoryEvent.LogStreamError,
             "The log stream {LogSourceId} has not been parsed")
 
+    let logStreamErrorStr =
+        LoggerMessage.Define<LogSourceId, string>(
+            LogLevel.Error, LogRepositoryEvent.LogStreamError,
+            "The log stream {LogSourceId} has not been parsed. {ErrorMessage}")
+
     let processingMsg =
         LoggerMessage.Define<string, string>(
             LogLevel.Trace, LogRepositoryEvent.ProcessingMsg,
@@ -99,6 +104,9 @@ let init (logger: ILogger<LogRepository>) : LogRepositoryLogger =
 
         LogLogStreamError =
             fun id ex -> LogRepositoryMessage.logStreamError.Invoke(logger, id, ex)
+
+        LogLogStreamErrorStr =
+            fun id err -> LogRepositoryMessage.logStreamErrorStr.Invoke(logger, id, err, null)
 
         LogProcessingMsg =
             fun msg state -> LogRepositoryMessage.processingMsg.Invoke(logger, msg, state, null)

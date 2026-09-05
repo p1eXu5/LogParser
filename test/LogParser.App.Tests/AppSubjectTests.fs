@@ -2,6 +2,7 @@ namespace LogParser.App.Tests
 
 open System
 open System.Threading
+open System.Threading.Tasks
 
 open NUnit.Framework
 open Faqt
@@ -56,6 +57,27 @@ module AppSubjectTests =
         let appSubject = appSubject 1
         let obs = appSubject.GetObserver(LogSourceId.create ())
         %obs.Should().NotBeNull()
+
+    [<Test>]
+    let ``0x: OnCompleted test`` () =
+        let appSubject = appSubject 1
+        let mutable isCompleted = false
+        let _ =
+            appSubject.Observable
+                |> Observable.subscribeNext (fun (_ , p) ->
+                    match p with
+                    | ObservableLogPosition.Completed ->
+                        isCompleted <- true
+                    | _ -> ()
+                )
+        let logSourceId = LogSourceId.create ()
+        let obs = appSubject.GetObserver logSourceId
+
+        appSubject.SendCompleteToInner logSourceId
+
+        let res = SpinWait.SpinUntil(Func<bool> (fun _ -> isCompleted = true), 5000)
+
+        %res.Should().BeTrue()
 
     [<Test>]
     let ``02: Messages from a single observer reach subscribers`` () =

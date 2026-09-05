@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="Utilities\ShouldExtensions.fs" />
+    <Compile Include="AppSubjectStocks.fs" />
     <Compile Include="AppSubjectTests.fs" />
     <Compile Include="LogRepositoryTests.fs" />
     <Compile Include="Program.fs" />

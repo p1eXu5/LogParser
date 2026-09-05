@@ -13,6 +13,8 @@ type AppSubject =
         GetObserver: LogSourceId -> IObserver<TechLogPosition>
         Observable: IObservable<LogSourceId * ObservableLogPosition>
         Dispose: unit -> unit
+        // test purpose
+        SendCompleteToInner: LogSourceId -> unit
     }
     interface IDisposable with
         member this.Dispose() =
@@ -86,17 +88,14 @@ module AppSubject =
         {
             Observers: Map<LogSourceId, (System.Reactive.Subjects.Subject<TechLogPosition> * IDisposable)>
             Merged: System.Reactive.Subjects.Subject<IObservable<LogSourceId * LogPositionSignal>>
-            InnerSignal: System.Reactive.Subjects.Subject<LogSourceId * LogPositionSignal>
+            CompleteErrorSignal: System.Reactive.Subjects.Subject<LogSourceId * LogPositionSignal>
             Iteration: int
         }
         static member Init =
-            let innerSignal = Subject.broadcast
-            let merged = Subject.broadcast
-            merged.OnNext(innerSignal :> IObservable<LogSourceId * LogPositionSignal>)
             {
                 Observers = Map.empty;
-                Merged = merged;
-                InnerSignal = innerSignal
+                Merged = Subject.broadcast;
+                CompleteErrorSignal = Subject.broadcast
                 Iteration = 0
             }
     and
@@ -110,7 +109,7 @@ module AppSubject =
         | GetObserver of LogSourceId * mainObserver: IObserver<IObservable<LogSourceId * ObservableLogPosition>> * AsyncReplyChannel<IObserver<TechLogPosition>>
         | FinishObserver of LogSourceId * error: string option
         | Dispose of AsyncReplyChannel<unit>
-
+        | SendCompleteToInner of LogSourceId
 
     let private agent (logger: AppSubjectLogger) (appConfig: AppConfig) = new MailboxProcessor<Msg>(fun mailbox ->
         let rec loop state =
@@ -118,17 +117,15 @@ module AppSubject =
                 let! msg = mailbox.Receive()
                 match msg with
                 | Msg.GetObserver (logSourceId, mainObserver, reply) ->
-                    let firstCall = state.Observers.IsEmpty
-
                     match state.Observers |> Map.tryFind logSourceId with
                     | Some (inner, _) ->
                         logger.LogInnerObserverExists logSourceId
                         reply.Reply(inner :> IObserver<TechLogPosition>)
                         return! loop state
                     | None ->
-                        let inner = Subject.broadcast
+                        let externalSignal = Subject.broadcast
                         let d =
-                            inner
+                            externalSignal
                             |> Observable.subscribeSafeWithCallbacks
                                 (fun techLogPosition ->
                                     logger.LogObserverNext logSourceId techLogPosition
@@ -143,7 +140,11 @@ module AppSubject =
                                 )
 
                         let iteration =
-                            if firstCall then
+                            if state.Observers.IsEmpty then
+                                // If first observer request:
+                                // 1. create 'merged' from state.Merged
+                                // 2. push 'merged' to main observer (switch)
+                                // 3. push new inner to the state.Merged
                                 let merged =
                                     state.Merged
                                     |> Observable.mergeInner
@@ -152,33 +153,56 @@ module AppSubject =
                                         g
                                         |> Observable.bufferSpanCount appConfig.ParserBatchFlushTimeSpan appConfig.ParserSubscriptionBatchSize
                                         |> Observable.filter (fun l -> not (Seq.isEmpty l))
-                                        |> Observable.map (fun signal ->
-                                            match signal |> Seq.head with
-                                            | LogPositionSignal.Next _ ->
-                                                ObservableLogPosition.Next (
-                                                    signal
-                                                    |> Seq.choose (function LogPositionSignal.Next lp -> lp |> Some | _ -> None)
-                                                    |> Seq.toList
-                                                )
-                                            | LogPositionSignal.Completed -> ObservableLogPosition.Completed
-                                            | LogPositionSignal.Error err -> ObservableLogPosition.Error err
+                                        |> Observable.bind (fun signals ->
+                                            Seq.foldBack
+                                                (fun sg st ->
+                                                    match sg with
+                                                    | LogPositionSignal.Next tlp ->
+                                                        (tlp :: (fst st), snd st)
+                                                    | LogPositionSignal.Completed ->
+                                                        (fst st, ObservableLogPosition.Completed |> Some)
+                                                    | LogPositionSignal.Error err ->
+                                                        (fst st, ObservableLogPosition.Error err |> Some)
+                                                ) 
+                                                signals
+                                                ([], None)
+                                            |> fun t ->
+                                                let (tlps, term) = t
+                                                Observable.ofSeq
+                                                    (
+                                                        seq {
+                                                            if tlps.Length > 0 then
+                                                                yield (g.Key, ObservableLogPosition.Next tlps)
+
+                                                            if term.IsSome then
+                                                                yield (g.Key, term.Value)
+                                                        }
+                                                    )
                                         )
-                                        |> Observable.map (fun l -> (g.Key, l))
                                     )
 
                                 let i = state.Iteration + 1
                                 logger.LogSwitchingToIteration i
                                 mainObserver.OnNext(merged)
+                                state.Merged.OnNext(state.CompleteErrorSignal)
                                 i
                             else
                                 state.Iteration
                         
-                        state.Merged.OnNext(inner |> Observable.map (fun log -> (logSourceId, log |> LogPositionSignal.Next)))
-                        reply.Reply(inner :> IObserver<TechLogPosition>)
+                        state.Merged.OnNext(externalSignal |> Observable.map (fun log -> (logSourceId, log |> LogPositionSignal.Next)))
+                        reply.Reply(externalSignal :> IObserver<TechLogPosition>)
 
                         logger.LogInnerObserverCreated logSourceId
 
-                        return! loop { state with Observers = state.Observers |> Map.add logSourceId (inner, d); Iteration = iteration }
+                        return! loop
+                            { state with
+                                Observers = state.Observers |> Map.add logSourceId (externalSignal, d);
+                                Iteration = iteration
+                            }
+
+                | Msg.SendCompleteToInner logSourceId ->
+                    state.CompleteErrorSignal.OnNext((logSourceId, LogPositionSignal.Completed))
+                    return! loop state
 
                 | Msg.FinishObserver (logSourceId, errOpt) ->
                     match state.Observers |> Map.tryFind logSourceId with
@@ -189,15 +213,19 @@ module AppSubject =
 
                         match errOpt with
                         | Some err ->
-                            state.InnerSignal.OnNext((logSourceId, LogPositionSignal.Error err))
+                            state.CompleteErrorSignal.OnNext((logSourceId, LogPositionSignal.Error err))
                         | None ->
-                            state.InnerSignal.OnNext((logSourceId, LogPositionSignal.Completed))
+                            state.CompleteErrorSignal.OnNext((logSourceId, LogPositionSignal.Completed))
                         
                         let observers = state.Observers |> Map.remove logSourceId
                         if observers.IsEmpty then
-                            state.InnerSignal.Dispose()
-                            state.Merged.Dispose()
+                            state.CompleteErrorSignal.OnCompleted()
+                            state.Merged.OnCompleted()
+
                             logger.LogSourceIsDisposedWithMerged logSourceId
+
+                            state.CompleteErrorSignal.Dispose()
+                            state.Merged.Dispose()
 
                             return! loop { State.Init with Iteration = state.Iteration }
                         else
@@ -249,4 +277,7 @@ module AppSubject =
                     agent.PostAndReply(fun reply -> Msg.Dispose reply)
                     agent.Dispose()
                     mainSubject.Dispose()
+            SendCompleteToInner =
+                fun logSourceId ->
+                    agent.Post(Msg.SendCompleteToInner logSourceId)
         }
