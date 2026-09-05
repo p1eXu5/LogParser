@@ -23,7 +23,7 @@ type LogRepository =
         GetNextFilteredLogBatch: Map<FieldKey, string> -> Async<LogMetaBatch>
         /// Returns Tech and Raw logs asynchronously.
         GetLogs: TechLogId list -> Async<LogBatch>
-        GetTechLogs: TechLogId list -> CacheKey -> Map<TechLogId, TechLog>
+        GetTechLogs: TechLogId list -> CacheKey -> Map<TechLogId, IndexedTechLog>
         GetRawLogs: TechLogId list -> Map<TechLogId, string>
         Dispose: unit -> unit
     }
@@ -57,9 +57,18 @@ and
         {
             ///// Is needed to cache result
             //BatchId: Guid
-            TechLogs: TechLog list
+            TechLogs: IndexedTechLog list
             RawLogs: string list
         }
+    and
+        IndexedTechLog =
+            {
+                TechLog: TechLog
+                Fields: Map<FieldKey, int> option
+            }
+            with
+                member this.IsTechJson =
+                    this.Fields.IsSome
 and
     LogRepositoryLogger =
         {
@@ -106,7 +115,7 @@ and
 
 module private LogMetaBatch =
 
-    let create (techLogIds: TechLogId list, fieldKeys: Set<FieldKey>, parsingError: bool) =
+    let inline create (techLogIds: TechLogId list, fieldKeys: Set<FieldKey>, parsingError: bool) =
         {
             TechLogIds = techLogIds
             FieldKeys = fieldKeys
@@ -115,10 +124,18 @@ module private LogMetaBatch =
 
 module private LogBatch =
 
-    let create (techLogs: TechLog list) (rawLogs: string list) =
+    let inline create (techLogs: IndexedTechLog list) (rawLogs: string list) =
         {
             TechLogs = techLogs
             RawLogs = rawLogs
+        }
+
+module private IndexedTechLog =
+
+    let inline create (techLog: TechLog) (fields: Map<FieldKey, int> option) =
+        {
+            TechLog = techLog
+            Fields = fields
         }
 
 module LogRepository =
@@ -139,7 +156,7 @@ module LogRepository =
                 ParseTask: Task
                 Stream: Stream
                 StreamSource: LogSource
-                Logs: TechLogPosition list
+                Logs: IndexedTechLogPosition list
                 Skip: int
                 (*
                 Special fields could be stored separately,
@@ -167,7 +184,7 @@ module LogRepository =
             {
                 Stream: Stream
                 StreamSource: LogSource
-                Logs: TechLogPosition list
+                Logs: IndexedTechLogPosition list
                 Skip: int
                 Fields: Map<FieldKey, int>
                 FieldValueToLogs: UkkonenTrie<int> list
@@ -184,9 +201,15 @@ module LogRepository =
                 member this.Logs = this.Logs
                 member this.Stream = this.Stream
     and
+        IndexedTechLogPosition =
+            {
+                TechLogPosition: TechLogPosition
+                Fields: Map<FieldKey, int> option
+            }
+    and
         private IStateLogs =
             interface
-                abstract Logs: TechLogPosition list with get
+                abstract Logs: IndexedTechLogPosition list with get
                 abstract Skip: int with get
                 abstract Fields: Map<FieldKey, int> with get
                 abstract FieldValueToLogs: UkkonenTrie<int> list with get
@@ -195,9 +218,35 @@ module LogRepository =
     and
         private IStateLogsStream =
             interface
-                abstract Logs: TechLogPosition list with get
+                abstract Logs: IndexedTechLogPosition list with get
                 abstract Stream: Stream
             end
+
+    module private IndexedTechLogPosition =
+
+        let ofTechLogPosition (logPos: TechLogPosition) : IndexedTechLogPosition =
+            let (map: Map<FieldKey, int> option) =
+                match logPos.Log with
+                | TechLog.TextLog _ ->
+                    None
+                | TechLog.JsonLog jsonLog ->
+                    jsonLog.Fields
+                    |> Seq.mapi (fun ind field -> (field |> TechJsonLogField.key, ind))
+                    |> Map.ofSeq
+                    |> Some
+
+            {
+                TechLogPosition = logPos
+                Fields = map
+            }
+
+    module private IndexedTechLog =
+
+        let inline ofIndexedTechLogPosition (indexedTechLogPosition: IndexedTechLogPosition) =
+            {
+                TechLog = indexedTechLogPosition.TechLogPosition.Log
+                Fields = indexedTechLogPosition.Fields
+            }
 
     module private State =
 
@@ -229,7 +278,7 @@ module LogRepository =
         | GetNextBatch of AsyncReplyChannel<LogMetaBatch>
         | GetNextFilteredBatch of filter: Map<FieldKey, string> * AsyncReplyChannel<LogMetaBatch>
         | GetLogs of logIdList: TechLogId list * AsyncReplyChannel<LogBatch>
-        | GetTechLogs of logIdList: TechLogId list * AsyncReplyChannel<Map<TechLogId, TechLog>>
+        | GetTechLogs of logIdList: TechLogId list * AsyncReplyChannel<Map<TechLogId, IndexedTechLog>>
         | GetRawLogs of logIdList: TechLogId list * AsyncReplyChannel<Map<TechLogId, string>>
 
 
@@ -323,7 +372,7 @@ module LogRepository =
 
     let private logs (appConfig: AppConfig) (stateLogs: IStateLogs) =
         let skip = stateLogs.Skip
-        if skip >= stateLogs.Logs.Length - 1 then
+        if skip >= stateLogs.Logs.Length then
             List.empty
         else
             let length = stateLogs.Logs.Length
@@ -331,8 +380,8 @@ module LogRepository =
                 stateLogs.Logs
                 |> List.rev
                 |> List.skip skip
-                |> List.take appConfig.ParserSubscriptionBatchSize
-                |> List.mapi (fun ind l -> TechLogId.fromTechLogPosition (length - skip - ind - 1) length l)
+                |> List.take (min appConfig.ParserSubscriptionBatchSize (length - skip))
+                |> List.mapi (fun ind l -> TechLogId.fromTechLogPosition (length - skip - ind - 1) length l.TechLogPosition)
             else
                 stateLogs.Fields
                 |> Map.fold (fun s key ind ->
@@ -343,9 +392,9 @@ module LogRepository =
                 ) Seq.empty
                 |> Seq.sortDescending
                 |> Seq.skip skip
-                |> Seq.take appConfig.ParserSubscriptionBatchSize
+                |> Seq.take (min appConfig.ParserSubscriptionBatchSize (length - skip))
                 |> Seq.map (fun ind ->
-                    stateLogs.Logs[length - ind - 1] |> TechLogId.fromTechLogPosition ind length
+                    stateLogs.Logs[length - ind - 1].TechLogPosition |> TechLogId.fromTechLogPosition ind length
                 )
                 |> Seq.toList
 
@@ -467,11 +516,11 @@ module LogRepository =
                             | State.Parsing s -> 
                                 let (stateLogs, stateFields, stateFieldValueToLogs) =
                                     Seq.foldBack
-                                        (fun (log: TechLogPosition) (logs: TechLogPosition list, fields: Map<FieldKey, int>, fieldValueToLogs: UkkonenTrie<int> list) ->
+                                        (fun (log: TechLogPosition) (logs: IndexedTechLogPosition list, fields: Map<FieldKey, int>, fieldValueToLogs: UkkonenTrie<int> list) ->
                                             match log.Log with
                                             | TechLog.TextLog text ->
                                                 fieldValueToLogs[0].Add(text, logs.Length)
-                                                (log :: logs, fields, fieldValueToLogs)
+                                                ((log |> IndexedTechLogPosition.ofTechLogPosition) :: logs, fields, fieldValueToLogs)
                                             | TechLog.JsonLog json ->
                                                 json.Fields
                                                 |> List.fold
@@ -490,7 +539,7 @@ module LogRepository =
                                                     )
                                                     (fields, fieldValueToLogs)
                                                 |> fun (fields, fieldValueToLogs) ->
-                                                    (log :: logs, fields, fieldValueToLogs)
+                                                    ((log |> IndexedTechLogPosition.ofTechLogPosition) :: logs, fields, fieldValueToLogs)
                                         )
                                         logs
                                         (s.Logs, s.Fields, s.FieldValueToLogs)
@@ -645,7 +694,7 @@ module LogRepository =
                                                 let _ = sr.BaseStream.Seek(logId.StartIndex, SeekOrigin.Begin)
                                                 let read = sr.ReadBlock(buf, 0, count)
                                                 { batch with
-                                                    TechLogs = s.Logs[logId.Ind].Log :: batch.TechLogs
+                                                    TechLogs = (s.Logs[logId.Ind] |> IndexedTechLog.ofIndexedTechLogPosition) :: batch.TechLogs
                                                     RawLogs = System.String(buf, 0, read) :: batch.RawLogs
                                                 }
                                             )
@@ -668,7 +717,7 @@ module LogRepository =
                                     let logBatch =
                                         logIdList
                                         |> Seq.map (fun logId ->
-                                            (logId, s.Logs[logId.Ind].Log)
+                                            (logId, s.Logs[logId.Ind] |> IndexedTechLog.ofIndexedTechLogPosition)
                                         )
                                         |> Map.ofSeq
 

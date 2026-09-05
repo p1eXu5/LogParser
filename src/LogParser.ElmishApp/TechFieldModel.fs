@@ -110,7 +110,7 @@ module TechFieldModel =
             }
 
 
-namespace rec LogParser.ElmishApp.TechFieldModel
+namespace LogParser.ElmishApp.TechFieldModel
 
 open System.Windows.Input
 open LogParser.ElmishApp
