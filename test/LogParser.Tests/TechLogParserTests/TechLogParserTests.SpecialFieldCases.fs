@@ -14,7 +14,7 @@ type SpecialFieldCases() =
         seq {
             TestCaseData(
                 "\"timestamp\": \"2022-04-14T11:49:52.912Z\"",
-                TechJsonLogField.Timespan (Timespan.Value "2022-04-14T11:49:52.912Z")
+                TechJsonLogField.Timestamp (Timespan.Value "2022-04-14T11:49:52.912Z")
             ).SetName("01 - special field. Timespan")
 
             TestCaseData(

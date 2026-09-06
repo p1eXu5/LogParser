@@ -42,7 +42,7 @@ module TechJsonLogField =
             |> Seq.toList
 
         [|
-            Timespan.generate >> TechJsonLogField.Timespan
+            Timespan.generate >> TechJsonLogField.Timestamp
             generateMessage
             generateLogLevel
             fun () -> faker.Lorem.Word() |> TechJsonLogField.Method

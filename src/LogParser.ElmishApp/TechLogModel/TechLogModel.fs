@@ -16,7 +16,8 @@ type TechLogModel =
 
 module TechLogModel =
 
-    type Msg = Msg
+    type Msg = 
+        | TechFieldMsg of string * TechFieldModel.Msg
 
     let init (techLogId: TechLogId) =
         {

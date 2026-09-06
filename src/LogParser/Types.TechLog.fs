@@ -82,7 +82,7 @@ module TechLog =
             techLog.Fields
             |> List.tryPick (fun field -> 
                 match fieldType, field with
-                | TechJsonSpecialFieldType.Timespan, TechJsonLogField.Timespan (Timespan.Value v)
+                | TechJsonSpecialFieldType.Timespan, TechJsonLogField.Timestamp (Timespan.Value v)
                 | TechJsonSpecialFieldType.Message, TechJsonLogField.Message v 
                 | TechJsonSpecialFieldType.Method, TechJsonLogField.Method v
                 | TechJsonSpecialFieldType.Path, TechJsonLogField.Path v

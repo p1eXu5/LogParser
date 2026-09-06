@@ -62,7 +62,7 @@ module TechJsonLogModel=
             |> List.distinct
             |> List.partition (fun f -> 
                 match f.TechField with
-                | TechJsonLogField.Timespan _
+                | TechJsonLogField.Timestamp _
                 | TechJsonLogField.Level _
                 | TechJsonLogField.HierarchicalTraceId _ // TODO: remove after make log model hierarchy
                 | TechJsonLogField.TraceId _ // TODO: remove after make log model hierarchy

@@ -154,8 +154,8 @@ let internal p_port q =
 
 let internal p_timestamp q =
     choice [
-        p_predefinedStringField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (Timespan.Value >> TechJsonLogField.Timespan)
-        p_predefinedNullField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (TechJsonLogField.Timespan Timespan.Null)
+        p_predefinedStringField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (Timespan.Value >> TechJsonLogField.Timestamp)
+        p_predefinedNullField q ["timespan"; "timestamp"; "@timestamp"; "@t"] (TechJsonLogField.Timestamp Timespan.Null)
     ]
 
 let internal p_host q = p_predefinedStringField q ["host"] TechJsonLogField.Host

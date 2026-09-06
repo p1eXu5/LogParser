@@ -10,7 +10,7 @@ type Timespan =
     | Null
 
 type TechJsonLogField =
-    | Timespan of Timespan
+    | Timestamp of Timespan
 
     // TODO: wrap in separate DU
     | Message of string
@@ -51,8 +51,8 @@ type TechJsonLogField =
     with
         override this.ToString() =
             match this with
-            | Timespan (Timespan.Value v) -> $"\"timespan\": \"{v}\""
-            | Timespan (Timespan.Null) -> $"\"timespan\": null"
+            | Timestamp (Timespan.Value v) -> $"\"timespan\": \"{v}\""
+            | Timestamp (Timespan.Null) -> $"\"timespan\": null"
 
             | Message v -> $"\"message\": \"{v}\""
             | MessageBoddied (k, v) -> $"\"message\": \"{k},\n {v |> TechJsonLogField.toString 1}\""
@@ -312,7 +312,7 @@ module TechJsonLogField =
 
     let value field =
         match field with
-        | Timespan (Timespan.Value v)
+        | Timestamp (Timespan.Value v)
         | Message v
         | Method v
         | Path v
@@ -365,7 +365,7 @@ module TechJsonLogField =
 
             $"[\n{values}\n]"
 
-        | Timespan (Timespan.Null)
+        | Timestamp (Timespan.Null)
         | Null _ -> "null"
         | NullAnnonimous -> "null"
 
@@ -388,6 +388,25 @@ module TechJsonLogField =
     let capitalize (s: string) =
         Char.ToUpper(s[0]) |> sprintf "%c%s" <| s[1..]
 
+    module Keys =
+        let [<Literal>] TIMESTAMP = "Timestamp"
+        let [<Literal>] METHOD = "Method"
+        let [<Literal>] PATH = "Path"
+        let [<Literal>] HOST = "Host"
+        let [<Literal>] SOURCE_CONTEXT = "SourceContext"
+        let [<Literal>] REQUEST_ID = "RequestId"
+        let [<Literal>] REQUEST_PATH = "RequestPath"
+        let [<Literal>] SPAN_ID = "SpanId"
+        let [<Literal>] TRACE_ID = "TraceId"
+        let [<Literal>] PARENT_ID = "ParentId"
+        let [<Literal>] CONNECTION_ID = "ConnectionId"
+        let [<Literal>] HIERARCHICAL_TRACE_ID = "HierarchicalTraceId"
+        let [<Literal>] STATUS_CODE = "StatusCode"
+        let [<Literal>] LEVEL = "Level"
+        let [<Literal>] PORT = "Port"
+        let [<Literal>] BODY = "Body"
+        let [<Literal>] EVENT_ID = "EventId"
+        let [<Literal>] MESSAGE = "Message"
 
     let key field =
         let GetUnionCaseName (x:'a) = 
@@ -395,23 +414,23 @@ module TechJsonLogField =
             | case, _ -> case.Name
 
         match field with
-        | Timespan _
-        | Method _
-        | Path _
-        | Host _
-        | SourceContext _
-        | RequestId _
-        | RequestPath _
-        | SpanId _
-        | TraceId _
-        | ParentId _
-        | ConnectionId _
-        | HierarchicalTraceId _
-        | StatusCode _
-        | Level _
-        | Port _
-        | Body _
-        | EventId _ -> GetUnionCaseName field
+        | Timestamp _ -> Keys.TIMESTAMP
+        | Method _ -> Keys.METHOD
+        | Path _ -> Keys.PATH
+        | Host _ -> Keys.HOST
+        | SourceContext _ -> Keys.SOURCE_CONTEXT
+        | RequestId _ -> Keys.REQUEST_ID
+        | RequestPath _ -> Keys.REQUEST_PATH
+        | SpanId _ -> Keys.SPAN_ID
+        | TraceId _ -> Keys.TRACE_ID
+        | ParentId _ -> Keys.PARENT_ID
+        | ConnectionId _ -> Keys.CONNECTION_ID
+        | HierarchicalTraceId _ -> Keys.HIERARCHICAL_TRACE_ID
+        | StatusCode _ -> Keys.STATUS_CODE
+        | Level _ -> Keys.LEVEL
+        | Port _ -> Keys.PORT
+        | Body _ -> Keys.BODY
+        | EventId _ -> Keys.EVENT_ID
 
         | String (k, _)
         | Int (k, _)
@@ -426,7 +445,7 @@ module TechJsonLogField =
         | Message _
         | MessageBoddied _
         | MessageArrayJson _ 
-        | MessageBoddiedWithPostfix _ -> "Message"
+        | MessageBoddiedWithPostfix _ -> Keys.MESSAGE
 
         | JsonAnnotated v -> capitalize v.Key
         | ArrayJsonAnnonimous _ -> failwith "ArrayJsonAnnonimous does not contain key"
@@ -437,7 +456,7 @@ module TechJsonLogField =
     /// For important fields returns predefined order ("0", "1", ...),
     /// for other returns key value.
     let orderOrKey = function
-        | Timespan _ -> "0"
+        | Timestamp _ -> "0"
         | Level _ -> "1"
         | MessageBoddied _
         | MessageBoddiedWithPostfix _

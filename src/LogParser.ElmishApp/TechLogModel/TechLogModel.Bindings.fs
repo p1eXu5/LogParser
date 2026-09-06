@@ -15,6 +15,7 @@ type IBindings =
         abstract LogLevel: string option with get
         abstract Timestamp: string option with get
         abstract Message: string option with get
+        abstract Fields: TechFieldModel.IBindings seq with get
     end
 
 module Bindings =
@@ -29,11 +30,23 @@ module Bindings =
             indexedTechLod
             |> _.Fields
             |> Option.bind (fun map ->
-                match map |> Map.tryFind "Level" with
+                match map |> Map.tryFind fieldKey with
                 | Some ind -> l.Fields |> List.item ind |> TechJsonLogField.value |> Some
                 | None -> None
             )
         | _ -> None
+
+    let message (_, indexedTechLod) =
+        match indexedTechLod.TechLog with
+        | TechLog.JsonLog l ->
+            indexedTechLod
+            |> _.Fields
+            |> Option.bind (fun map ->
+                match map |> Map.tryFind TechJsonLogField.Keys.MESSAGE with
+                | Some ind -> l.Fields |> List.item ind |> TechJsonLogField.value |> Some
+                | None -> None
+            )
+        | TechLog.TextLog tlog -> tlog |> Some
 
     let bindings () : Binding<TechLogModel * IndexedTechLog, TechLogModel.Msg> list =
         [
@@ -41,25 +54,26 @@ module Bindings =
                 |> Binding.oneWay (snd >> _.IsTechJson)
 
             nameof __.LogLevel
-                |> Binding.oneWayOpt (fieldValue "Level")
+                |> Binding.oneWayOpt (fieldValue TechJsonLogField.Keys.LEVEL)
 
             nameof __.Timestamp
-                |> Binding.oneWayOpt (fieldValue "Timestamp")
+                |> Binding.oneWayOpt (fieldValue TechJsonLogField.Keys.TIMESTAMP)
 
             nameof __.Message
-                |> Binding.oneWayOpt (fieldValue "Message")
+                |> Binding.oneWayOpt (message)
 
-            (*
-            "Fields"
+            nameof __.Fields
                 |> Binding.subModelSeq (
                     (fun m ->
                         match (snd m).TechLog with
                         | TechLog.TextLog _ -> []
                         | TechLog.JsonLog t -> t.Fields),
-                    (fun (_, f: TechFieldModel) -> f),
+                    (fun (_, f: TechJsonLogField) -> f |> TechFieldModel.init),
                     (fun f -> f.Key),
                     (Msg.TechFieldMsg),
                     TechFieldModel.Bindings.bindings
+                )
+            (*
 
             "CopyCommand"
                 |> Binding.cmd Msg.CopyLogCommand

@@ -27,7 +27,7 @@ type JsonLogBuilder () =
     member _.Run(log) = log |> Log.fieldList
 
     [<CustomOperation("timestamp")>]
-    member _.Timestamp(log: TechJsonLog, value: string) = { log with Fields = log.Fields @ [(value |> (Timespan.Value >> TechJsonLogField.Timespan))] }
+    member _.Timestamp(log: TechJsonLog, value: string) = { log with Fields = log.Fields @ [(value |> (Timespan.Value >> TechJsonLogField.Timestamp))] }
 
     /// <summary>
     /// "message" : "some text"
